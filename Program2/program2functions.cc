@@ -7,20 +7,9 @@
 #include "program2functions.h"
 
 using std::cout;
-using std::cin;
 using std::endl;
 using std::string;
 using std::to_string;
-
-// For testing purposes, not needed for actual submission.
-int main()
-{
-    cout << "enter shit" << endl;
-    int a;
-    cin >> a;
-
-    cout << SumDigits(a) << endl;
-}
 
 int SumDigits(int number) {
     int remainder, total = 0;
