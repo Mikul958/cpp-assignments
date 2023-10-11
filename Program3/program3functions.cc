@@ -16,8 +16,16 @@ int main()
         {0.5, 3.5, 4.1, 1.6, 2.5, 3.9, 0.5, 1.8, 5.6, 5.2},
         };
 
-    cout << CountAboveAv(testArray, 4) << endl;
+    cout << "Average: " << CountAboveAv(testArray, 4) << endl;
+    cout << "Median in Column 0: " << MedianInCol(testArray, 4, 0) << endl;
 
+    double testOut[2] = {-1,-1};
+
+    cout << ModeInCol(testArray, 4, 2, testOut) << " mode(s): ";
+
+    cout << testOut[0] << " and " << testOut[1] << endl;
+
+    cout << "Sorted by column 6 in ascending order:" << endl;
     SortByCol(testArray, 4, 6, true);
     for (int i=0; i<4; i++)
     {
@@ -28,7 +36,7 @@ int main()
         cout << endl;
     }
 
-    cout << endl;
+    cout << endl << "Sorted by row 1 in descending order: " << endl;
 
     SortByRow(testArray, 4, 1, false);
     for (int i=0; i<4; i++)
@@ -121,17 +129,90 @@ void SortByRow(double array[][10], int num_rows, int row, bool ascending)
     }
 }
 
-double MediumInCol(double array[][10], int num_rows, int col)
+double MedianInCol(double array[][10], int num_rows, int col)
 {
-    // Create new array[] and slot in values from specified column, then sort them.
-    // If odd number of rows, median is value at num_rows/2
-    // If even number of rows, median is average of values at (num_rows/2) - 1 and num_rows/2
+    // Slot values from specified column into a single-dimensional array.
+    double data[num_rows];
+    for (int i=0; i<num_rows; i++)
+        data[i] = array[i][col];
+    
+    // Selection sort array in ascending order.
+    for (int i=0; i<num_rows-1; i++)
+    {
+        int min = i;
+        for (int j=i; j<num_rows; j++)
+        {
+            if (data[j] < data[min])
+                min = j;
+        }
+        double temp = data[i];
+        data[i] = data[min];
+        data[min] = temp;
+    }
+
+    // If odd number of rows, return exact middle value in set.
+    if (num_rows%2 != 0)
+        return data[num_rows/2];
+
+    // If not, return average of middle two values in set.
+    return (data[num_rows/2] + data[(num_rows/2)-1]) / 2;
 }
 
-double ModeInCol(double array[][10], int num_rows, int col)
-{
-    // Create new array[] and slot in values from specified column, then sort them.
-    // Run through numbers. Keep track of current number, add to "amount of current" for each of the same number in array.
-    // After a new number shows up, compared "amount of current" with "amount of mode"
-        // If higher, set number equal to new mode and "amount of mode" equal to "amount of current".
+double ModeInCol(double array[][10], int num_rows, int col, double out[2])
+{   
+    double mode1, mode2;
+    int mode1_count = 1, mode2_count = 1;
+    int num_modes = 0;
+
+    double current_number = array[0][col];
+    int count = 1;
+    for (int i=0; i<num_rows; i++)
+    {
+        // For each element, loop through array and find all occurrences AFTER.
+        double current_number = array[i][col];
+        int count = 1;
+        for (int j=i; j<num_rows; j++)
+        {
+            if (array[j][col] == current_number)
+                count++;
+        }
+
+        // Set new mode and count of it, if applicable.
+        if (count > mode1_count)            // New single mode
+        {
+            mode1 = current_number;
+            mode1_count = count;
+            num_modes = 1;
+        }
+        else if (count == mode1_count)      // Tied with current mode.
+        {
+            if (mode1_count == mode2_count) // There were already 2 modes.
+            {
+                num_modes = 3;
+            }
+            else
+            {
+                mode2 = current_number;
+                mode2_count = count;
+                num_modes = 2;
+            }
+        }
+
+    }
+
+    // Return number of modes in a column and add each mode to array out.
+    // If more than 2 distinct modes, return 0 and add nothing.
+    switch(num_modes)
+    {
+        case 1:
+            out[0] = mode1;
+            break;
+        case 2:
+            out[0] = mode1;
+            out[1] = mode2;
+            break;
+        case 3:
+            return 0;
+    }
+    return num_modes;
 }
