@@ -103,8 +103,6 @@ double ModeInCol(double array[][10], int num_rows, int col, double out[2]) {
     int mode1_count = 1, mode2_count = 1;
     int num_modes = 0;
 
-    double current_number = array[0][col];
-    int count = 1;
     for (int i=0; i < num_rows; i++) {
         // For each element, loop through array and find all occurrences AFTER.
         double current_number = array[i][col];
