@@ -4,6 +4,7 @@
 #define _WEIGHTRANGE_H_
 
 #include "weight.h"
+#include "weight.cc"  // For testing while still on VS Code
 
 class WeightRange
 {
