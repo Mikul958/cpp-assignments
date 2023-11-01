@@ -1,9 +1,6 @@
 // Copyright 2023 mpikula
 
 #include "weight.h"
-#include <iostream>
-using std::cout;
-using std::endl;
 
 ostream& operator << (ostream& whereto, const Weight& w)
 {
