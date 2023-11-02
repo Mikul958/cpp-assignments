@@ -12,11 +12,11 @@ class WeightRange
         explicit WeightRange();
         explicit WeightRange(const Weight smallest, const Weight largest);
 
-        Weight GetLow();
-        Weight GetHigh();
+        Weight GetSmallest();
+        Weight GetLargest();
 
-        void SetLow(Weight smallest);
-        void SetHigh(Weight largest);
+        void SetSmallest(Weight smallest);
+        void SetLargest(Weight largest);
 
         bool InRange(Weight w, bool inclusive = true);
         Weight Width();
