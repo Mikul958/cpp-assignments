@@ -4,26 +4,25 @@
 #define _WEIGHTRANGE_H_
 
 #include "weight.h"
-#include "weight.cc"  // For testing while still on VS Code
+// #include "weight.cc"  // For testing while still on VS Code
 
-class WeightRange
-{
-    public:
-        explicit WeightRange();
-        explicit WeightRange(const Weight smallest, const Weight largest);
+class WeightRange {
+ public:
+    WeightRange();
+    explicit WeightRange(const Weight smallest, const Weight largest);
 
-        Weight GetLow();
-        Weight GetHigh();
+    Weight GetSmallest();
+    Weight GetLargest();
 
-        void SetLow(Weight smallest);
-        void SetHigh(Weight largest);
+    void SetSmallest(Weight smallest);
+    void SetLargest(Weight largest);
 
-        bool InRange(Weight w, bool inclusive = true);
-        Weight Width();
+    bool InRange(Weight w, bool inclusive = true);
+    Weight Width();
 
-    private:
-        Weight smallest_;
-        Weight largest_;
+ private:
+    Weight smallest_;
+    Weight largest_;
 };
 
 #endif  // _WEIGHTRANGE_H_
