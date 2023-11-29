@@ -11,6 +11,8 @@ namespace csce240_program5
 
 MultipleChoiceQuestion::MultipleChoiceQuestion(string q, int num, string * c, bool * ans) : Question(q)
 {
+    choices_ = new string[num];
+    answers_ = new bool[num];
     SetAnswerChoices(num, c, ans);
 }
 
