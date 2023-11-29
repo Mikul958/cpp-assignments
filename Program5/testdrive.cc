@@ -19,7 +19,7 @@ using namespace csce240_program5;
 
 int main()
 {
-    cout << endl;
+    cout << "START" << endl;
     
     // Testing base Question class
     cout << "----------------------------------- TEST QUESTION" << endl;
@@ -44,7 +44,7 @@ int main()
     cout << "----------------------------------- TEST MC" << endl;
     string choices[] = {"Balloon", "Ball", "Dapper", "Bed"};
     bool answers[] = {true, true, false, true};
-    MultipleChoiceQuestion mc("Which letters start with B?", 4, choices, answers);
+    MultipleChoiceQuestion mc("Which words start with B?", 4, choices, answers);
 
     mc.Print(false);
     cout << endl;

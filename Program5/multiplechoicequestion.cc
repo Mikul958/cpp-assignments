@@ -11,8 +11,9 @@ namespace csce240_program5
 
 MultipleChoiceQuestion::MultipleChoiceQuestion(string q, int num, string * c, bool * ans) : Question(q)
 {
-    choices_ = new string[num];
-    answers_ = new bool[num];
+    num_choices_ = 0;
+    choices_ = new string[0];
+    answers_ = new bool[0];
     SetAnswerChoices(num, c, ans);
 }
 
@@ -56,28 +57,27 @@ int MultipleChoiceQuestion::GetNumChoices() const
 }
 void MultipleChoiceQuestion::SetAnswerChoices(int num, string * c, bool * ans)
 {
+    if (num < 1)
+        return;
     num_choices_ = num;
+    delete [] choices_;
+    delete [] answers_;
+    choices_ = new string[num_choices_];
+    choices_ = new string[num_choices_];
 
-    if (c == nullptr)
+    for (int i=0; i<num_choices_; i++)
     {
-        choices_ = new string[num];
-        for (int i=0; i<num; i++)
-            choices_[i] = "?";
-    }
-    else
-    {
-        choices_ = c;
-    }
+        // If answer choices parameter is a null pointer, default choices to ""
+        if (c == nullptr)
+            choices_[i] = "";
+        else
+            choices_[i] = c[i];
 
-    if (ans == nullptr)
-    {
-        answers_ = new bool[num];
-        for (int i=0; i<num; i++)
+        // If answers parameter is a null pointer, default all answers to true.
+        if (ans == nullptr)
             answers_[i] = true;
-    }
-    else
-    {
-        answers_ = ans;
+        else
+            answers_[i] = ans[i];
     }
 }
 
