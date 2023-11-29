@@ -6,26 +6,22 @@
 using std::cout;
 using std::endl;
 
-namespace csce240_program5
-{
+namespace csce240_program5 {
 
 // Member initializer list calls parent class constructor.
-ShortAnswerQuestion::ShortAnswerQuestion(string question, string answer) : Question(question)
-{
+ShortAnswerQuestion::ShortAnswerQuestion(string question, string answer)
+                                       : Question(question) {
     SetAnswer(answer);
 }
 
-string ShortAnswerQuestion::GetAnswer() const
-{
+string ShortAnswerQuestion::GetAnswer() const {
     return answer_;
 }
-void ShortAnswerQuestion::SetAnswer(string answer)
-{
+void ShortAnswerQuestion::SetAnswer(string answer) {
     answer_ = answer;
 }
 
-void ShortAnswerQuestion::Print(bool show_answer) const
-{
+void ShortAnswerQuestion::Print(bool show_answer) const {
     cout << "Question: " << GetQuestion() << endl;
     if (show_answer)
         cout << "Correct Answer: " << answer_ << endl;

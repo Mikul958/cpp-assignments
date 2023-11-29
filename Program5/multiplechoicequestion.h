@@ -8,31 +8,29 @@
 #include <string>
 using std::string;
 
-namespace csce240_program5
-{
+namespace csce240_program5 {
 
-class MultipleChoiceQuestion : public Question
-{
-    public:
-        explicit MultipleChoiceQuestion(string = "?", int = 0, string * = nullptr, bool * = nullptr);
+class MultipleChoiceQuestion : public Question {
+ public:
+    explicit MultipleChoiceQuestion(string = "?", int = 0,
+                                    string * = nullptr, bool * = nullptr);
 
-        // Copy Constructor
-        MultipleChoiceQuestion(const MultipleChoiceQuestion&);
-        // Overload assignment operator
-        MultipleChoiceQuestion& operator = (const MultipleChoiceQuestion&);
-        // Destructor
-        ~MultipleChoiceQuestion();
+    // Copy Constructor
+    MultipleChoiceQuestion(const MultipleChoiceQuestion&);
+    // Overload assignment operator
+    MultipleChoiceQuestion& operator = (const MultipleChoiceQuestion&);
+    // Destructor
+    ~MultipleChoiceQuestion();
 
-        int GetNumChoices() const;
-        void SetAnswerChoices(int, string *, bool *);
+    int GetNumChoices() const;
+    void SetAnswerChoices(int, string *, bool *);
 
-        void Print(bool) const;
+    void Print(bool) const;
 
-    private:
-        int num_choices_;
-        string * choices_;
-        bool * answers_;
-
+ private:
+    int num_choices_;
+    string * choices_;
+    bool * answers_;
 };
 
 }  // namespace csce240_program5

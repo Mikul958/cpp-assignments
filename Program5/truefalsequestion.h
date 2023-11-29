@@ -4,25 +4,23 @@
 #ifndef _TRUE_FALSE_QUESTION_H_
 #define _TRUE_FALSE_QUESTION_H_
 
-#include "question.h"
 #include <string>
 using std::string;
+#include "question.h"
 
-namespace csce240_program5
-{
+namespace csce240_program5 {
 
-class TrueFalseQuestion : public Question
-{
-    public:
-        explicit TrueFalseQuestion(string = "?", bool = true);
+class TrueFalseQuestion : public Question {
+ public:
+    explicit TrueFalseQuestion(string = "?", bool = true);
 
-        bool GetAnswer() const;
-        void SetAnswer(bool);
+    bool GetAnswer() const;
+    void SetAnswer(bool);
 
-        void Print(bool) const;
+    void Print(bool) const;
 
-    private:
-        bool answer_;
+ private:
+    bool answer_;
 };
 
 }  // namespace csce240_program5
