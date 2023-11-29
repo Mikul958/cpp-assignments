@@ -4,9 +4,9 @@
 #ifndef _MULTIPLE_CHOICE_QUESTION_H_
 #define _MULTIPLE_CHOICE_QUESTION_H_
 
-#include "question.h"
 #include <string>
 using std::string;
+#include "question.h"
 
 namespace csce240_program5 {
 
