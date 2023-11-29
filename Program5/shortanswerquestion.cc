@@ -12,7 +12,7 @@ namespace csce240_program5
 // Member initializer list calls parent class constructor.
 ShortAnswerQuestion::ShortAnswerQuestion(string question, string answer) : Question(question)
 {
-    answer_ = answer;
+    SetAnswer(answer);
 }
 
 string ShortAnswerQuestion::GetAnswer() const

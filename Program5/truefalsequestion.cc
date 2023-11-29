@@ -12,7 +12,7 @@ namespace csce240_program5
 // Member initializer list calls parent class constructor, analagous to Java super().
 TrueFalseQuestion::TrueFalseQuestion(string question, bool answer) : Question(question)
 {
-    answer_ = answer;
+    SetAnswer(answer);
 }
 
 bool TrueFalseQuestion::GetAnswer() const

@@ -17,8 +17,8 @@ class MultipleChoiceQuestion : public Question
         explicit MultipleChoiceQuestion(string = "?", int = 0, string * = nullptr, bool * = nullptr);
 
         // Copy Constructor
-        MultipleChoiceQuestion();
-        // Overload = operator
+        MultipleChoiceQuestion(const MultipleChoiceQuestion&);
+        // Overload assignment operator
         MultipleChoiceQuestion& operator = (const MultipleChoiceQuestion&);
         // Destructor
         ~MultipleChoiceQuestion();
