@@ -14,12 +14,12 @@ namespace csce240_program5
 class ShortAnswerQuestion : public Question
 {
     public:
-        explicit ShortAnswerQuestion(string question = "?", string answer = "");
+        explicit ShortAnswerQuestion(string = "?", string = "");
 
         string GetAnswer() const;
-        void SetAnswer(string answer);
+        void SetAnswer(string);
 
-        void Print(bool show_answer) const;
+        void Print(bool) const;
 
     private:
         string answer_;

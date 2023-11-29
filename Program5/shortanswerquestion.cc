@@ -9,7 +9,7 @@ using std::endl;
 namespace csce240_program5
 {
 
-// Member initializer list call parent class constructor.
+// Member initializer list calls parent class constructor.
 ShortAnswerQuestion::ShortAnswerQuestion(string question, string answer) : Question(question)
 {
     answer_ = answer;

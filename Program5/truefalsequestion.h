@@ -14,12 +14,12 @@ namespace csce240_program5
 class TrueFalseQuestion : public Question
 {
     public:
-        explicit TrueFalseQuestion(string question = "?", bool answer = true);
+        explicit TrueFalseQuestion(string = "?", bool = true);
 
         bool GetAnswer() const;
-        void SetAnswer(bool answer);
+        void SetAnswer(bool);
 
-        void Print(bool show_answer) const;
+        void Print(bool) const;
 
     private:
         bool answer_;
