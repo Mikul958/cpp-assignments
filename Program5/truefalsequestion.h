@@ -20,6 +20,7 @@ class TrueFalseQuestion : public Question
         void SetAnswer(bool answer);
 
         void Print(bool show_answer) const;
+
     private:
         bool answer_;
 };
