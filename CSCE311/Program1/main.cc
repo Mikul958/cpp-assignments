@@ -2,11 +2,11 @@
 
 #include <iostream>
 using std::cout;
+using std::endl;
 
 int main(int argc, char* argv[])
 {
-    cout << "test\n";
-    calculate(argc, argv);
+    cout << Calculate(argc, argv) << endl;
 
     return 0;
 }
