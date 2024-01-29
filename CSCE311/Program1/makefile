@@ -26,7 +26,7 @@ main.o : main.cc
 calculator.o : calculator.cc calculator.h
 	$(compile) $@ $<
 
-# Use cpplint on all source files
+# Use cpplint on all source files (will not work on Windows)
 lint : calculator.cc calculator.h main.cc
 	cpplint --root=$(path) $^
 
