@@ -10,9 +10,10 @@ using std::stack;
 
 void ExitInvalidOrder();
 void ExitInvalidChar();
+void ExitDivideByZero();
 
-void PopulateStacks(vector<string>, stack<double>, stack<string>);
-double EvaluateStacks(stack<double>, stack<string>);
+void PopulateStacks(vector<string>&, stack<double>&, stack<string>&);
+double EvaluateStacks(stack<double>&, stack<string>&);
 
 double Calculate(int, char**);
 
