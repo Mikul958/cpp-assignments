@@ -15,7 +15,7 @@ compile = g++ $(flags) -c -o
 link = g++ $(flags) -o
 
 # Link main.o and calculator.o to one executable file
-calculator : main.o calculator.o
+calculate : main.o calculate.o
 	$(link) $@ $^
 
 # Compile main.cc to .o, ensuring it exists
@@ -23,11 +23,11 @@ main.o : main.cc
 	$(compile) $@ $<
 
 # Compile calculator.cc, ensuring both calculator.cc and calculator.h exist
-calculator.o : calculator.cc calculator.h
+calculate.o : calculate.cc calculate.h
 	$(compile) $@ $<
 
 # Use cpplint on all source files (will not work on Windows)
-lint : calculator.cc calculator.h main.cc
+lint : calculate.cc calculate.h main.cc
 	cpplint --root=$(path) $^
 
 # Removes intermediary .o files

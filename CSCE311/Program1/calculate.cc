@@ -1,4 +1,4 @@
-#include <Program1/calculator.h>
+#include <Program1/calculate.h>
 
 #include <iostream>
 using std::cout;
