@@ -25,8 +25,8 @@ void ExitDivideByZero() {
     exit(EXIT_FAILURE);
 }
 
-void PopulateStacks(vector<string> * input, stack<double> * operands,
-                    stack<string> * operators) {
+void PopulateStacks(vector<string>* input, stack<double>* operands,
+                    stack<string>* operators) {
     bool need_operand = true;  // Alternates to make sure args are in order
     for (string item : *input) {
         try {
@@ -71,7 +71,7 @@ void PopulateStacks(vector<string> * input, stack<double> * operands,
     }
 }
 
-double EvaluateStacks(stack<double> * operands, stack<string> * operators) {
+double EvaluateStacks(stack<double>* operands, stack<string>* operators) {
     double result = operands->top();
     operands->pop();
 
