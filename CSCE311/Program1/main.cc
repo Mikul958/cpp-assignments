@@ -5,9 +5,16 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <stdexcept>
+using std::invalid_argument;
 
 int main(int argc, char* argv[]) {
-    cout << Calculate(argc, argv) << endl;
-
+    try {
+        cout << Calculate(argc, argv) << endl;
+    }
+    catch(const invalid_argument& e) {
+        cout << e.what() << endl;
+    }
+     
     return 0;
 }

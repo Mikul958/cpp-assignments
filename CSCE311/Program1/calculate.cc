@@ -11,19 +11,13 @@ using std::stod;
 using std::vector;
 #include <stack>
 using std::stack;
+#include <stdexcept>
+using std::exception;
+using std::invalid_argument;
 
-void ExitInvalidOrder() {
-    cout << "Invalid expression, please check the order of characters.\n";
-    exit(EXIT_FAILURE);
-}
-void ExitInvalidChar() {
-    cout << "Invalid character entered, please only use +, -, x, and /.\n";
-    exit(EXIT_FAILURE);
-}
-void ExitDivideByZero() {
-    cout << "Invalid expression, contains division by 0.\n";
-    exit(EXIT_FAILURE);
-}
+const string bad_order = "Invalid expression, verify the order of characters.";
+const string bad_char = "Invalid expression, please use only +, -, x, or /.";
+const string divide_by_zero = "Invalid expression, contains division by 0.";
 
 void PopulateStacks(vector<string>* input, stack<double>* operands,
                     stack<string>* operators) {
@@ -33,7 +27,7 @@ void PopulateStacks(vector<string>* input, stack<double>* operands,
             double current = stod(item);
             // If last arg was also an operand, exit
             if (!need_operand)
-                ExitInvalidOrder();
+                throw invalid_argument(bad_order);
 
             // Check last operator to uphold order of operations.
             if (operators->empty()) {
@@ -43,7 +37,7 @@ void PopulateStacks(vector<string>* input, stack<double>* operands,
                 operators->pop();
             } else if (operators->top() == "/") {
                 if (operands->top() == 0)
-                    ExitDivideByZero();
+                    throw invalid_argument(divide_by_zero);
                 operands->top() = current / operands->top();
                 operators->pop();
             } else {
@@ -53,18 +47,18 @@ void PopulateStacks(vector<string>* input, stack<double>* operands,
             need_operand = false;
         }
         // Arg is not a numerical value.
-        catch(const std::invalid_argument& e) {
+        catch(const invalid_argument& e) {
             string current = item;
             // If last arg was also an operator, exit
             if (need_operand)
-                ExitInvalidOrder();
+                throw invalid_argument(bad_order);
 
             // Check validity of operators.
             if (current == "+" || current == "-" || current == "x"
             || current == "X" || current == "/")
                 operators->push(current);
             else
-                ExitInvalidChar();
+                throw invalid_argument(bad_char);
 
             need_operand = true;
         }

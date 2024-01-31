@@ -10,10 +10,6 @@ using std::vector;
 #include <stack>
 using std::stack;
 
-void ExitInvalidOrder();
-void ExitInvalidChar();
-void ExitDivideByZero();
-
 void PopulateStacks(vector<string>&, stack<double>&, stack<string>&);
 double EvaluateStacks(stack<double>&, stack<string>&);
 
