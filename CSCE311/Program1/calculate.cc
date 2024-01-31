@@ -25,10 +25,10 @@ void ExitDivideByZero() {
     exit(EXIT_FAILURE);
 }
 
-void PopulateStacks(vector<string> &input, stack<double> &operands,
-                    stack<string> &operators) {
+void PopulateStacks(vector<string> * input, stack<double> * operands,
+                    stack<string> * operators) {
     bool need_operand = true;  // Alternates to make sure args are in order
-    for (string item : input) {
+    for (string item : *input) {
         try {
             double current = stod(item);
             // If last arg was also an operand, exit
@@ -36,18 +36,18 @@ void PopulateStacks(vector<string> &input, stack<double> &operands,
                 ExitInvalidOrder();
 
             // Check last operator to uphold order of operations.
-            if (operators.empty()) {
-                operands.push(current);
-            } else if (operators.top() == "x" || operators.top() == "X") {
-                operands.top() = current * operands.top();
-                operators.pop();
-            } else if (operators.top() == "/") {
-                if (operands.top() == 0)
+            if (operators->empty()) {
+                operands->push(current);
+            } else if (operators->top() == "x" || operators->top() == "X") {
+                operands->top() = current * operands->top();
+                operators->pop();
+            } else if (operators->top() == "/") {
+                if (operands->top() == 0)
                     ExitDivideByZero();
-                operands.top() = current / operands.top();
-                operators.pop();
+                operands->top() = current / operands->top();
+                operators->pop();
             } else {
-                operands.push(current);
+                operands->push(current);
             }
 
             need_operand = false;
@@ -62,7 +62,7 @@ void PopulateStacks(vector<string> &input, stack<double> &operands,
             // Check validity of operators.
             if (current == "+" || current == "-" || current == "x"
             || current == "X" || current == "/")
-                operators.push(current);
+                operators->push(current);
             else
                 ExitInvalidChar();
 
@@ -71,17 +71,17 @@ void PopulateStacks(vector<string> &input, stack<double> &operands,
     }
 }
 
-double EvaluateStacks(stack<double> &operands, stack<string> &operators) {
-    double result = operands.top();
-    operands.pop();
+double EvaluateStacks(stack<double> * operands, stack<string> * operators) {
+    double result = operands->top();
+    operands->pop();
 
-    while (!operators.empty()) {
-        if (operators.top() == "+")
-            result = result + operands.top();
-        else if (operators.top() == "-")
-            result = result - operands.top();
-        operands.pop();
-        operators.pop();
+    while (!operators->empty()) {
+        if (operators->top() == "+")
+            result = result + operands->top();
+        else if (operators->top() == "-")
+            result = result - operands->top();
+        operands->pop();
+        operators->pop();
     }
 
     return result;
@@ -98,6 +98,6 @@ double Calculate(int argc, char* argv[]) {
     stack<double> operands;
     stack<string> operators;
 
-    PopulateStacks(input, operands, operators);
-    return EvaluateStacks(operands, operators);
+    PopulateStacks(&input, &operands, &operators);
+    return EvaluateStacks(&operands, &operators);
 }
