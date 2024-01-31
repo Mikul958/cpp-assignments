@@ -15,14 +15,13 @@ using std::stack;
 using std::exception;
 using std::invalid_argument;
 
-const string bad_order = "Invalid expression, verify the order of characters.";
-const string bad_char = "Invalid expression, please use only +, -, x, or /.";
-const string divide_by_zero = "Invalid expression, contains division by 0.";
-
 void PopulateStacks(vector<string>* input, stack<double>* operands,
                     stack<string>* operators) {
     bool need_operand = true;  // Alternates to make sure args are in order
     for (string item : *input) {
+        string bad_order = "Invalid expression, verify the character order.";
+        string bad_char = "Invalid expression, use only +, -, x, or /.";
+        string divide_by_zero = "Invalid expression, contains division by 0.";
         try {
             double current = stod(item);
             // If last arg was also an operand, exit
@@ -68,7 +67,6 @@ void PopulateStacks(vector<string>* input, stack<double>* operands,
 double EvaluateStacks(stack<double>* operands, stack<string>* operators) {
     double result = operands->top();
     operands->pop();
-
     while (!operators->empty()) {
         if (operators->top() == "+")
             result = result + operands->top();
@@ -77,7 +75,6 @@ double EvaluateStacks(stack<double>* operands, stack<string>* operators) {
         operands->pop();
         operators->pop();
     }
-
     return result;
 }
 
