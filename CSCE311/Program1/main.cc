@@ -15,6 +15,5 @@ int main(int argc, char* argv[]) {
     catch(const invalid_argument& e) {
         cout << e.what() << endl;
     }
-     
     return 0;
 }
