@@ -23,3 +23,7 @@ client.o : client.cc client.h domain_socket.h
 
 domain_socket.o : domain_socket.cc domain_socket.h
 	$(compile) $@ $<
+
+# Clean
+clean:
+	$(RM) *.o
