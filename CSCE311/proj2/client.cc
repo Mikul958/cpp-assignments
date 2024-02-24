@@ -37,19 +37,27 @@ void Client::Run() {
 }
 
 int main(int argc, char* argv[]) {
+    // Validate usage
     if (argc < 4) {
-        cerr << "Must provide socket name, file path, and file lines\n"
-             << "Ex. ./client socket_name file_name line_0 ... line_n" << endl;
+        cerr << " Usage : " << argv[0]
+             << "<server name> <filepath> <line 0> ... <line n>" << endl;
         exit(5);
     }
-    
     char* socket_name = argv[1];
-    
-    string file_path = argv[2];
-    std::vector<string> line_numbers;
-    for (int i=3; i < argc-3; ++i)
-        line_numbers.push_back(argv[i]);
 
+    // Using default US and EoT chars from DomainSocket class
+    char us = DomainSocket::kUS;
+    char eot = DomainSocket::kEoT;
+
+    // Build message string
+    string message = string(argv[2]);
+    for (int i=3; i < argc; ++i)
+        message = (message + us) + argv[i];
+    message += eot;
+
+    message = us + (eot + message);  // Prepend US and EoT chars
+
+    // Connect to server with given socket name.
     Client client(socket_name);
     client.Run();
 

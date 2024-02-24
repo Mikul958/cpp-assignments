@@ -51,7 +51,7 @@ void Server::Run() {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        cerr << "Must provide socket name\nEx. ./server socket_name" << endl;
+        cerr << " Usage : " << argv[0] << " <server name>" << endl;
         exit(-4);
     }
     
