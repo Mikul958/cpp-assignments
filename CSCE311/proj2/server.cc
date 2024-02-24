@@ -11,17 +11,15 @@ using std::string;
 void Server::Run() {
     int socket_fd;  // Socket file descriptor
 
-    cout << "Server initializing..." << endl;
     if (!Init())
         exit(-1);
-
-    cout << "Server binding socket to address..." << endl;
     if (!Bind())
         exit(-2);
-
-    cout << "Server listening for client connections..." << endl;
     if (!Listen())
         exit(-3);
+
+    int max_clients = get_nprocs_conf() - 1;
+    cout << "SERVER STARTED\n    MAX CLIENTS: " << max_clients << endl;
 
     while (true) {
         socket_fd = ::accept(socket_fd_, nullptr, nullptr);
@@ -29,7 +27,7 @@ void Server::Run() {
             cerr << "Socket connection: " << ::strerror(errno) << endl;
             continue;
         }
-        cout << "Client connected" << endl;
+        cout << "  CLIENT CONNECTED" << endl;
 
         while (true) {
             string message;

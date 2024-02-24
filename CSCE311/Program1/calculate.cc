@@ -6,24 +6,24 @@
 using std::cout;
 #include <string>
 using std::string;
-using std::stod;
 #include <vector>
 using std::vector;
+#include <algorithm>
 #include <stack>
 using std::stack;
 #include <stdexcept>
 using std::exception;
 using std::invalid_argument;
 
-void PopulateStacks(vector<string>* input, stack<double>* operands,
+void PopulateStacks(vector<string> input, stack<double>* operands,
                     stack<string>* operators) {
     bool need_operand = true;  // Alternates to make sure args are in order
-    for (string item : *input) {
+    for (string item : input) {
         string bad_order = "Invalid expression, verify the character order.";
         string bad_char = "Invalid expression, use only +, -, x, or /.";
         string divide_by_zero = "Invalid expression, contains division by 0.";
         try {
-            double current = stod(item);
+            double current = std::stod(item);
             // If last arg was also an operand, exit
             if (!need_operand)
                 throw invalid_argument(bad_order);
@@ -78,17 +78,15 @@ double EvaluateStacks(stack<double>* operands, stack<string>* operators) {
     return result;
 }
 
-double Calculate(int argc, char* argv[]) {
-    // Cast all args to string and add to vector in reverse order.
-    vector<string> input;
-    for (int i=argc-1; i > 0; i--)
-        input.push_back(string(argv[i]));
-
+double Calculate(vector<string> input) {
     // Set up stacks for operands/operators and add args
     // Note: Args added to stacks are now back in forwards order
     stack<double> operands;
     stack<string> operators;
 
-    PopulateStacks(&input, &operands, &operators);
+    // Reverses order of input vector so that stacks evaluate left to right
+    std::reverse(input.begin(), input.end());
+
+    PopulateStacks(input, &operands, &operators);
     return EvaluateStacks(&operands, &operators);
 }

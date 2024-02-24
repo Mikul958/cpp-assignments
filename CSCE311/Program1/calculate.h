@@ -10,9 +10,9 @@ using std::vector;
 #include <stack>
 using std::stack;
 
-void PopulateStacks(vector<string>&, stack<double>&, stack<string>&);
+void PopulateStacks(vector<string>, stack<double>&, stack<string>&);
 double EvaluateStacks(stack<double>&, stack<string>&);
 
-double Calculate(int, char**);
+double Calculate(vector<string>);
 
 #endif  // PROGRAM1_CALCULATE_H_

@@ -9,10 +9,6 @@
 #include <string>
 #include <iostream>
 
-
-const char kSocketPath[] = "socket_example";
-
-
 class Client : public DomainSocket {
     public:
         using DomainSocket::DomainSocket;

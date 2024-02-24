@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <sys/sysinfo.h>
 
 #include <cassert>
 #include <cerrno>
@@ -17,8 +18,6 @@
 
 #include <string>
 #include <iostream>
-
-const char kSocketPath[] = "socket_example";
 
 class Server : public DomainSocket {
     public:
