@@ -29,7 +29,8 @@ void Client::Run(string message) {
         else
             cout << c;
     }
-        
+
+    // TODO this possibly segfaults, keep an eye on it.
     ::ssize_t bytes_written = Write(message);
     if (bytes_written < 0) {
         cerr << "DomainSocketClient terminating..." << endl;
@@ -41,11 +42,13 @@ void Client::Run(string message) {
     }
     cout << "BYTES WRITTEN: " << bytes_written << endl;
 
+    /*
     string received;
     ::ssize_t bytes_received = Read(&received);
 
     cout << "BYTES_RECEIVED: " << bytes_received << endl;
     cout << "MESSAGE: " << received << endl;
+    */
 
     /*
     while (true) {
@@ -77,7 +80,7 @@ int main(int argc, char* argv[]) {
     // Validate usage
     if (argc < 4) {
         cerr << " Usage : " << argv[0]
-             << "<socket name> <filepath> <line 0> ... <line n>" << endl;
+             << " <socket name> <filepath> <line 0> ... <line n>" << endl;
         exit(5);
     }
     char* socket_name = argv[1];
