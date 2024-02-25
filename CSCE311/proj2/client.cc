@@ -2,14 +2,13 @@
 
 #include <proj2/client.h>
 
-#include <vector>
-
 using std::cout;
 using std::cin;
 using std::cerr;
 using std::endl;
 
 using std::string;
+using std::vector;
 
 void Client::Run(string message) {
     cout << "Client initializing..." << endl;
@@ -23,12 +22,12 @@ void Client::Run(string message) {
 
     cout << "SENDING MESSAGE: ";
     for (char c : message) {
-    if (c == '\037')
-        cout << "|US|";
-    else if (c == '\004')
-        cout << "|EOT|";
-    else
-        cout << c;
+        if (c == '\037')
+            cout << "|US|";
+        else if (c == '\004')
+            cout << "|EOT|";
+        else
+            cout << c;
     }
         
     ::ssize_t bytes_written = Write(message);

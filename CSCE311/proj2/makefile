@@ -7,10 +7,10 @@ link = g++ $(flags) -o
 
 
 # Executable server/client
-server : server.o domain_socket.o calculate.o
+server : server.o domain_socket.o
 	$(link) $@ $^
 
-client : client.o domain_socket.o
+client : client.o domain_socket.o calculate.o
 	$(link) $@ $^
 
 

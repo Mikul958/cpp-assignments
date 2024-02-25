@@ -17,12 +17,14 @@
 #include <cstring>
 
 #include <string>
+#include <vector>
 #include <iostream>
 
 class Server : public DomainSocket {
     public:
         using ::DomainSocket::DomainSocket;
 
+        std::vector<std::string> Explode(std::string, char = '\037', char = '\004');
         void Run();
 };
 
