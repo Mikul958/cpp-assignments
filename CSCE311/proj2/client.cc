@@ -22,6 +22,16 @@ void Client::Run(string message) {
     cout << "SERVER CONNECTION ACCEPTED\n";
 
     while (true) {
+        cout << "SENDING MESSAGE: ";
+        for (char c : message) {
+            if (c == '\037')
+                cout << "|US|";
+            else if (c == '\004')
+                cout << "|EOT|";
+            else
+                cout << c;
+        }
+        
         ::ssize_t bytes_written = Write(message);
         if (bytes_written < 0) {
             cerr << "DomainSocketClient terminating..." << endl;
@@ -31,6 +41,7 @@ void Client::Run(string message) {
             cout << "Server disconnected" << endl;
             exit(4);
         }
+        cout << "BYTES WRITTEN: " << bytes_written << endl;
     }
 }
 
@@ -38,7 +49,7 @@ int main(int argc, char* argv[]) {
     // Validate usage
     if (argc < 4) {
         cerr << " Usage : " << argv[0]
-             << "<server name> <filepath> <line 0> ... <line n>" << endl;
+             << "<socket name> <filepath> <line 0> ... <line n>" << endl;
         exit(5);
     }
     char* socket_name = argv[1];
