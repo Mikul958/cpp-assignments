@@ -29,8 +29,8 @@ void Server::Run() {
         }
         cout << "  CLIENT CONNECTED" << endl;
 
+        string message;
         while (true) {
-            string message;
             ::ssize_t bytes_read = Read(&message, socket_fd);
 
             if (bytes_read < 0) {
@@ -43,8 +43,9 @@ void Server::Run() {
                 break;
             }
 
-            std::cout << "read " << bytes_read << " bytes: ";
-            std::cout << message << endl;
+            // TODO this is not working and i don't understand, may also be client
+            cout << "read " << bytes_read << " bytes: " << message << endl;
+            cout << "STRING SIZE: " << message.size() << endl;
         }
     }
 }
