@@ -13,7 +13,7 @@ class Client : public DomainSocket {
     public:
         using DomainSocket::DomainSocket;
 
-        void Run();
+        void Run(std::string message);
 };
 
 #endif  // PROJ2_CLIENT_H_

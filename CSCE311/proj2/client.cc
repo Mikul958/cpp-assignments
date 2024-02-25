@@ -11,7 +11,7 @@ using std::endl;
 
 using std::string;
 
-void Client::Run() {
+void Client::Run(string message) {
     cout << "Client initializing..." << endl;
     if (!Init())
         exit(1);
@@ -19,17 +19,15 @@ void Client::Run() {
     cout << "Client connecting..." << endl;
     if (!Connect())
         exit(2);
-    cout << "SERVER CONNECTION ACCEPTED";
+    cout << "SERVER CONNECTION ACCEPTED\n";
 
     while (true) {
-        string input;
-        std::getline(cin, input);
-        ::ssize_t bytes_wrote = Write(input);
-        if (bytes_wrote < 0) {
+        ::ssize_t bytes_written = Write(message);
+        if (bytes_written < 0) {
             cerr << "DomainSocketClient terminating..." << endl;
             exit(3);
         }
-        else if (bytes_wrote == 0) {
+        else if (bytes_written == 0) {
             cout << "Server disconnected" << endl;
             exit(4);
         }
@@ -59,7 +57,7 @@ int main(int argc, char* argv[]) {
 
     // Connect to server with given socket name.
     Client client(socket_name);
-    client.Run();
+    client.Run(message);
 
     exit(0);
 }
