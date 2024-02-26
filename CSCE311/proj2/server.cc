@@ -24,13 +24,13 @@ vector<string> Server::Explode(string input, char us, char eot) {
 }
 
 // Open file and read lines at desired line numbers.
-// Upon error: returns false, clears out and writes error to out[0].
-bool Server::ReadFile(string path, vector<int> lines, vector<string>* out) {
+// Upon error: returns false, clears output and writes error to output[0].
+bool Server::ReadFile(string path, vector<int> lines, vector<string>* output) {
     // Check for invalid file
     std::ifstream file(path.c_str());
     if (!file.is_open()) {
-        out->clear();
-        out->push_back("INVALID FILE");
+        output->clear();
+        output->push_back("INVALID FILE");
         return false;
     }
 
@@ -41,15 +41,16 @@ bool Server::ReadFile(string path, vector<int> lines, vector<string>* out) {
         ++line_number;
         for (int i : lines) {
             if (line_number == i)
-                out->push_back("Line " + std::to_string(line_number) + ": " + line);
+                output->push_back("Line " + std::to_string(line_number) + ": " + line);
         }
     }
-
+    file.close();
+        
     // Check for line requests < 1 or > final line count
     for (int i : lines) {
         if (i < 1 || i > line_number) {
-            out->clear();
-            out->push_back("INVALID LINE NO " + std::to_string(i));
+            output->clear();
+            output->push_back("INVALID LINE NO " + std::to_string(i));
             return false;
         }
     }
@@ -90,7 +91,7 @@ void Server::Run() {
                 exit(0);
             }
             else if (bytes_read == 0) {
-                cout << "Client disconnected" << endl;
+                cout << "  CLIENT DISCONNECTED" << endl;
                 close(socket_fd);
                 break;
             }
@@ -104,8 +105,20 @@ void Server::Run() {
             string path = request[0];
             request.erase(request.begin());  // Remove item 0 to get lines only
             vector<int> lines;
-            for (string s : request)
-                lines.push_back(stoi(s));  // Convert lines from string to int                   TODO handle exception?
+
+            // Convert lines to int, return invalid line error if exception
+            try {
+                for (string s : request)
+                    lines.push_back(stoi(s));
+            }
+            catch (std::invalid_argument& e) {
+                string error = "INVALID LINE: NON-NUMERICAL";
+                error = us + (eot + error) + eot;
+                ::ssize_t bytes_written = Write(error, socket_fd, eot);
+                cout << "      BYTES_SENT: " << bytes_written << endl;
+                close(socket_fd);
+                break;
+            }
 
             // Print file path and requested lines to console
             cout << "    PATH: \"" << path << "\""<< endl;
@@ -114,17 +127,34 @@ void Server::Run() {
                 cout << lines[i] << ", ";
             cout << lines[lines.size()-1] << endl;
 
-            // Obtain desired lines as string vector and check for errors                        TODO figure out how to send back to client.
+            // Obtain desired lines as string vector
+            // ReadFile error is returned at retrieved[0] if encountered
             vector<string> retrieved;
             if (!ReadFile(path, lines, &retrieved)) {
-                cout << retrieved[0] << endl;
+                string error = us + (eot + retrieved[0]) + eot;
+                ::ssize_t bytes_written = Write(error, socket_fd, eot);
+                cout << "      BYTES_SENT: " << bytes_written << endl;
                 close(socket_fd);
                 break;
             }
 
-            // Test code, printing result from ReadFile()                                        TODO build string and send to client
-            for (string s : retrieved)
-                cout << s << endl;
+            // Verify results exist and build response string                                        TODO remove prepending US and EoT, client keeps track (also make it work)
+            string response = "INPUT VALID BUT THIS DOESN'T WORK YET, VECTORS SUCK";
+            response = us + (eot + response) + eot;
+            ::size_t bytes_written = Write(response, socket_fd, eot);
+            cout << "      BYTES_SENT: " << bytes_written << endl;
+            
+            /*
+            for (char c : response) {
+                if (c == '\037')
+                    cout << "|US|";
+                else if (c == '\004')
+                    cout << "|EOT|";
+                else
+                    cout << c;
+            }
+            cout << endl;
+            */
         }
     }
 }
