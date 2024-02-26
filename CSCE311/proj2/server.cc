@@ -118,7 +118,7 @@ void Server::Run() {
                 break;
             }
 
-            // Test code, printing result from ReadFile()
+            // Test code, printing result from ReadFile()                                        TODO build string and send to client
             for (string s : retrieved)
                 cout << s << endl;
         }
