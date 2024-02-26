@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <sys/sysinfo.h>
+#include <sys/sysinfo.h>  // Using get_nprocs_conf
 
 #include <cassert>
 #include <cerrno>
@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <fstream>
+#include <fstream>  // Using ifstream to read file
 
 using std::string;
 using std::vector;
@@ -31,7 +31,7 @@ using std::endl;
 class Server : public DomainSocket {
     public:
         using ::DomainSocket::DomainSocket;
-
+        
         vector<string> Explode(string, char = '\037', char = '\004');
         bool ReadFile(string, vector<int>, vector<string>*);
 

@@ -22,21 +22,42 @@ vector<string> Server::Explode(string input, char us, char eot) {
 }
 
 // Open file and read lines at desired line numbers.
-// Returns false if file not found
+// Upon error: returns false, clears out and writes error to out[0].
 bool Server::ReadFile(string path, vector<int> lines, vector<string>* out) {
+    // Check for invalid file
     std::ifstream file(path.c_str());
-    if (!file.is_open())
+    if (!file.is_open()) {
+        out->push_back("INVALID FILE");
         return false;
-    
-    cout << "      TEST PRINT: READING FROM: " << path << endl;
+    }
 
-    out->push_back(string("test"));
+    // Read lines and count line number, add desired lines to vector
+    string line;
+    int line_number = 0;
+    while (getline(file, line)) {
+        ++line_number;
+        for (int i : lines) {
+            if (line_number == i)
+                out->push_back("Line " + std::to_string(line_number) + ": " + line);
+        }
+    }
+
+    // Check for line requests < 1 or > final line count
+    for (int i : lines) {
+        if (i < 1 || i > line_number) {
+            out->clear();
+            out->push_back("INVALID LINE NO " + std::to_string(i));
+            return false;
+        }
+    }
+
     return true;
 }
 
 void Server::Run() {
     int socket_fd;  // Socket file descriptor
     
+    // Establish domain socket and begin listening for clients.
     if (!Init())
         exit(-1);
     if (!Bind())
@@ -48,6 +69,7 @@ void Server::Run() {
     cout << "SERVER STARTED\n    MAX CLIENTS: " << max_clients << endl;
 
     while (true) {
+        // Accept client connection
         socket_fd = ::accept(socket_fd_, nullptr, nullptr);
         if (socket_fd < 0) {
             cerr << "Socket connection: " << ::strerror(errno) << endl;
@@ -57,7 +79,7 @@ void Server::Run() {
 
         string message;
         while (true) {
-            // Read message from server.
+            // Read message from server
             ::ssize_t bytes_read = Read(&message, socket_fd);
             if (bytes_read < 0) {
                 cerr << "Server shutting down..." << endl;
@@ -79,7 +101,7 @@ void Server::Run() {
             request.erase(request.begin());  // Remove item 0 to get lines only
             vector<int> lines;
             for (string s : request)
-                lines.push_back(stoi(s));
+                lines.push_back(stoi(s));  // Convert lines from string to int                   TODO handle exception?
 
             // Print file path and requested lines to console
             cout << "    PATH: \"" << path << "\""<< endl;
@@ -88,14 +110,17 @@ void Server::Run() {
                 cout << lines[i] << ", ";
             cout << lines[lines.size()-1] << endl;
 
-            // Obtain desired lines as vector of strings from file.
-            // TODO I don't know how to close client connection
+            // Obtain desired lines as string vector and check for errors                        TODO figure out how to send back to client.
             vector<string> retrieved;
             if (!ReadFile(path, lines, &retrieved)) {
-                cout << "      TEST PRINT: INVALID FILE\n";
+                cout << retrieved[0] << endl;
                 close(socket_fd);
                 break;
             }
+
+            // Test code, printing result from ReadFile()
+            for (string s : retrieved)
+                cout << s << endl;
         }
     }
 }
