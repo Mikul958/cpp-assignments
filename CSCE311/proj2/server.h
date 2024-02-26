@@ -19,12 +19,22 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
+
+using std::string;
+using std::vector;
+
+using std::cout;
+using std::cerr;
+using std::endl;
 
 class Server : public DomainSocket {
     public:
         using ::DomainSocket::DomainSocket;
 
-        std::vector<std::string> Explode(std::string, char = '\037', char = '\004');
+        vector<string> Explode(string, char = '\037', char = '\004');
+        bool ReadFile(string, vector<int>, vector<string>*);
+
         void Run();
 };
 

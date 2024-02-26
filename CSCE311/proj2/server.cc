@@ -2,13 +2,7 @@
 
 #include <proj2/server.h>
 
-using std::cout;
-using std::cerr;
-using std::endl;
-
-using std::string;
-using std::vector;
-
+// Split string into vector of args based on provided separator
 vector<string> Server::Explode(string input, char us, char eot) {
     vector<string> args;
     string current;
@@ -25,6 +19,19 @@ vector<string> Server::Explode(string input, char us, char eot) {
         args.push_back(current);
 
     return args;
+}
+
+// Open file and read lines at desired line numbers.
+// Returns false if file not found
+bool Server::ReadFile(string path, vector<int> lines, vector<string>* out) {
+    std::ifstream file(path.c_str());
+    if (!file.is_open())
+        return false;
+    
+    cout << "      TEST PRINT: READING FROM: " << path << endl;
+
+    out->push_back(string("test"));
+    return true;
 }
 
 void Server::Run() {
@@ -66,17 +73,29 @@ void Server::Run() {
             char us = message[0];
             char eot = message[1];
             message = message.substr(2);
-            vector<string> lines = Explode(message, us, eot);
+            vector<string> request = Explode(message, us, eot);
 
-            string path = lines[0];
-            lines.erase(lines.begin());  // Remove element 0 to get lines only
+            string path = request[0];
+            request.erase(request.begin());  // Remove item 0 to get lines only
+            vector<int> lines;
+            for (string s : request)
+                lines.push_back(stoi(s));
 
             // Print file path and requested lines to console
-            cout << "    PATH: " << path << endl;
+            cout << "    PATH: \"" << path << "\""<< endl;
             cout << "    LINES: ";
             for (size_t i=0; i < lines.size()-1; ++i)
                 cout << lines[i] << ", ";
             cout << lines[lines.size()-1] << endl;
+
+            // Obtain desired lines as vector of strings from file.
+            // TODO I don't know how to close client connection
+            vector<string> retrieved;
+            if (!ReadFile(path, lines, &retrieved)) {
+                cout << "      TEST PRINT: INVALID FILE\n";
+                close(socket_fd);
+                break;
+            }
         }
     }
 }
