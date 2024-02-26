@@ -7,12 +7,14 @@ vector<string> Server::Explode(string input, char us, char eot) {
     vector<string> args;
     string current;
 
-    for (int i=0; input[i] != eot; i++) {
-        if (input[i] == us) {
+    for (char c : input) {
+        if (c == eot) {
+            break;
+        } else if (c == us) {
             args.push_back(current);
             current.clear();
         } else {
-            current += input[i];
+            current += c;
         }
     }
     if (current.size() > 0)
@@ -27,6 +29,7 @@ bool Server::ReadFile(string path, vector<int> lines, vector<string>* out) {
     // Check for invalid file
     std::ifstream file(path.c_str());
     if (!file.is_open()) {
+        out->clear();
         out->push_back("INVALID FILE");
         return false;
     }
@@ -57,7 +60,7 @@ bool Server::ReadFile(string path, vector<int> lines, vector<string>* out) {
 void Server::Run() {
     int socket_fd;  // Socket file descriptor
     
-    // Establish domain socket and begin listening for clients.
+    // Establish domain socket and begin listening for clients
     if (!Init())
         exit(-1);
     if (!Bind())
@@ -65,6 +68,7 @@ void Server::Run() {
     if (!Listen())
         exit(-3);
 
+    // Get max number of processes on this machine
     int max_clients = get_nprocs_conf() - 1;
     cout << "SERVER STARTED\n    MAX CLIENTS: " << max_clients << endl;
 
