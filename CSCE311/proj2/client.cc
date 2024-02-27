@@ -30,6 +30,7 @@ void Client::Run(string message) {
             cout << c;
     }
 
+    //
     // TODO this possibly segfaults, keep an eye on it.
     ::ssize_t bytes_written = Write(message);
     if (bytes_written < 0) {
@@ -42,13 +43,24 @@ void Client::Run(string message) {
     }
     cout << "BYTES WRITTEN: " << bytes_written << endl;
 
-    /*
+    // Read in response from server
     string received;
     ::ssize_t bytes_received = Read(&received);
 
+    // Test code, checking response from server.
     cout << "BYTES_RECEIVED: " << bytes_received << endl;
-    cout << "MESSAGE: " << received << endl;
-    */
+    cout << "MESSAGE: " << endl;
+    for (char c : received) {
+        if (c == '\037')
+            cout << "|US|" << endl;
+        else if (c == '\004')
+            cout << "|EOT|" << endl;
+        else if (c == '\r')
+            cout << "|R|";
+        else
+            cout << c;
+    }
+    
 
     /*
     while (true) {

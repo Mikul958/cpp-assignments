@@ -139,7 +139,7 @@ void Server::Run() {
                 break;
             }
 
-            // Build response string                                          TODO strings print weirdly in server but read just fine from client?
+            // Build response string
             string response;
             for (string s : retrieved)
                 response += s + us;
@@ -149,6 +149,8 @@ void Server::Run() {
             // Write back to client
             ::ssize_t bytes_written = Write(response, socket_fd, eot);
             cout << "      BYTES SENT: " << bytes_written << endl;
+            close(socket_fd);
+            break;
         }
     }
 }
