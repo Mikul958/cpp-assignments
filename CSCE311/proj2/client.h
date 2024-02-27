@@ -25,7 +25,7 @@ class Client : public DomainSocket {
         using DomainSocket::DomainSocket;
 
         std::vector<std::string> Explode(std::string, char = '\037', char = '\004');
-        void Run(std::string message);
+        void Run(vector<string> request);
 };
 
 #endif  // PROJ2_CLIENT_H_
