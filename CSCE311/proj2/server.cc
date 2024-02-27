@@ -76,8 +76,7 @@ void Server::Run() {
 
     while (true) {
         // Accept client connection
-        socket_fd = ::accept(socket_fd_, nullptr, nullptr);
-        if (socket_fd < 0) {
+        if (!Accept(&socket_fd) || socket_fd < 0) {
             cerr << "Socket connection: " << ::strerror(errno) << endl;
             continue;
         }
@@ -117,7 +116,7 @@ void Server::Run() {
                 error = us + (eot + error) + eot;
                 ::ssize_t bytes_written = Write(error, socket_fd, eot);
                 cout << "      BYTES SENT: " << bytes_written << endl;
-                close(socket_fd);
+                Close(socket_fd);
                 break;
             }
 
@@ -135,7 +134,7 @@ void Server::Run() {
                 string error = us + (eot + retrieved[0]) + eot;
                 ::ssize_t bytes_written = Write(error, socket_fd, eot);
                 cout << "      BYTES SENT: " << bytes_written << endl;
-                close(socket_fd);
+                Close(socket_fd);
                 break;
             }
 
@@ -149,7 +148,7 @@ void Server::Run() {
             // Write back to client
             ::ssize_t bytes_written = Write(response, socket_fd, eot);
             cout << "      BYTES SENT: " << bytes_written << endl;
-            close(socket_fd);
+            Close(socket_fd);
             break;
         }
     }

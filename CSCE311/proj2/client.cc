@@ -30,8 +30,7 @@ void Client::Run(string message) {
             cout << c;
     }
 
-    //
-    // TODO this possibly segfaults, keep an eye on it.
+    // Write request to server and print bytes written
     ::ssize_t bytes_written = Write(message);
     if (bytes_written < 0) {
         cerr << "DomainSocketClient terminating..." << endl;
@@ -46,9 +45,9 @@ void Client::Run(string message) {
     // Read in response from server
     string received;
     ::ssize_t bytes_received = Read(&received);
+    cout << "BYTES RECEIVED: " << bytes_received << endl;
 
     // Test code, checking response from server.
-    cout << "BYTES_RECEIVED: " << bytes_received << endl;
     cout << "MESSAGE: " << endl;
     for (char c : received) {
         if (c == '\037')
@@ -60,32 +59,6 @@ void Client::Run(string message) {
         else
             cout << c;
     }
-    
-
-    /*
-    while (true) {
-        cout << "SENDING MESSAGE: ";
-        for (char c : message) {
-            if (c == '\037')
-                cout << "|US|";
-            else if (c == '\004')
-                cout << "|EOT|";
-            else
-                cout << c;
-        }
-        
-        ::ssize_t bytes_written = Write(message);
-        if (bytes_written < 0) {
-            cerr << "DomainSocketClient terminating..." << endl;
-            exit(3);
-        }
-        else if (bytes_written == 0) {
-            cout << "Server disconnected" << endl;
-            exit(4);
-        }
-        cout << "BYTES WRITTEN: " << bytes_written << endl;
-    }
-    */
 }
 
 int main(int argc, char* argv[]) {
@@ -98,16 +71,16 @@ int main(int argc, char* argv[]) {
     char* socket_name = argv[1];
 
     // Using default US and EoT chars from DomainSocket class
-    char us = DomainSocket::kUS;
-    char eot = DomainSocket::kEoT;
+    const char kUS = DomainSocket::kUS;
+    const char kEoT = DomainSocket::kEoT;
 
     // Build message string
     string message = string(argv[2]);
     for (int i=3; i < argc; ++i)
-        message = (message + us) + argv[i];
-    message += eot;
+        message = (message + kUS) + argv[i];
+    message += kEoT;
 
-    message = us + (eot + message);  // Prepend US and EoT chars
+    message = kUS + (kEoT + message);  // Prepend US and EoT chars
 
     // Connect to server with given socket name.
     Client client(socket_name);
