@@ -1,5 +1,6 @@
 // Copyright 2024 CSCE 311
-//
+// Modified by Michael Pikula
+
 #ifndef PROJ2_DOMAIN_SOCK_H_
 #define PROJ2_DOMAIN_SOCK_H_
 
@@ -14,6 +15,7 @@
 #include <cstring>  // using strncpy, strerror
 
 #include <string>
+#include <vector>
 #include <iostream>
 
 
@@ -67,6 +69,16 @@ class DomainSocket {
 
   // 0 uses member socket_fd_
   void Close(int socket_file_descriptor = 0) const;
+
+  // Takes in a vector of strings and builds a message string separated by
+  // unit separator '\037' and end of transmission character '\004'
+  // Added by Michael Pikula
+  std::string BuildMessage(std::vector<std::string> inputs);
+
+  // Takes in a message string with unit separator '\037' and splits it into
+  // a vector of strings
+  // Added by Michael Pikula
+  std::vector<std::string> ParseMessage(std::string message);
 
  protected:
   int socket_fd_;  // file descriptor for socket this class wraps

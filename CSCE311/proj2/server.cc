@@ -2,7 +2,7 @@
 
 #include <proj2/server.h>
 
-// Split string into vector of args based on provided separator
+// Split string into vector of args based on provided separator                            TODO currently unused in favor of DomainSocket::ParseMessage()
 vector<string> Server::Explode(string input, char us, char eot) {
     vector<string> args;
     string current;
@@ -96,12 +96,15 @@ void Server::Run() {
                 break;
             }
 
-            // Split string into vector of arguments: path, line1, line2...
-            char us = message[0];
-            char eot = message[1];
-            message = message.substr(2);
-            vector<string> request = Explode(message, us, eot);
 
+
+            // Temporary, will not be necessary after refactor                                 TODO refactor message build.
+            char eot = DomainSocket::kEoT;
+
+
+
+            // Split string into vector of arguments: path, line1, line2...
+            vector<string> request = ParseMessage(message);
             string path = request[0];
             request.erase(request.begin());  // Remove item 0 to get lines only
             vector<int> lines;
@@ -113,8 +116,8 @@ void Server::Run() {
             }
             catch (std::invalid_argument& e) {
                 string error = "INVALID LINE: NON-NUMERICAL";
-                error = us + (eot + error) + eot;
-                ::ssize_t bytes_written = Write(error, socket_fd, eot);
+                error = error + eot;
+                ::ssize_t bytes_written = Write(error, socket_fd, eot);                                             // TODO incorporate BuildMessage
                 cout << "      BYTES SENT: " << bytes_written << endl;
                 Close(socket_fd);
                 break;
@@ -127,25 +130,23 @@ void Server::Run() {
                 cout << lines[i] << ", ";
             cout << lines[lines.size()-1] << endl;
 
+
+            // TODO figure all this refactoring junk out
+
+
             // Obtain desired lines as string vector
             // ReadFile error is returned at retrieved[0] if encountered
             vector<string> retrieved;
             if (!ReadFile(path, lines, &retrieved)) {
-                string error = us + (eot + retrieved[0]) + eot;
-                ::ssize_t bytes_written = Write(error, socket_fd, eot);
+                string error = retrieved[0] + kEoT;
+                ::ssize_t bytes_written = Write(error, socket_fd, eot);                                 // TODO incorporate BuildMessage
                 cout << "      BYTES SENT: " << bytes_written << endl;
                 Close(socket_fd);
                 break;
             }
 
-            // Build response string
-            string response;
-            for (string s : retrieved)
-                response += s + us;
-            response.back() = eot;    // Replace extra US with EoT
-            response = us + (eot + response);
-
-            // Write back to client
+            // Build response string and write back to client
+            string response = BuildMessage(retrieved);
             ::ssize_t bytes_written = Write(response, socket_fd, eot);
             cout << "      BYTES SENT: " << bytes_written << endl;
             Close(socket_fd);

@@ -1,5 +1,5 @@
 // Copyright 2024 CSCE 311
-//
+// Modified by Michael Pikula
 
 #include <proj2/domain_socket.h>
 
@@ -187,4 +187,36 @@ void DomainSocket::Close(int socket_file_descriptor) const {
     ::close(socket_file_descriptor);
   else
     ::close(socket_fd_);
+}
+
+// Added by Michael Pikula
+std::string DomainSocket::BuildMessage(std::vector<std::string> inputs) {
+  std::string message;
+
+  for (std::string s : inputs)
+    message += s + kUS;
+  message.back() = kEoT;  // Replace extra US with EoT char
+
+  return message;
+}
+
+// Added by Michael Pikula
+std::vector<std::string> DomainSocket::ParseMessage(std::string message) {
+  std::vector<std::string> output;
+  std::string current;
+
+  for (char c : message) {
+    if (c == kEoT) {
+      break;
+    } else if (c == kUS) {
+      output.push_back(current);
+      current.clear();
+    } else {
+      current += c;
+    }
+  }
+  if (current.length() > 0)
+    output.push_back(current);
+
+  return output;
 }

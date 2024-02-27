@@ -13,6 +13,13 @@
 #include <vector>
 #include <iostream>
 
+using std::string;
+using std::vector;
+
+using std::cout;
+using std::cerr;
+using std::endl;
+
 class Client : public DomainSocket {
     public:
         using DomainSocket::DomainSocket;

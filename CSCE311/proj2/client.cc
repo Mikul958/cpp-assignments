@@ -2,25 +2,20 @@
 
 #include <proj2/client.h>
 
-using std::cout;
-using std::cin;
-using std::cerr;
-using std::endl;
-
-using std::string;
-using std::vector;
-
 void Client::Run(string message) {
+    // Initalize client and attempt to connect to DomainSocket
     cout << "Client initializing..." << endl;
     if (!Init())
         exit(1);
-
     cout << "Client connecting..." << endl;
     if (!Connect())
         exit(2);
     cout << "SERVER CONNECTION ACCEPTED\n";
 
-    cout << "SENDING MESSAGE: ";
+
+
+    // Test code                                                        TODO delete when finished
+    cout << "      TEST - SENDING MESSAGE: ";
     for (char c : message) {
         if (c == '\037')
             cout << "|US|";
@@ -47,25 +42,28 @@ void Client::Run(string message) {
     ::ssize_t bytes_received = Read(&received);
     cout << "BYTES RECEIVED: " << bytes_received << endl;
 
-    // Test code, checking response from server.
-    cout << "MESSAGE: " << endl;
+    
+    
+    // Test code, checking response from server.                            TODO delete when finished
+    cout << "      TEST - RECEIVED MESSAGE: ";
     for (char c : received) {
         if (c == '\037')
-            cout << "|US|" << endl;
+            cout << "|US|";
         else if (c == '\004')
-            cout << "|EOT|" << endl;
+            cout << "|EOT|";
         else if (c == '\r')
             cout << "|R|";
         else
             cout << c;
     }
+    cout << endl;
 }
 
 int main(int argc, char* argv[]) {
     // Validate usage
     if (argc < 4) {
-        cerr << " Usage : " << argv[0]
-             << " <socket name> <filepath> <line 0> ... <line n>" << endl;
+        cerr << "\n    Usage : " << argv[0]
+             << " <socket name> <filepath> <line 0> ... <line n>\n" << endl;
         exit(5);
     }
     char* socket_name = argv[1];
@@ -79,8 +77,6 @@ int main(int argc, char* argv[]) {
     for (int i=3; i < argc; ++i)
         message = (message + kUS) + argv[i];
     message += kEoT;
-
-    message = kUS + (kEoT + message);  // Prepend US and EoT chars
 
     // Connect to server with given socket name.
     Client client(socket_name);
