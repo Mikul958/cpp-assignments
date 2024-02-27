@@ -36,19 +36,20 @@ bool Server::ReadFile(string path, vector<int> lines, vector<string>* output) {
 
     // Read lines and count line number, add desired lines to vector
     string line;
-    int line_number = 0;
-    while (getline(file, line)) {
-        ++line_number;
-        for (int i : lines) {
-            if (line_number == i)
-                output->push_back("Line " + std::to_string(line_number) + ": " + line);
+    int line_num = 0;
+    while (std::getline(file, line)) {
+        ++line_num;
+        if (std::find(lines.begin(), lines.end(), line_num) != lines.end()) {
+            if (line.back() == '\r')
+                line.pop_back();     // Clean possible trailing \r from newline
+            output->push_back("Line " + std::to_string(line_num) + ": " + line);
         }
     }
     file.close();
-        
+
     // Check for line requests < 1 or > final line count
     for (int i : lines) {
-        if (i < 1 || i > line_number) {
+        if (i < 1 || i > line_num) {
             output->clear();
             output->push_back("INVALID LINE NO " + std::to_string(i));
             return false;
@@ -115,7 +116,7 @@ void Server::Run() {
                 string error = "INVALID LINE: NON-NUMERICAL";
                 error = us + (eot + error) + eot;
                 ::ssize_t bytes_written = Write(error, socket_fd, eot);
-                cout << "      BYTES_SENT: " << bytes_written << endl;
+                cout << "      BYTES SENT: " << bytes_written << endl;
                 close(socket_fd);
                 break;
             }
@@ -133,28 +134,21 @@ void Server::Run() {
             if (!ReadFile(path, lines, &retrieved)) {
                 string error = us + (eot + retrieved[0]) + eot;
                 ::ssize_t bytes_written = Write(error, socket_fd, eot);
-                cout << "      BYTES_SENT: " << bytes_written << endl;
+                cout << "      BYTES SENT: " << bytes_written << endl;
                 close(socket_fd);
                 break;
             }
 
-            // Verify results exist and build response string                                        TODO remove prepending US and EoT, client keeps track (also make it work)
-            string response = "INPUT VALID BUT THIS DOESN'T WORK YET, VECTORS SUCK";
-            response = us + (eot + response) + eot;
-            ::size_t bytes_written = Write(response, socket_fd, eot);
-            cout << "      BYTES_SENT: " << bytes_written << endl;
-            
-            /*
-            for (char c : response) {
-                if (c == '\037')
-                    cout << "|US|";
-                else if (c == '\004')
-                    cout << "|EOT|";
-                else
-                    cout << c;
-            }
-            cout << endl;
-            */
+            // Build response string                                          TODO strings print weirdly in server but read just fine from client?
+            string response;
+            for (string s : retrieved)
+                response += s + us;
+            response.back() = eot;    // Replace extra US with EoT
+            response = us + (eot + response);
+
+            // Write back to client
+            ::ssize_t bytes_written = Write(response, socket_fd, eot);
+            cout << "      BYTES SENT: " << bytes_written << endl;
         }
     }
 }
