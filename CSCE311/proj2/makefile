@@ -27,6 +27,7 @@ domain_socket.o : domain_socket.cc domain_socket.h
 calculate.o : calculate.cc calculate.h
 	$(compile) $@ $<
 
+
 # Clean
 clean:
 	$(RM) *.o
