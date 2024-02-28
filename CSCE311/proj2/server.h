@@ -32,7 +32,7 @@ class Server : public DomainSocket {
     public:
         using ::DomainSocket::DomainSocket;
         
-        vector<string> Explode(string, char = '\037', char = '\004');
+        // Reads file and outputs resulting lines / error to a vector
         bool ReadFile(string, vector<int>, vector<string>*);
 
         void Run();

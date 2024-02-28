@@ -2,27 +2,6 @@
 
 #include <proj2/server.h>
 
-// Split string into vector of args based on provided separator                            TODO currently unused in favor of DomainSocket::ParseMessage()
-vector<string> Server::Explode(string input, char us, char eot) {
-    vector<string> args;
-    string current;
-
-    for (char c : input) {
-        if (c == eot) {
-            break;
-        } else if (c == us) {
-            args.push_back(current);
-            current.clear();
-        } else {
-            current += c;
-        }
-    }
-    if (current.size() > 0)
-        args.push_back(current);
-
-    return args;
-}
-
 // Open file and read lines at desired line numbers.
 // Upon error: returns false, clears output and writes error to output[0].
 bool Server::ReadFile(string path, vector<int> lines, vector<string>* output) {

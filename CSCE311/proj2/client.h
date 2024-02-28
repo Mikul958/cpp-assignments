@@ -24,7 +24,9 @@ class Client : public DomainSocket {
     public:
         using DomainSocket::DomainSocket;
 
-        std::vector<std::string> Explode(std::string, char = '\037', char = '\004');
+        // Trims and splits a line from the server and evaluates its equation
+        double EvaluateLine(string line);
+
         void Run(vector<string> request);
 };
 

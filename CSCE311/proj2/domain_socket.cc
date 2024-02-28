@@ -203,8 +203,8 @@ std::string DomainSocket::BuildMessage(std::vector<std::string> inputs) {
 // Added by Michael Pikula
 std::vector<std::string> DomainSocket::ParseMessage(std::string message) {
   std::vector<std::string> output;
-  std::string current;
 
+  std::string current;
   for (char c : message) {
     if (c == kEoT) {
       break;

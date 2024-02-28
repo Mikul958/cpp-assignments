@@ -2,6 +2,27 @@
 
 #include <proj2/client.h>
 
+double Client::EvaluateLine(string line) {
+    vector<string> equation;
+
+    string current;
+    for (char c : line) {
+        if (c == ' ') {
+            equation.push_back(current);
+            current.clear();
+        } else {
+            current += c;
+        }
+    }
+    if (current.length() > 0)
+        equation.push_back(current);
+
+    // Remove "Line" and "<num>:" from equation vector
+    equation.erase(equation.begin(), equation.begin()+2);
+
+    return Calculate(equation);  // Using calculate.h from Project 1
+}
+
 void Client::Run(vector<string> request) {
     // Initalize client and attempt to connect to DomainSocket
     cout << "Client initializing..." << endl;
@@ -25,30 +46,19 @@ void Client::Run(vector<string> request) {
     }
     cout << "BYTES WRITTEN: " << bytes_written << endl;
 
-    // Read in response from server
+    // Read in response from server and check for error                        TODO not exactly happy with how errors are checked, think of a better way.
     string response;
     ::ssize_t bytes_received = Read(&response);
     cout << "BYTES RECEIVED: " << bytes_received << endl;
-    vector<string> returned = ParseMessage(response);
-
-    /*
-    // Test code                                                        TODO delete when finished
-    cout << "      TEST - SENDING MESSAGE: ";
-    for (char c : message) {
-        if (c == '\037')
-            cout << "|US|";
-        else if (c == '\004')
-            cout << "|EOT|";
-        else
-            cout << c;
+    if (response[0] == 'I' || response[0] == 'i') {
+        cout << response << endl;
+        return;
     }
-    */
 
-    // test code                                                TODO delete when finished
+    // Parse response and print equations to console.
+    vector<string> returned = ParseMessage(response);
     for (string s : returned)
-        cout << s << endl;
-    
-    // TODO parse responses from server and evaluate using calculate.cc
+        cout << s << " = " << EvaluateLine(s) << endl;
 }
 
 int main(int argc, char* argv[]) {
