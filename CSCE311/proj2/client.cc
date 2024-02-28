@@ -44,7 +44,6 @@ void Client::Run(vector<string> request) {
         cout << "Server disconnected" << endl;
         exit(4);
     }
-    cout << "BYTES WRITTEN: " << bytes_written << endl;
 
     // Read in response from server and check for error                        TODO not exactly happy with how errors are checked, think of a better way.
     string response;
@@ -58,7 +57,7 @@ void Client::Run(vector<string> request) {
     // Parse response and print equations to console.
     vector<string> returned = ParseMessage(response);
     for (string s : returned)
-        cout << s << " = " << EvaluateLine(s) << endl;
+        cout << "  " << s << "  =  " << EvaluateLine(s) << endl;
 }
 
 int main(int argc, char* argv[]) {
