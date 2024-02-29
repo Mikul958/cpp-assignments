@@ -32,8 +32,13 @@ class Server : public DomainSocket {
     public:
         using ::DomainSocket::DomainSocket;
         
-        // Reads file and outputs resulting lines / error to a vector
-        bool ReadFile(string, vector<int>, vector<string>*);
+        // Reads file and outputs resulting lines to output vector.
+        // Returns false and outputs error to output[0] if it fails.
+        bool ReadFile(string path, vector<int> lines, vector<string>* output);
+
+        // Builds error string to send to client from a message.
+        // Error message built as "0 + US + <error message> + EoT"
+        string ToError(string message);
 
         void Run();
 };

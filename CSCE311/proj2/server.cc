@@ -38,6 +38,11 @@ bool Server::ReadFile(string path, vector<int> lines, vector<string>* output) {
     return true;
 }
 
+string Server::ToError(string message) {
+    // Prepend a 0 to signify error to client.
+    return '0' + (DomainSocket::kUS + message) + DomainSocket::kEoT;
+}
+
 void Server::Run() {
     int socket_fd;  // Socket file descriptor
     
@@ -75,58 +80,46 @@ void Server::Run() {
                 break;
             }
 
-
-
-            // Temporary, will not be necessary after refactor                                 TODO refactor message build.
-            char eot = DomainSocket::kEoT;
-
-
-
             // Split string into vector of arguments: path, line1, line2...
             vector<string> request = ParseMessage(message);
             string path = request[0];
             request.erase(request.begin());  // Remove item 0 to get lines only
-            vector<int> lines;
 
-            // Convert lines to int, return invalid line error if exception
+            // Print file path and requested lines to console
+            cout << "    PATH: \"" << path << "\""<< endl;
+            cout << "    LINES: ";
+            for (size_t i=0; i < request.size()-1; ++i)
+                cout << request[i] << ", ";
+            cout << request.back() << endl;
+            
+            // Convert lines to integers and add to vector
+            // Returns invalid line to client if exception is thrown.                           TODO can probably reorganize to send the invalid input to client.
+            vector<int> lines;
             try {
                 for (string s : request)
                     lines.push_back(stoi(s));
             }
             catch (std::invalid_argument& e) {
                 string error = "INVALID LINE: NON-NUMERICAL";
-                error = error + eot;
-                ::ssize_t bytes_written = Write(error, socket_fd, eot);                                             // TODO incorporate BuildMessage
+                error = ToError(error);
+                ::ssize_t bytes_written = Write(error, socket_fd);
                 cout << "      BYTES SENT: " << bytes_written << endl;
                 Close(socket_fd);
                 break;
             }
 
-            // Print file path and requested lines to console
-            cout << "    PATH: \"" << path << "\""<< endl;
-            cout << "    LINES: ";
-            for (size_t i=0; i < lines.size()-1; ++i)
-                cout << lines[i] << ", ";
-            cout << lines[lines.size()-1] << endl;
-
-
-            // TODO figure all this refactoring junk out
-
-
-            // Obtain desired lines as string vector
+            // Obtain desired lines as string vector and write back to client
             // ReadFile error is returned at retrieved[0] if encountered
             vector<string> retrieved;
+            ::size_t bytes_written;
             if (!ReadFile(path, lines, &retrieved)) {
-                string error = retrieved[0] + kEoT;
-                ::ssize_t bytes_written = Write(error, socket_fd, eot);                                 // TODO incorporate BuildMessage
-                cout << "      BYTES SENT: " << bytes_written << endl;
-                Close(socket_fd);
-                break;
+                string error = ToError(retrieved[0]);
+                bytes_written = Write(error, socket_fd);
             }
-
-            // Build response string and write back to client
-            string response = BuildMessage(retrieved);
-            ::ssize_t bytes_written = Write(response, socket_fd, eot);
+            else {
+                string response = BuildMessage(retrieved);
+                bytes_written = Write(response, socket_fd);
+            }
             cout << "      BYTES SENT: " << bytes_written << endl;
             Close(socket_fd);
             break;

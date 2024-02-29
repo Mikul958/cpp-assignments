@@ -45,17 +45,19 @@ void Client::Run(vector<string> request) {
         exit(4);
     }
 
-    // Read in response from server and check for error                        TODO not exactly happy with how errors are checked, think of a better way.
+    // Read in response from server and parse
     string response;
     ::ssize_t bytes_received = Read(&response);
     cout << "BYTES RECEIVED: " << bytes_received << endl;
-    if (response[0] == 'I' || response[0] == 'i') {
-        cout << response << endl;
+    vector<string> returned = ParseMessage(response);
+
+    // Check for error from server
+    if (returned[0] == "0") {
+        cout << returned[1] << endl;
         return;
     }
 
     // Parse response and print equations to console.
-    vector<string> returned = ParseMessage(response);
     for (string s : returned)
         cout << "  " << s << "  =  " << EvaluateLine(s) << endl;
 }
