@@ -59,7 +59,7 @@ void Client::Run(vector<string> request) {
 
     // Parse response and print equations to console.
     for (string s : returned)
-        cout << "  " << s << "  =  " << EvaluateLine(s) << endl;
+        cout << s << "  =  " << EvaluateLine(s) << endl;
 }
 
 int main(int argc, char* argv[]) {

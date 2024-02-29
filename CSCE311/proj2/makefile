@@ -7,6 +7,8 @@ link = g++ $(flags) -o
 
 
 # Executable server/client
+all : server client clean
+
 server : server.o domain_socket.o
 	$(link) $@ $^
 

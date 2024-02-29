@@ -129,7 +129,7 @@ void Server::Run() {
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        cerr << " Usage : " << argv[0] << " <socket name>" << endl;
+        cerr << "\n    Usage : " << argv[0] << " <socket name>\n" << endl;
         exit(-4);
     }
     
