@@ -39,8 +39,7 @@ void Client::Run(vector<string> request) {
     if (bytes_written < 0) {
         cerr << "DomainSocketClient terminating..." << endl;
         exit(3);
-    }
-    else if (bytes_written == 0) {
+    } else if (bytes_written == 0) {
         cout << "Server disconnected" << endl;
         exit(4);
     }
@@ -73,7 +72,7 @@ int main(int argc, char* argv[]) {
     // Obtain socket name and build request vector of path and lines
     char* socket_name = argv[1];
     vector<string> request;
-    for (int i=2; i<argc; ++i)
+    for (int i=2; i < argc; ++i)
         request.push_back(argv[i]);
 
     // Connect to server with given socket name and request

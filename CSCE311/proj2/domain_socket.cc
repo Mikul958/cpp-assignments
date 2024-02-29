@@ -123,7 +123,8 @@ bool DomainSocket::Connect() const {
   }
 
   // do not include end of transmission char unless it is included in byte_count
-  output->insert(output->size(), buffer, byte_count ? bytes_read : bytes_read - 1);
+  output->insert(output->size(), buffer,
+                 byte_count ? bytes_read : bytes_read - 1);
 
   return total_bytes_read;
 }

@@ -45,7 +45,7 @@ string Server::ToError(string message) {
 
 void Server::Run() {
     int socket_fd;  // Socket file descriptor
-    
+
     // Establish domain socket and begin listening for clients
     if (!Init())
         exit(-1);
@@ -73,8 +73,7 @@ void Server::Run() {
             if (bytes_read < 0) {
                 cerr << "Server shutting down..." << endl;
                 exit(0);
-            }
-            else if (bytes_read == 0) {
+            } else if (bytes_read == 0) {
                 cout << "  CLIENT DISCONNECTED" << endl;
                 close(socket_fd);
                 break;
@@ -91,7 +90,7 @@ void Server::Run() {
             for (size_t i=0; i < request.size()-1; ++i)
                 cout << request[i] << ", ";
             cout << request.back() << endl;
-            
+
             // Convert lines to integers and add to vector
             // Returns invalid line to client if exception is thrown.
             vector<int> lines;
@@ -117,7 +116,7 @@ void Server::Run() {
                 response = BuildMessage(retrieved);
             else
                 response = ToError(retrieved[0]);
-            
+
             // Write back to client and close connection
             ::size_t bytes_written = Write(response, socket_fd);
             cout << "      BYTES SENT: " << bytes_written << endl;
@@ -132,7 +131,7 @@ int main(int argc, char* argv[]) {
         cerr << "\n    Usage : " << argv[0] << " <socket name>\n" << endl;
         exit(-4);
     }
-    
+
     Server server(argv[1]);
     server.Run();
 

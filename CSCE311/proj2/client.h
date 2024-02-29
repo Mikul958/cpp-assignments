@@ -21,13 +21,13 @@ using std::cerr;
 using std::endl;
 
 class Client : public DomainSocket {
-    public:
-        using DomainSocket::DomainSocket;
+ public:
+    using DomainSocket::DomainSocket;
 
-        // Trims and splits a line from the server and evaluates its equation
-        double EvaluateLine(string line);
+    // Trims and splits a line from the server and evaluates its equation
+    double EvaluateLine(string line);
 
-        void Run(vector<string> request);
+    void Run(vector<string> request);
 };
 
 #endif  // PROJ2_CLIENT_H_
