@@ -1,4 +1,4 @@
-# Flag setup
+# Set file path and compiler flags
 path = ..
 flags = -std=c++2a -Wall -pedantic -I $(path) -g
 
@@ -30,6 +30,11 @@ calculate.o : calculate.cc calculate.h
 	$(compile) $@ $<
 
 
-# Clean
+# Check style with cpplint
+lint : server.cc server.h client.cc client.h domain_socket.cc domain_socket.h calculate.cc calculate.h
+	cpplint --root=$(path) $^
+
+
+# Remove intermediary .o files
 clean:
 	$(RM) *.o

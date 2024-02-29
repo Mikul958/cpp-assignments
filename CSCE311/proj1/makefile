@@ -7,9 +7,9 @@
 # Set #include path to parent directory
 path = ..
 # Use C++20, compile with all warnings, set #include path, compile for GDB
-flags = -std=c++2a -Wall -I $(path)
+flags = -std=c++2a -Wall -I $(path) -g
 
-# Compilation to .o files
+# Compile to .o files
 compile = g++ $(flags) -c -o
 # Link to executable
 link = g++ $(flags) -o
