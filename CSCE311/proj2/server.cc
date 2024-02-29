@@ -85,7 +85,7 @@ void Server::Run() {
             string path = request[0];
             request.erase(request.begin());  // Remove item 0 to get lines only
 
-            // Print file path and requested lines to console
+            // Print file path and requested lines to server console
             cout << "    PATH: \"" << path << "\""<< endl;
             cout << "    LINES: ";
             for (size_t i=0; i < request.size()-1; ++i)
@@ -108,18 +108,17 @@ void Server::Run() {
                 break;
             }
 
-            // Obtain desired lines as string vector and write back to client
+            // Obtain desired lines as string vector and build response string
             // ReadFile error is returned at retrieved[0] if encountered
+            string response;
             vector<string> retrieved;
-            ::size_t bytes_written;
-            if (!ReadFile(path, lines, &retrieved)) {
-                string error = ToError(retrieved[0]);
-                bytes_written = Write(error, socket_fd);
-            }
-            else {
-                string response = BuildMessage(retrieved);
-                bytes_written = Write(response, socket_fd);
-            }
+            if (ReadFile(path, lines, &retrieved))
+                response = BuildMessage(retrieved);
+            else
+                response = ToError(retrieved[0]);
+            
+            // Write back to client and close connection
+            ::size_t bytes_written = Write(response, socket_fd);
             cout << "      BYTES SENT: " << bytes_written << endl;
             Close(socket_fd);
             break;
