@@ -80,5 +80,5 @@ int main(int argc, char* argv[]) {
     Client client(socket_name);
     client.Run(request);
 
-    exit(0);
+    return 0;
 }
