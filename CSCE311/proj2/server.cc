@@ -93,14 +93,15 @@ void Server::Run() {
             cout << request.back() << endl;
             
             // Convert lines to integers and add to vector
-            // Returns invalid line to client if exception is thrown.                           TODO can probably reorganize to send the invalid input to client.
+            // Returns invalid line to client if exception is thrown.
             vector<int> lines;
+            ::size_t i;
             try {
-                for (string s : request)
-                    lines.push_back(stoi(s));
+                for (i=0; i < request.size(); ++i)
+                    lines.push_back(stoi(request[i]));
             }
             catch (std::invalid_argument& e) {
-                string error = "INVALID LINE: NON-NUMERICAL";
+                string error = "INVALID LINE NO \"" + request[i] + "\"";
                 error = ToError(error);
                 ::ssize_t bytes_written = Write(error, socket_fd);
                 cout << "      BYTES SENT: " << bytes_written << endl;
