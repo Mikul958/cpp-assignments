@@ -1,9 +1,11 @@
 // Copyright 2024 mpikula
 
-#ifndef PROJ2_SERVER_H_
-#define PROJ2_SERVER_H_
+// TODO modify for project 3
 
-#include <proj2/domain_socket.h>
+#ifndef PROJ3_SERVER_H_
+#define PROJ3_SERVER_H_
+
+#include <proj3/domain_socket.h>
 
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -43,4 +45,4 @@ class Server : public DomainSocket {
     void Run();
 };
 
-#endif  // PROJ2_SERVER_H_
+#endif  // PROJ3_SERVER_H_

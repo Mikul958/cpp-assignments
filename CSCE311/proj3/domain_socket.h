@@ -1,8 +1,8 @@
 // Copyright 2024 CSCE 311
 // Modified by Michael Pikula
 
-#ifndef PROJ2_DOMAIN_SOCKET_H_
-#define PROJ2_DOMAIN_SOCKET_H_
+#ifndef PROJ3_DOMAIN_SOCKET_H_
+#define PROJ3_DOMAIN_SOCKET_H_
 
 #include <sys/socket.h>  // Unix header for sockets, using socket
 #include <sys/un.h>  // defns for Unix domain sockets, using struct sockaddr_un
@@ -92,4 +92,4 @@ class DomainSocket {
   ::ssize_t Read(int socket_fd, char buffer[], std::size_t buffer_size) const;
 };
 
-#endif  // PROJ2_DOMAIN_SOCKET_H_
+#endif  // PROJ3_DOMAIN_SOCKET_H_

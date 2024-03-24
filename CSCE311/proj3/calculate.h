@@ -1,7 +1,7 @@
 // Copyright 2024 mpikula
 
-#ifndef PROJ2_CALCULATE_H_
-#define PROJ2_CALCULATE_H_
+#ifndef PROJ3_CALCULATE_H_
+#define PROJ3_CALCULATE_H_
 
 #include <string>
 using std::string;
@@ -15,4 +15,4 @@ double EvaluateStacks(stack<double>&, stack<string>&);
 
 double Calculate(vector<string>);
 
-#endif  // PROJ2_CALCULATE_H_
+#endif  // PROJ3_CALCULATE_H_

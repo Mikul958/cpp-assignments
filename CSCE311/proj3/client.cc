@@ -1,6 +1,8 @@
 // Copyright 2024 mpikula
 
-#include <proj2/client.h>
+// TODO modify for project 3
+
+#include <proj3/client.h>
 
 double Client::EvaluateLine(string line) {
     vector<string> equation;

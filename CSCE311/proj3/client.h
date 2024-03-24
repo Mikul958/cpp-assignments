@@ -1,10 +1,12 @@
 // Copyright 2024 mpikula
 
-#ifndef PROJ2_CLIENT_H_
-#define PROJ2_CLIENT_H_
+// TODO modify for project 3
 
-#include <proj2/domain_socket.h>
-#include <proj2/calculate.h>
+#ifndef PROJ3_CLIENT_H_
+#define PROJ3_CLIENT_H_
+
+#include <proj3/domain_socket.h>
+#include <proj3/calculate.h>
 
 #include <cstddef>
 #include <cstdlib>
@@ -30,4 +32,4 @@ class Client : public DomainSocket {
     void Run(vector<string> request);
 };
 
-#endif  // PROJ2_CLIENT_H_
+#endif  // PROJ3_CLIENT_H_

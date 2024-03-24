@@ -1,6 +1,8 @@
 // Copyright 2024 mpikula
 
-#include <proj2/server.h>
+// TODO modify for project 3
+
+#include <proj3/server.h>
 
 // Open file and read lines at desired line numbers.
 // Upon error: returns false, clears output and writes error to output[0].
