@@ -93,6 +93,8 @@ void Server::Run() {
                 cout << request[i] << ", ";
             cout << request.back() << endl;
 
+            // Open the shared memory                                                                   TODO figure out shm
+
             // Convert lines to integers and add to vector
             // Returns invalid line to client if exception is thrown.
             vector<int> lines;
@@ -119,11 +121,13 @@ void Server::Run() {
             else
                 response = ToError(retrieved[0]);
 
-            // Write back to client and close connection
+            // Write back to client and close connection                                            TODO make shm instead of domain socket
             ::size_t bytes_written = Write(response, socket_fd);
             cout << "      BYTES SENT: " << bytes_written << endl;
             Close(socket_fd);
             break;
+
+            // Close shared memory                                                                  TODO figure out shm
         }
     }
 }

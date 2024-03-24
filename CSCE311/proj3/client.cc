@@ -1,7 +1,5 @@
 // Copyright 2024 mpikula
 
-// TODO modify for project 3
-
 #include <proj3/client.h>
 
 double Client::EvaluateLine(string line) {
@@ -35,7 +33,10 @@ void Client::Run(vector<string> request) {
         exit(2);
     cout << "SERVER CONNECTION ACCEPTED" << endl;
 
-    // Build message string from request and write to server
+    // Create shared memory between this client and the server                                  TODO figure out shm
+
+
+    // Build message string from request and write to server                                    TODO decide between shm and re-using domain sockets
     string message = BuildMessage(request);
     ::ssize_t bytes_written = Write(message);
     if (bytes_written < 0) {
@@ -61,6 +62,8 @@ void Client::Run(vector<string> request) {
     // Parse response and print equations to console.
     for (string s : returned)
         cout << s << "  =  " << EvaluateLine(s) << endl;
+
+    // Close shared memory                                                                      TODO figure out shm
 }
 
 int main(int argc, char* argv[]) {
