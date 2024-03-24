@@ -68,9 +68,9 @@ void Client::Run(vector<string> request) {
 
 int main(int argc, char* argv[]) {
     // Validate usage
-    if (argc < 4) {
+    if (argc != 4) {
         cerr << "\n    Usage : " << argv[0]
-             << " <socket name> <filepath> <line 0> ... <line n>\n" << endl;
+             << " <socket name> <filepath> <number of lines in file>\n" << endl;
         exit(5);
     }
 

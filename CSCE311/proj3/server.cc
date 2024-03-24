@@ -94,6 +94,7 @@ void Server::Run() {
             cout << request.back() << endl;
 
             // Open the shared memory                                                                   TODO figure out shm
+            
 
             // Convert lines to integers and add to vector
             // Returns invalid line to client if exception is thrown.
