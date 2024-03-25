@@ -23,6 +23,12 @@ double Client::EvaluateLine(string line) {
     return Calculate(equation);  // Using calculate.h from Project 1
 }
 
+// starts are inclusive, ends are exclusive.
+void Client::EvaluateSHM(vector<string> lines, int start, int end) {
+    for (int i=start; i < end; i++)
+        cout << i << endl;
+}
+
 void Client::Run(string path, int num_lines) {
     // Initalize client and attempt to connect to DomainSocket
     cout << "Client initializing..." << endl;
@@ -52,23 +58,38 @@ void Client::Run(string path, int num_lines) {
     Read(&response);
     if (response[0] == '0') {
         cout << "INVALID FILE" << endl;
-        // close shared memory                                                                  TODO close shm
+        // close shared memory                                                                            TODO close shm
         return;
     }
 
+    // STEP 3. Create 4 threads and evaluate lines in shared memory.                                       TODO figure out pthreads
+    int starts[4], ends[4];
+    int range = num_lines / 4;
+    int remainder = num_lines % 4;
+    // Divide num_lines by 4 to obtain upper bounds of shared memory segments
+    for (int i=0; i<4; i++)
+        ends[i] = (i+1) * range;
+    // Shift upper bounds to account for uneven divisions
+    for (int i=0; i < remainder; i++)
+        ends[3-i] += remainder-i;
+    // Set lower bounds to match corresponding upper bounds.
+    starts[0] = 0;
+    for (int i=1; i < 4; i++)
+        starts[i] = ends[i-1];
 
-    // STEP 2.5 BEFORE THE REST: read the entirety of shared memory to test server write
-    
+
+    // TEST CODE
+    cout << "RANGES FOR " << num_lines << " LINES:" << endl;
+    for (int i=0; i < 4; i++)
+        cout << starts[i] << "-" << ends[i] << endl;
 
 
+    // Create threads that evaluate their respective segments of shared memory.                           TODO figure out pthreads
 
-    // STEP 3. Create 4 threads and determine each section of shared memory.                    TODO figure out pthreads
-
-
-    // STEP 4. Use threads to evaluate evenly-sized sections of shared memory.
+    // STEP 4. Report results of threads to console.
 
 
-    // STEP 5. Close shared memory (step 6 is in main).                                                                      TODO figure out shm
+    // STEP 5. Close shared memory (step 6 is in main).                                                     TODO figure out shm
 }
 
 int main(int argc, char* argv[]) {

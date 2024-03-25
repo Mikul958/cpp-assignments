@@ -5,9 +5,14 @@
 #ifndef PROJ3_CLIENT_H_
 #define PROJ3_CLIENT_H_
 
-#include <proj3/domain_socket.h>
+#include <proj3/domain_socket.h>  // TODO probably obsolete
 #include <proj3/calculate.h>
 
+#include <sys/mman.h>  // shared memory
+#include <sys/unistd.h>  // UNIX standard header
+
+#include <cassert>
+#include <cerrno>
 #include <cstddef>
 #include <cstdlib>
 
@@ -28,6 +33,8 @@ class Client : public DomainSocket {
 
     // Trims and splits a line from the server and evaluates its equation
     double EvaluateLine(string line);
+
+    void EvaluateSHM(vector<string> lines, int start, int end);
 
     void Run(string filepath, int num_lines);
 };
