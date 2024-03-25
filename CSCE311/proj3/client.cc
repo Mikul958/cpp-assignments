@@ -17,23 +17,17 @@ double Client::EvaluateLine(string line) {
     if (current.length() > 0)
         equation.push_back(current);
 
-    // Remove "Line" and "<num>:" from equation vector
-    equation.erase(equation.begin(), equation.begin()+2);
-
     return Calculate(equation);  // Using calculate.h from Project 1
 }
 
-struct thread_data {
-    int start = 0;
-    int end = 0;
-    double sum = 0;
-};                                                                                              // TODO figure out how to include this in client class
-
-// starts are inclusive, ends are exclusive.                                                    // TODO figure out how to include this in client class
-void *EvaluateSHM(void * input) {
-    struct thread_data *data = (struct thread_data *) input;
-
-    cout << "Call EvaluateSHM with range " << data->start << "-" << data->end << endl;
+void *Client::EvaluateSHM(void * input) {
+    // Cast void pointer back to struct to get parameters.
+    struct thread_args * args = (struct thread_args *) input;
+    vector<string> data = *(args->data);
+    
+    // Evaluate designated of shared memory and add to section total.
+    for (int i=args->start; i < args->end; i++)
+        args->sum += EvaluateLine(data[i]);
 
     pthread_exit(0);
 }
@@ -71,33 +65,48 @@ void Client::Run(string path, int num_lines) {
         return;
     }
 
-    // STEP 3. Create 4 threads and evaluate lines in shared memory
-    struct thread_data thread_array[4];
+    // STEP 3. Partition shared memory segments for each thread and build args
+    struct thread_args t_args_array[4];
     int range = num_lines / 4;
     int remainder = num_lines % 4;
     // Divide num_lines by 4 to obtain upper bounds of shared memory segments
     for (int i=0; i < 4; i++)
-        thread_array[i].end = (i+1) * range;
+        t_args_array[i].end = (i+1) * range;
     // Shift upper bounds to account for uneven divisions
     for (int i=0; i < remainder; i++)
-        thread_array[3-i].end += remainder-i;
+        t_args_array[3-i].end += remainder-i;
     // Set lower bounds to match corresponding upper bounds.
-    thread_array[0].start = 0;
+    t_args_array[0].start = 0;
     for (int i=1; i < 4; i++)
-        thread_array[i].start = thread_array[i-1].end;
+        t_args_array[i].start = t_args_array[i-1].end;
+    
 
-    // Create threads that evaluate their respective segments of shared memory.
+
+    // TEST CODE: VECTOR NOT FINAL                                                                                  TODO remove when ready
+    vector<string> equations;
+    for (int i=0; i<num_lines; i++)
+        equations.push_back(std::to_string(i));
+
+    for (int i=0; i<4; i++)
+        t_args_array[i].data = &equations;
+
+
+
+    // Create threads to evaluate their respective segments of shared memory.
     pthread_t threads[4];
     for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_create(&threads[t_id], NULL, EvaluateSHM, (void *) &thread_array[t_id]);
-    for (int i=0; i < 4; i++)
-        pthread_join(threads[i], NULL);
-    
-    cout << "threads finished" << endl;                                                                   // TODO more here
-
+        pthread_create(&threads[t_id], NULL, &Client::EvaluateSHM_Helper, (void *) &t_args_array[t_id]);
+    cout << "THREADS CREATED" << endl;
+    for (pthread_t t_id=0; t_id < 4; t_id++)
+        pthread_join(threads[t_id], NULL);
     
     // STEP 4. Report results of threads to console.
-
+    double total = 0;
+    for (int i=0; i < 4; i++) {
+        cout << "THREAD " << i << ":  " << t_args_array[i].end - t_args_array[i].start << " LINES, " << t_args_array[i].sum << endl;
+        total += t_args_array[i].sum;
+    }
+    cout << "SUM:  " << total << endl;
 
     // STEP 5. Close shared memory (step 6 is in main).                                                     TODO figure out shm
 }
