@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Connect to server with given socket name and request
-    Client client("PROJ3_SERVER");
+    Client client("MP_SOCKET");
     client.Run(path, num_lines);
 
     return 0;

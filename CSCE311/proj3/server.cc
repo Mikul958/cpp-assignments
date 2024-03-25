@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
         exit(-4);
     }
 
-    Server server("PROJ3_SERVER");
+    Server server("MP_SOCKET");
     server.Run();
 
     return 0;
