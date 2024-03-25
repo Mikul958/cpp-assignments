@@ -62,12 +62,12 @@ void Client::Run(string path, int num_lines) {
         return;
     }
 
-    // STEP 3. Create 4 threads and evaluate lines in shared memory.                                       TODO figure out pthreads
+    // STEP 3. Create 4 threads and evaluate lines in shared memory
     int starts[4], ends[4];
     int range = num_lines / 4;
     int remainder = num_lines % 4;
     // Divide num_lines by 4 to obtain upper bounds of shared memory segments
-    for (int i=0; i<4; i++)
+    for (int i=0; i < 4; i++)
         ends[i] = (i+1) * range;
     // Shift upper bounds to account for uneven divisions
     for (int i=0; i < remainder; i++)
@@ -77,14 +77,8 @@ void Client::Run(string path, int num_lines) {
     for (int i=1; i < 4; i++)
         starts[i] = ends[i-1];
 
-
-    // TEST CODE
-    cout << "RANGES FOR " << num_lines << " LINES:" << endl;
-    for (int i=0; i < 4; i++)
-        cout << starts[i] << "-" << ends[i] << endl;
-
-
     // Create threads that evaluate their respective segments of shared memory.                           TODO figure out pthreads
+
 
     // STEP 4. Report results of threads to console.
 
