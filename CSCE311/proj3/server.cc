@@ -4,45 +4,22 @@
 
 #include <proj3/server.h>
 
-// Open file and read lines at desired line numbers.
-// Upon error: returns false, clears output and writes error to output[0].
-bool Server::ReadFile(string path, vector<int> lines, vector<string>* output) {
-    // Check for invalid file
+bool Server::ReadFile(string path, vector<string>* output) {
+    // Check for invalid file path
     std::ifstream file(path.c_str());
-    if (!file.is_open()) {
-        output->clear();
-        output->push_back("INVALID FILE");
+    if (!file.is_open())
         return false;
-    }
 
-    // Read lines and count line number, add desired lines to vector
+    // Read all file lines and add to output vector
     string line;
-    int line_num = 0;
     while (std::getline(file, line)) {
-        ++line_num;
-        if (std::find(lines.begin(), lines.end(), line_num) != lines.end()) {
-            if (line.back() == '\r')
-                line.pop_back();     // Clean possible trailing \r from newline
-            output->push_back("Line " + std::to_string(line_num) + ": " + line);
-        }
+        if (line.back() == '\r')
+            line.pop_back();     // Clean possible trailing \r from newline
+        output->push_back(line);
     }
     file.close();
 
-    // Check for line requests < 1 or > final line count
-    for (int i : lines) {
-        if (i < 1 || i > line_num) {
-            output->clear();
-            output->push_back("INVALID LINE NO " + std::to_string(i));
-            return false;
-        }
-    }
-
     return true;
-}
-
-string Server::ToError(string message) {
-    // Prepend a 0 to signify error to client.
-    return '0' + (DomainSocket::kUS + message) + DomainSocket::kEoT;
 }
 
 void Server::Run() {
@@ -55,91 +32,73 @@ void Server::Run() {
         exit(-2);
     if (!Listen())
         exit(-3);
-
-    // Get max number of processes on this machine
-    int max_clients = get_nprocs_conf() - 1;
-    cout << "SERVER STARTED\n    MAX CLIENTS: " << max_clients << endl;
+    cout << "SERVER STARTED" << endl;
 
     while (true) {
-        // Accept client connection
+        // Accept client connection using domain socket
         if (!Accept(&socket_fd) || socket_fd < 0) {
             cerr << "Socket connection: " << ::strerror(errno) << endl;
             continue;
         }
-        cout << "  CLIENT CONNECTED" << endl;
+        cout << "CLIENT CONNECTED" << endl;
 
-        string message;
         while (true) {
-            // Read message from server
+            // STEP 2. Read client message through domain socket.
+            string message;
             ::ssize_t bytes_read = Read(&message, socket_fd);
             if (bytes_read < 0) {
-                cerr << "Server shutting down..." << endl;
                 exit(0);
             } else if (bytes_read == 0) {
-                cout << "  CLIENT DISCONNECTED" << endl;
                 close(socket_fd);
                 break;
             }
 
-            // Split string into vector of arguments: path, line1, line2...
+            // Confirm request received in output stream and get file path.
+            cout << "CLIENT REQUEST RECEIVED" << endl;
             vector<string> request = ParseMessage(message);
             string path = request[0];
-            request.erase(request.begin());  // Remove item 0 to get lines only
 
-            // Print file path and requested lines to server console
-            cout << "    PATH: \"" << path << "\""<< endl;
-            cout << "    LINES: ";
-            for (size_t i=0; i < request.size()-1; ++i)
-                cout << request[i] << ", ";
-            cout << request.back() << endl;
+            // STEP 3. Open the shared memory created by client.                                                 TODO figure out opening shm
+            // pretend i did shm stuff
+            cout << "\tMEMORY OPEN" << endl;
 
-            // Open the shared memory                                                                   TODO figure out shm
-            
-
-            // Convert lines to integers and add to vector
-            // Returns invalid line to client if exception is thrown.
-            vector<int> lines;
-            ::size_t i;
-            try {
-                for (i=0; i < request.size(); ++i)
-                    lines.push_back(stoi(request[i]));
-            }
-            catch (std::invalid_argument& e) {
-                string error = "INVALID LINE NO \"" + request[i] + "\"";
-                error = ToError(error);
-                ::ssize_t bytes_written = Write(error, socket_fd);
-                cout << "      BYTES SENT: " << bytes_written << endl;
-                Close(socket_fd);
-                break;
-            }
-
-            // Obtain desired lines as string vector and build response string
-            // ReadFile error is returned at retrieved[0] if encountered
-            string response;
+            // STEP 4. Open and read file at desired path.
+            cout << "\tOPENING: " << path << endl;
             vector<string> retrieved;
-            if (ReadFile(path, lines, &retrieved))
-                response = BuildMessage(retrieved);
-            else
-                response = ToError(retrieved[0]);
+            bool file_read = ReadFile(path, &retrieved);
+            cout << "\tFILE CLOSED" << endl;
 
-            // Write back to client and close connection                                            TODO make shm instead of domain socket
-            ::size_t bytes_written = Write(response, socket_fd);
-            cout << "      BYTES SENT: " << bytes_written << endl;
+            // Check for file IO error and write file lines to shared memory.
+            // NOTE: '0' at response[0] indicates error to client, else normal.
+            string response;
+            if (file_read) {
+                response = string("1") + DomainSocket::kEoT;
+                // Write retrieved file lines to shared memory.                                                 TODO figure out writing to shm
+            } else {
+                response = string("0") + DomainSocket::kEoT;
+            }
+            // NOTE: Client blocks waiting for server response, so response
+            // must be written after server is done writing to shared memory
+            Write(response, socket_fd);
+
+            // Release server's hold on shared memory.                                                           TODO figure out closing shm
+            // pretend i did shm stuff
+            clog << "\tMEMORY CLOSED" << endl;
+
+            // Close client connection.
             Close(socket_fd);
             break;
-
-            // Close shared memory                                                                  TODO figure out shm
         }
     }
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 2) {
-        cerr << "\n    Usage : " << argv[0] << " <socket name>\n" << endl;
+    if (argc != 1) {
+        cerr << "\n    Usage : " << argv[0] << "\n" << endl;
         exit(-4);
     }
 
-    Server server(argv[1]);
+    Server server("PROJ3_SERVER");
     server.Run();
 
     return 0;

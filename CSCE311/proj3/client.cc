@@ -23,7 +23,7 @@ double Client::EvaluateLine(string line) {
     return Calculate(equation);  // Using calculate.h from Project 1
 }
 
-void Client::Run(vector<string> request) {
+void Client::Run(string path, int num_lines) {
     // Initalize client and attempt to connect to DomainSocket
     cout << "Client initializing..." << endl;
     if (!Init())
@@ -33,11 +33,11 @@ void Client::Run(vector<string> request) {
         exit(2);
     cout << "SERVER CONNECTION ACCEPTED" << endl;
 
-    // Create shared memory between this client and the server                                  TODO figure out shm
+    // STEP 1. Create shared memory between this client and the server                                  TODO figure out shm
 
 
-    // Build message string from request and write to server                                    TODO decide between shm and re-using domain sockets
-    string message = BuildMessage(request);
+    // STEP 2. Build message string from request and write to server                                    TODO decide between shm and re-using domain sockets
+    string message = path + DomainSocket::kEoT;
     ::ssize_t bytes_written = Write(message);
     if (bytes_written < 0) {
         cerr << "DomainSocketClient terminating..." << endl;
@@ -47,42 +47,54 @@ void Client::Run(vector<string> request) {
         exit(4);
     }
 
-    // Read in response from server and parse
+    // Read in response from server and exit if error.
     string response;
-    ::ssize_t bytes_received = Read(&response);
-    cout << "BYTES RECEIVED: " << bytes_received << endl;
-    vector<string> returned = ParseMessage(response);
-
-    // Check for error from server
-    if (returned[0] == "0") {
-        cout << returned[1] << endl;
+    Read(&response);
+    if (response[0] == '0') {
+        cout << "INVALID FILE" << endl;
+        // close shared memory                                                                  TODO close shm
         return;
     }
 
-    // Parse response and print equations to console.
-    for (string s : returned)
-        cout << s << "  =  " << EvaluateLine(s) << endl;
 
-    // Close shared memory                                                                      TODO figure out shm
+    // STEP 2.5 BEFORE THE REST: read the entirety of shared memory to test server write
+    
+
+
+
+    // STEP 3. Create 4 threads and determine each section of shared memory.                    TODO figure out pthreads
+
+
+    // STEP 4. Use threads to evaluate evenly-sized sections of shared memory.
+
+
+    // STEP 5. Close shared memory (step 6 is in main).                                                                      TODO figure out shm
 }
 
 int main(int argc, char* argv[]) {
     // Validate usage
-    if (argc != 4) {
+    if (argc != 3) {
         cerr << "\n    Usage : " << argv[0]
-             << " <socket name> <filepath> <number of lines in file>\n" << endl;
+             << "  <filepath> <number of lines in file>\n" << endl;
         exit(5);
     }
 
-    // Obtain socket name and build request vector of path and lines
-    char* socket_name = argv[1];
-    vector<string> request;
-    for (int i=2; i < argc; ++i)
-        request.push_back(argv[i]);
+    // Obtain args from command line and check validity.
+    string path = argv[1];
+    int num_lines;
+    try {
+        num_lines = std::stoi(argv[2]);
+        if (num_lines < 1)
+            throw std::invalid_argument("negative line count");
+    }
+    catch (const std::invalid_argument &e) {
+        cout << "  client: invalid number of lines entered" << endl;
+        exit(6);
+    }
 
     // Connect to server with given socket name and request
-    Client client(socket_name);
-    client.Run(request);
+    Client client("PROJ3_SERVER");
+    client.Run(path, num_lines);
 
     return 0;
 }

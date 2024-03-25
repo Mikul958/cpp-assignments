@@ -29,7 +29,7 @@ class Client : public DomainSocket {
     // Trims and splits a line from the server and evaluates its equation
     double EvaluateLine(string line);
 
-    void Run(vector<string> request);
+    void Run(string filepath, int num_lines);
 };
 
 #endif  // PROJ3_CLIENT_H_
