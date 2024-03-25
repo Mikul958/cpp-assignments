@@ -10,6 +10,7 @@
 
 #include <sys/mman.h>  // shared memory
 #include <sys/unistd.h>  // UNIX standard header
+#include <pthread.h>  // POSIX threads
 
 #include <cassert>
 #include <cerrno>
@@ -34,7 +35,7 @@ class Client : public DomainSocket {
     // Trims and splits a line from the server and evaluates its equation
     double EvaluateLine(string line);
 
-    void EvaluateSHM(vector<string> lines, int start, int end);
+    //void *EvaluateSHM(void * t_id);
 
     void Run(string filepath, int num_lines);
 };

@@ -2,6 +2,9 @@
     "files.associations": {
         "string": "cpp",
         "stdexcept": "cpp",
-        "cstddef": "cpp"
+        "cstddef": "cpp",
+        "array": "cpp",
+        "string_view": "cpp",
+        "iostream": "cpp"
     }
 }

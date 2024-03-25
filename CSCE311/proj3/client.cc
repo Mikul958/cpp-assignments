@@ -23,10 +23,19 @@ double Client::EvaluateLine(string line) {
     return Calculate(equation);  // Using calculate.h from Project 1
 }
 
-// starts are inclusive, ends are exclusive.
-void Client::EvaluateSHM(vector<string> lines, int start, int end) {
-    for (int i=start; i < end; i++)
-        cout << i << endl;
+struct thread_data {
+    int start = 0;
+    int end = 0;
+    double sum = 0;
+};                                                                                              // TODO figure out how to include this in client class
+
+// starts are inclusive, ends are exclusive.                                                    // TODO figure out how to include this in client class
+void *EvaluateSHM(void * input) {
+    struct thread_data *data = (struct thread_data *) input;
+
+    cout << "Call EvaluateSHM with range " << data->start << "-" << data->end << endl;
+
+    pthread_exit(0);
 }
 
 void Client::Run(string path, int num_lines) {
@@ -63,23 +72,30 @@ void Client::Run(string path, int num_lines) {
     }
 
     // STEP 3. Create 4 threads and evaluate lines in shared memory
-    int starts[4], ends[4];
+    struct thread_data thread_array[4];
     int range = num_lines / 4;
     int remainder = num_lines % 4;
     // Divide num_lines by 4 to obtain upper bounds of shared memory segments
     for (int i=0; i < 4; i++)
-        ends[i] = (i+1) * range;
+        thread_array[i].end = (i+1) * range;
     // Shift upper bounds to account for uneven divisions
     for (int i=0; i < remainder; i++)
-        ends[3-i] += remainder-i;
+        thread_array[3-i].end += remainder-i;
     // Set lower bounds to match corresponding upper bounds.
-    starts[0] = 0;
+    thread_array[0].start = 0;
     for (int i=1; i < 4; i++)
-        starts[i] = ends[i-1];
+        thread_array[i].start = thread_array[i-1].end;
 
-    // Create threads that evaluate their respective segments of shared memory.                           TODO figure out pthreads
+    // Create threads that evaluate their respective segments of shared memory.
+    pthread_t threads[4];
+    for (pthread_t t_id=0; t_id < 4; t_id++)
+        pthread_create(&threads[t_id], NULL, EvaluateSHM, (void *) &thread_array[t_id]);
+    for (int i=0; i < 4; i++)
+        pthread_join(threads[i], NULL);
+    
+    cout << "threads finished" << endl;                                                                   // TODO more here
 
-
+    
     // STEP 4. Report results of threads to console.
 
 
