@@ -48,8 +48,8 @@ void Server::Run() {
         }
         cout << "SERVER STARTED" << endl;
         
-        // Wait on a client to increment semaphore to indicate connection.
-        ::sem_wait(sem_client);
+        // Wait on a client to unblock server.
+        ::sem_wait(sem_server);
         cout << "CLIENT CONNECTED" << endl;
 
         // STEP 2. Read client message through shared memory.

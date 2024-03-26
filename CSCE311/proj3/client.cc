@@ -70,7 +70,7 @@ void Client::Run(string path, int num_lines) {
     sem_t * sem_client = ::sem_open(SEM_CLIENT, 0);
     string message = path + END_OF_TRANSMISSION;
     // write write write                                                                                        TODO
-    ::sem_post(sem_client);  // Indicate client is done writing to server.
+    ::sem_post(sem_server);  // Unblock server
 
     // Read in lines from shared memory buffer and populate equations vector.                                             TODO
 
