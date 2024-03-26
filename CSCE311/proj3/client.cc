@@ -69,13 +69,15 @@ void Client::Run(string path, int num_lines) {
     sem_t * sem_server = ::sem_open(SEM_SERVER, 0);
     sem_t * sem_client = ::sem_open(SEM_CLIENT, 0);
     string message = path + END_OF_TRANSMISSION;
-    // write write write
-    ::sem_post(sem_client);
-    
+    // write write write                                                                                        TODO
+    ::sem_post(sem_client);  // Indicate client is done writing to server.
 
-    // Read in server response from domain socket and exit if error.                                             TODO
+    // Read in lines from shared memory buffer and populate equations vector.                                             TODO
 
-    // Read in lines from shared memory vector and populate equations vector.                                    TODO
+
+
+    // Check equations vector for errors
+
 
 
     // STEP 3. Create 4 threads, each evaluating 1/4 of equations vector.
