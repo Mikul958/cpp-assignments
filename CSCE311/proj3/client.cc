@@ -43,6 +43,8 @@ void Client::Run(string path, int num_lines) {
     cout << "SERVER CONNECTION ACCEPTED" << endl;
 
     // STEP 1. Create shared memory between this client and the server                                  TODO figure out shm
+    // pretend i did shm stuff
+    cout << "SHARED MEMORY ALLOCATED: " << endl;
 
 
     // STEP 2. Build message string from request and write to server                                    TODO decide between shm and re-using domain sockets
@@ -65,10 +67,10 @@ void Client::Run(string path, int num_lines) {
         return;
     }
 
-    // STEP 3. Partition shared memory segments for each thread and build args
-    struct thread_args t_args_array[4];
+    // STEP 3. Set start and end index of each thread based on num_lines.
     int range = num_lines / 4;
     int remainder = num_lines % 4;
+    struct thread_args t_args_array[4];
     // Divide num_lines by 4 to obtain upper bounds of shared memory segments
     for (int i=0; i < 4; i++)
         t_args_array[i].end = (i+1) * range;
@@ -88,14 +90,17 @@ void Client::Run(string path, int num_lines) {
         equations.push_back(std::to_string(i));
 
     for (int i=0; i<4; i++)
-        t_args_array[i].data = &equations;
+        t_args_array[i].data = &equations;  // Allow each thread to reference equations vector
 
 
 
-    // Create threads to evaluate their respective segments of shared memory.
+    // Create 4 threads executing EvaluateSHM(t_args_array) and wait on finish.
     pthread_t threads[4];
     for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_create(&threads[t_id], NULL, &Client::EvaluateSHM_Helper, (void *) &t_args_array[t_id]);
+        pthread_create(&threads[t_id],
+                       NULL,
+                       &Client::EvaluateSHM_Helper,
+                       (void *) &t_args_array[t_id]);
     cout << "THREADS CREATED" << endl;
     for (pthread_t t_id=0; t_id < 4; t_id++)
         pthread_join(threads[t_id], NULL);
@@ -103,8 +108,10 @@ void Client::Run(string path, int num_lines) {
     // STEP 4. Report results of threads to console.
     double total = 0;
     for (int i=0; i < 4; i++) {
-        cout << "THREAD " << i << ":  " << t_args_array[i].end - t_args_array[i].start << " LINES, " << t_args_array[i].sum << endl;
-        total += t_args_array[i].sum;
+        struct thread_args current = t_args_array[i];
+        cout << "THREAD " << i << ":  " << current.end - current.start
+             << " LINES, " << current.sum << endl;
+        total += current.sum;
     }
     cout << "SUM:  " << total << endl;
 
