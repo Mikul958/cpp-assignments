@@ -48,14 +48,28 @@ void Server::Run() {
         }
         cout << "SERVER STARTED" << endl;
         
-        // Wait on a client to unblock server.
+        // Wait on a client to unblock server and open/map shared memory.
         ::sem_wait(sem_server);
+        int shm_fd;
+        struct shm_buffer * shm_ptr;
+        shm_fd = ::shm_open(SHM_PATH, O_RDWR, 0);
+        shm_ptr = reinterpret_cast<struct shm_buffer*>(mmap(NULL, sizeof(*shm_ptr), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
         cout << "CLIENT CONNECTED" << endl;
 
-        // STEP 2. Read client message through shared memory.
-        string message;
-        message = "hello";
-        // more stuff
+        // STEP 2. Read client message through shared memory.                                         TODO this section is really sketch
+        char read_buffer[BUFFER_SIZE];
+        snprintf(read_buffer, BUFFER_SIZE, "%s", shm_ptr->buffer);                                    // TODO use getline instead?
+        for (char c : read_buffer) {
+            if (c == '\n')
+                cout << "|N|";
+            else if (c == '\004') {
+                cout << "|EoT|";
+                break;
+            }
+            else
+                cout << c;
+        }
+        cout << endl;
 
         // Confirm request received in output stream and get file path.
         cout << "CLIENT REQUEST RECEIVED" << endl;

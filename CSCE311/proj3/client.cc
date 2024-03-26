@@ -47,7 +47,7 @@ void Client::Run(string path, int num_lines) {
         return;
     }
 
-    // Set size of shared memory buffer (1.2 MB, max expected message size).
+    // Set size of shared memory buffer (16KB = 4 pages).
     if(::ftruncate(shm_fd, sizeof(struct shm_buffer)) == -1 ) {
         cerr << "Client::Run: failed to set size of shared memory object" << endl;
         ::shm_unlink(SHM_PATH);
@@ -65,12 +65,14 @@ void Client::Run(string path, int num_lines) {
         return;
     }
 
-    // STEP 2. Write message to shared memory and connect to server.
+    // Open named semaphores created by server
     sem_t * sem_server = ::sem_open(SEM_SERVER, 0);
     sem_t * sem_client = ::sem_open(SEM_CLIENT, 0);
-    string message = path + END_OF_TRANSMISSION;
-    // write write write                                                                                        TODO
-    ::sem_post(sem_server);  // Unblock server
+
+    // STEP 2. Write message to shared memory and unblock server.
+    string message = path + '\n' + END_OF_TRANSMISSION + '\n';
+    ::snprintf(shm_ptr->buffer, BUFFER_SIZE, "%s", message.c_str());                                               // TODO use strncpy instead?
+    ::sem_post(sem_server);
 
     // Read in lines from shared memory buffer and populate equations vector.                                             TODO
 

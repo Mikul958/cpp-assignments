@@ -16,7 +16,7 @@
 
 #define END_OF_TRANSMISSION '\004'
 
-#define BUFFER_SIZE         1200000  // Max message size
+#define BUFFER_SIZE         16384           // 16KB = 4 pages
 #define SHM_PATH            "MP_SHM"
 
 #define SEM_SERVER          "/MP_SEM_SERVER"
