@@ -5,12 +5,11 @@
 #ifndef PROJ3_SERVER_H_
 #define PROJ3_SERVER_H_
 
-#include <proj3/domain_socket.h>
+#include <proj3/shared_mem.h>
 
-#include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <sys/sysinfo.h>  // Using get_nprocs_conf
+#include <signal.h>
 
 #include <cassert>
 #include <cerrno>
@@ -31,9 +30,8 @@ using std::cerr;
 using std::clog;
 using std::endl;
 
-class Server : public DomainSocket {
+class Server {
  public:
-    using ::DomainSocket::DomainSocket;
 
     /**
     * Opens file at the specified path and returns all lines to output vector.

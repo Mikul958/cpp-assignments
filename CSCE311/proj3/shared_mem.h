@@ -14,8 +14,13 @@
 #include <semaphore.h>
 #include <string.h>
 
-#define BUFFER_SIZE 1200000  // Max message size
-#define SHM_PATH "MP_SHM"
+#define END_OF_TRANSMISSION '\004'
+
+#define BUFFER_SIZE         1200000  // Max message size
+#define SHM_PATH            "MP_SHM"
+
+#define SEM_SERVER          "/MP_SEM_SERVER"
+#define SEM_CLIENT          "/MP_SEM_CLIENT"
 
 struct shm_buffer {
     char buffer[BUFFER_SIZE];

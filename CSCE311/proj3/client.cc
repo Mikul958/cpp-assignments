@@ -20,7 +20,7 @@ double Client::EvaluateLine(string line) {
     return Calculate(equation);  // Using calculate.h from Project 1
 }
 
-void *Client::EvaluateSHM(void * input) {
+void *Client::EvaluateResult(void * input) {
     // Cast void pointer back to struct to get parameters.
     struct thread_args * args = (struct thread_args *) input;
     vector<string> data = *(args->data);
@@ -33,14 +33,6 @@ void *Client::EvaluateSHM(void * input) {
 }
 
 void Client::Run(string path, int num_lines) {
-    // Initalize client and attempt to connect to DomainSocket
-    cout << "Client initializing..." << endl;
-    if (!Init())
-        exit(1);
-    cout << "Client connecting..." << endl;
-    if (!Connect())
-        exit(2);
-    cout << "SERVER CONNECTION ACCEPTED" << endl;
 
     // STEP 1. Create shared memory between this client and the server                                              TODO move to createSharedMem function?
     int shm_fd;
@@ -73,26 +65,15 @@ void Client::Run(string path, int num_lines) {
         return;
     }
 
-    // STEP 2. Build message string from request and write to server
-    string message = path + DomainSocket::kEoT;
-    ::ssize_t bytes_written = Write(message);
-    if (bytes_written < 0) {
-        cerr << "DomainSocketClient terminating..." << endl;
-        exit(3);
-    } else if (bytes_written == 0) {
-        cout << "Server disconnected" << endl;
-        exit(4);
-    }
+    // STEP 2. Write message to shared memory and connect to server.
+    sem_t * sem_server = ::sem_open(SEM_SERVER, 0);
+    sem_t * sem_client = ::sem_open(SEM_CLIENT, 0);
+    string message = path + END_OF_TRANSMISSION;
+    // write write write
+    ::sem_post(sem_client);
+    
 
-    // Read in server response from domain socket and exit if error.
-    string response;
-    Read(&response);
-    if (response[0] == '0') {
-        cout << "INVALID FILE" << endl;
-        ::munmap(shm_ptr, sizeof(struct shm_buffer));
-        ::shm_unlink(SHM_PATH);
-        return;
-    }
+    // Read in server response from domain socket and exit if error.                                             TODO
 
     // Read in lines from shared memory vector and populate equations vector.                                    TODO
 
@@ -123,12 +104,12 @@ void Client::Run(string path, int num_lines) {
 
 
 
-    // Create 4 threads executing EvaluateSHM(t_args_array) and wait on finish.
+    // Create 4 threads executing EvaluateResult(t_args_array) and wait.
     pthread_t threads[4];
     for (pthread_t t_id=0; t_id < 4; t_id++)
         pthread_create(&threads[t_id],
                        NULL,
-                       &Client::EvaluateSHM_Helper,
+                       &Client::EvaluateResultHelper,
                        (void *) &t_args_array[t_id]);
     cout << "THREADS CREATED" << endl;
     for (pthread_t t_id=0; t_id < 4; t_id++)
@@ -171,7 +152,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Connect to server with given socket name and request
-    Client client("MP_SOCKET");
+    Client client;
     client.Run(path, num_lines);
 
     return 0;
