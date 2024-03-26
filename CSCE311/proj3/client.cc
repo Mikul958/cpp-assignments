@@ -61,7 +61,7 @@ void Client::Run(string path, int num_lines) {
         ::shm_unlink(SHM_PATH);
         return;
     }
-    cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_buffer) << endl;
+    cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_buffer) << " BYTES" << endl;
 
     // Map shared memory and return location at shm_ptr.
     shm_ptr = reinterpret_cast<struct shm_buffer*>(mmap(NULL, sizeof(*shm_ptr),
