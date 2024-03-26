@@ -1,4 +1,4 @@
-# Program 2 - UNIX Domain Socket Client/Server
+# Program 3 - Client/Server with Shared Memory
 
 **server.cc / server.h:**  
 Provides functionality for the server, including the ability to read in messages from the client and respond accordingly, as well as read in specified lines from a text file. Also serves as the entry point for the server.  

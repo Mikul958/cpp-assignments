@@ -42,12 +42,38 @@ void Client::Run(string path, int num_lines) {
         exit(2);
     cout << "SERVER CONNECTION ACCEPTED" << endl;
 
-    // STEP 1. Create shared memory between this client and the server                                  TODO figure out shm
-    // pretend i did shm stuff
-    cout << "SHARED MEMORY ALLOCATED: " << endl;
+    // STEP 1. Create shared memory between this client and the server                                              TODO move to createSharedMem function?
+    int shm_fd;
+    struct shm_buffer * shm_ptr;  // Pointer to mapped area of shared memory
+    ::shm_unlink(SHM_PATH);       // Pre-delete in case of previous error.
 
+    // Open shared memory
+    shm_fd = ::shm_open(SHM_PATH, O_CREAT | O_EXCL | O_RDWR,
+                                  S_IRUSR | S_IWUSR);
+    if (shm_fd == -1) {
+        cerr << "Client::Run: failed to create shared memory, may already exist" << endl;
+        return;
+    }
 
-    // STEP 2. Build message string from request and write to server                                    TODO decide between shm and re-using domain sockets
+    // Set size of shared memory buffer (1.2 MB, max expected message size).
+    if(::ftruncate(shm_fd, sizeof(struct shm_buffer)) == -1 ) {
+        cerr << "Client::Run: failed to set size of shared memory object" << endl;
+        ::shm_unlink(SHM_PATH);
+        return;
+    }
+    cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_buffer) << endl;
+
+    // Map shared memory and return location at shm_ptr.
+    shm_ptr = reinterpret_cast<struct shm_buffer*>(mmap(NULL, sizeof(*shm_ptr),
+                                                   PROT_READ | PROT_WRITE,
+                                                   MAP_SHARED, shm_fd, 0));
+    if (shm_ptr == MAP_FAILED) {
+        cerr << "Client::Run: failed to map shared memory" << endl;
+        ::shm_unlink(SHM_PATH);
+        return;
+    }
+
+    // STEP 2. Build message string from request and write to server
     string message = path + DomainSocket::kEoT;
     ::ssize_t bytes_written = Write(message);
     if (bytes_written < 0) {
@@ -58,26 +84,29 @@ void Client::Run(string path, int num_lines) {
         exit(4);
     }
 
-    // Read in response from server and exit if error.
+    // Read in server response from domain socket and exit if error.
     string response;
     Read(&response);
     if (response[0] == '0') {
         cout << "INVALID FILE" << endl;
-        // close shared memory                                                                            TODO close shm
+        ::munmap(shm_ptr, sizeof(struct shm_buffer));
+        ::shm_unlink(SHM_PATH);
         return;
     }
 
-    // STEP 3. Set start and end index of each thread based on num_lines.
+    // Read in lines from shared memory vector and populate equations vector.                                    TODO
+
+
+    // STEP 3. Create 4 threads, each evaluating 1/4 of equations vector.
     int range = num_lines / 4;
     int remainder = num_lines % 4;
     struct thread_args t_args_array[4];
-    // Divide num_lines by 4 to obtain upper bounds of shared memory segments
+
+    // Obtain upper and lower bounds for each thread based on num_lines.
     for (int i=0; i < 4; i++)
         t_args_array[i].end = (i+1) * range;
-    // Shift upper bounds to account for uneven divisions
     for (int i=0; i < remainder; i++)
         t_args_array[3-i].end += remainder-i;
-    // Set lower bounds to match corresponding upper bounds.
     t_args_array[0].start = 0;
     for (int i=1; i < 4; i++)
         t_args_array[i].start = t_args_array[i-1].end;
@@ -115,7 +144,9 @@ void Client::Run(string path, int num_lines) {
     }
     cout << "SUM:  " << total << endl;
 
-    // STEP 5. Close shared memory (step 6 is in main).                                                     TODO figure out shm
+    // STEP 5. Unmap and close shared memory.                                                                              TODO move to cleanup function
+    ::munmap(shm_ptr, sizeof(struct shm_buffer));
+    ::shm_unlink(SHM_PATH);
 }
 
 int main(int argc, char* argv[]) {

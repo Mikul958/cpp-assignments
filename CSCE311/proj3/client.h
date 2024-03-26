@@ -5,12 +5,16 @@
 #ifndef PROJ3_CLIENT_H_
 #define PROJ3_CLIENT_H_
 
-#include <proj3/domain_socket.h>  // TODO probably obsolete
+#include <proj3/domain_socket.h>
+#include <proj3/shared_mem.h>    // Contains shared mem path & buffer info
 #include <proj3/calculate.h>
 
-#include <sys/mman.h>  // shared memory
+#include <sys/mman.h>    // shared memory
 #include <sys/unistd.h>  // UNIX standard header
-#include <pthread.h>  // POSIX threads
+#include <sys/mman.h>    // Shared memory functions
+#include <fcntl.h>       // O_CREAT, ...
+#include <string.h>      // strlen, write
+#include <pthread.h>     // POSIX threads
 
 #include <cassert>
 #include <cerrno>
