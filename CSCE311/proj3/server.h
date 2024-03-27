@@ -30,18 +30,16 @@ using std::cerr;
 using std::clog;
 using std::endl;
 
-class Server {
- public:
 
-    /**
-    * Opens file at the specified path and returns all lines to output vector.
-    * @param path The path of the file to read.
-    * @param output Output parameter; contains all lines read from file.
-    * @return true if file exists and was successfully read.
-    */
-    bool ReadFile(string path, vector<string>* output);
+/**
+* Opens file at the specified path and returns all lines to output vector.
+* @param path The path of the file to read.
+* @param output Output parameter; contains all lines read from file.
+* @return true if file exists and was successfully read.
+*/
+bool ReadFile(string path, vector<string>* output);
 
-    void Run();
-};
+void Run();
+
 
 #endif  // PROJ3_SERVER_H_

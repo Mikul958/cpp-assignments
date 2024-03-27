@@ -9,7 +9,7 @@ void DestroySemaphores(int signum) {
     ::sem_unlink(SEM_CLIENT);
 }
 
-bool Server::ReadFile(string path, vector<string>* output) {
+bool ReadFile(string path, vector<string>* output) {
     // Check for invalid file path
     std::ifstream file(path.c_str());
     if (!file.is_open())
@@ -27,7 +27,7 @@ bool Server::ReadFile(string path, vector<string>* output) {
     return true;
 }
 
-void Server::Run() {
+void Run() {
     // Create signal handler to destroy named semaphores upon termination
     ::signal(SIGTERM, DestroySemaphores);                                                       // TODO figure out how to include DS in class
     ::signal(SIGINT, DestroySemaphores);
@@ -57,7 +57,7 @@ void Server::Run() {
 
         // STEP 2. Read client message through shared memory.                                         TODO this section is really sketch
         cout << "CLIENT REQUEST RECEIVED" << endl;
-        string request;
+        char request[BUFFER_ROW_SIZE];
         // std::getline(shm_ptr->message, request);
         snprintf(request, BUFFER_ROW_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
         int num_lines = shm_ptr->lines;
@@ -99,9 +99,9 @@ void Server::Run() {
         // pretend i did shm stuff
         clog << "\tMEMORY CLOSED" << endl;
 
-        // Block until next client opens connection
         
-        break;                                                                                              // TODO temporary
+        // Unblock client                                                                                   TODO possible temporary
+        ::sem_post(sem_client);
     }
 }
 
@@ -111,8 +111,7 @@ int main(int argc, char* argv[]) {
         exit(-4);
     }
 
-    Server server;
-    server.Run();
+    Run();
 
     return 0;
 }

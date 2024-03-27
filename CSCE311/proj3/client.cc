@@ -2,7 +2,7 @@
 
 #include <proj3/client.h>
 
-double Client::EvaluateLine(string line) {
+double EvaluateLine(string line) {
     vector<string> equation;
 
     string current;
@@ -20,7 +20,7 @@ double Client::EvaluateLine(string line) {
     return Calculate(equation);  // Using calculate.h from Project 1
 }
 
-void *Client::EvaluateResult(void * input) {
+void *EvaluateResult(void * input) {
     // Cast void pointer back to struct to get parameters.
     struct thread_args * args = (struct thread_args *) input;
     vector<string> data = *(args->data);
@@ -32,7 +32,7 @@ void *Client::EvaluateResult(void * input) {
     pthread_exit(0);
 }
 
-void Client::Run(string path, int num_lines) {
+void Run(string path, int num_lines) {
 
     // STEP 1. Create shared memory between this client and the server                                              TODO move to createSharedMem function?
     int shm_fd;
@@ -117,7 +117,7 @@ void Client::Run(string path, int num_lines) {
     for (pthread_t t_id=0; t_id < 4; t_id++)
         pthread_create(&threads[t_id],
                        NULL,
-                       &Client::EvaluateResultHelper,
+                       EvaluateResult,
                        (void *) &t_args_array[t_id]);
     cout << "THREADS CREATED" << endl;
     for (pthread_t t_id=0; t_id < 4; t_id++)
@@ -160,8 +160,7 @@ int main(int argc, char* argv[]) {
     }
 
     // Connect to server with given socket name and request
-    Client client;
-    client.Run(path, num_lines);
+    Run(path, num_lines);
 
     return 0;
 }

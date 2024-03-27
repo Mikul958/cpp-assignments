@@ -30,34 +30,26 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-class Client {
- public:
 
-    // Trims and splits a line from the server and evaluates its equation
-    double EvaluateLine(string line);
+// Trims and splits a line from the server and evaluates its equation
+double EvaluateLine(string line);
 
-    /**
-    * Evaluates the specified range of shared memory and returns sum of results
-    * Intended to be called through EvaluateResultHelper() from pthreads
-    * @param input struct containing pointer to string<vector>, int start,
-    *              int end, and double out; sum of section is returned at out.
-    */
-    void *EvaluateResult(void * input);
+/**
+* Evaluates the specified range of shared memory and returns sum of results
+* Intended to be called through EvaluateResultHelper() from pthreads
+* @param input struct containing pointer to string<vector>, int start,
+*              int end, and double out; sum of section is returned at out.
+*/
+void *EvaluateResult(void * input);
 
-    // Static wrapper for pthread to call Client::EvaluateResult
-    static void *EvaluateResultHelper(void * input) {
-        return reinterpret_cast<Client*>(input)->EvaluateResult(input);
-    }
+// Struct containing args for EvaluateSHM
+struct thread_args {
+    vector<string> * data;
+    int start = 0;
+    int end = 0;
+    double sum = 0;
+}; 
 
-    // Struct containing args for EvaluateSHM
-    struct thread_args {
-        vector<string> * data;
-        int start = 0;
-        int end = 0;
-        double sum = 0;
-    }; 
-
-    void Run(string filepath, int num_lines);
-};
+void Run(string filepath, int num_lines);
 
 #endif  // PROJ3_CLIENT_H_
