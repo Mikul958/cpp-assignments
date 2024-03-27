@@ -28,73 +28,70 @@ bool Server::ReadFile(string path, vector<string>* output) {
 }
 
 void Server::Run() {
-    while (true) {
-        // Create signal handler to destroy named semaphores upon termination
-        ::signal(SIGTERM, DestroySemaphores);                                                       // TODO figure out how to include DS in class
-        ::signal(SIGINT, DestroySemaphores);
+    // Create signal handler to destroy named semaphores upon termination
+    ::signal(SIGTERM, DestroySemaphores);                                                       // TODO figure out how to include DS in class
+    ::signal(SIGINT, DestroySemaphores);
 
-        // Pre-delete named semaphores in case they still exist from past run.
+    // Pre-delete named semaphores in case they still exist from past run.
+    ::sem_unlink(SEM_SERVER);
+    ::sem_unlink(SEM_CLIENT);
+
+    // Open named semaphores for communication, both with count 0.
+    sem_t * sem_server = ::sem_open(SEM_SERVER, O_CREAT, 0660, 0);
+    sem_t * sem_client = ::sem_open(SEM_CLIENT, O_CREAT, 0660, 0);
+    if (sem_server == SEM_FAILED || sem_client == SEM_FAILED) {
+        cout << "Server::Run: ::sem_open " << strerror(errno) << endl;
         ::sem_unlink(SEM_SERVER);
         ::sem_unlink(SEM_CLIENT);
-
-        // Open named semaphores for communication, both with count 0.
-        sem_t * sem_server = ::sem_open(SEM_SERVER, O_CREAT, 0660, 0);
-        sem_t * sem_client = ::sem_open(SEM_CLIENT, O_CREAT, 0660, 0);
-        if (sem_server == SEM_FAILED || sem_client == SEM_FAILED) {
-            cout << "Server::Run: ::sem_open " << strerror(errno) << endl;
-            ::sem_unlink(SEM_SERVER);
-            ::sem_unlink(SEM_CLIENT);
-            exit(-1);
-        }
-        cout << "SERVER STARTED" << endl;
-        
+        exit(-1);
+    }
+    cout << "SERVER STARTED" << endl;
+    
+    while (true) {        
         // Wait on a client to unblock server and open/map shared memory.
         ::sem_wait(sem_server);
         int shm_fd;
         struct shm_buffer * shm_ptr;
         shm_fd = ::shm_open(SHM_PATH, O_RDWR, 0);
         shm_ptr = reinterpret_cast<struct shm_buffer*>(mmap(NULL, sizeof(*shm_ptr), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
-        cout << "CLIENT CONNECTED" << endl;
 
         // STEP 2. Read client message through shared memory.                                         TODO this section is really sketch
-        char read_buffer[BUFFER_SIZE];
-        snprintf(read_buffer, BUFFER_SIZE, "%s", shm_ptr->buffer);                                    // TODO use getline instead?
-        for (char c : read_buffer) {
+        cout << "CLIENT REQUEST RECEIVED" << endl;
+        char request[BUFFER_ROW_SIZE];
+        snprintf(request, BUFFER_ROW_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead?
+        int num_lines = shm_ptr->lines;
+        cout << "PATH: ";
+        for (char c : request) {
             if (c == '\n')
-                cout << "|N|";
-            else if (c == '\004') {
-                cout << "|EoT|";
                 break;
-            }
             else
                 cout << c;
         }
-        cout << endl;
+        cout << endl << "NUMBER OF LINES: " << num_lines << endl;
 
         // Confirm request received in output stream and get file path.
-        cout << "CLIENT REQUEST RECEIVED" << endl;
         //vector<string> request = ParseMessage(message);
-        string path = "hello";
+        //string path = "hello";
 
         // STEP 3. Open the shared memory created by client.                                                 TODO figure out opening shm
         // pretend i did shm stuff
         cout << "\tMEMORY OPEN" << endl;
 
         // STEP 4. Open and read file at desired path.
-        cout << "\tOPENING: " << path << endl;
-        vector<string> retrieved;
-        bool file_read = ReadFile(path, &retrieved);
-        cout << "\tFILE CLOSED" << endl;
+        //cout << "\tOPENING: " << path << endl;
+        //vector<string> retrieved;
+        //bool file_read = ReadFile(path, &retrieved);
+        //cout << "\tFILE CLOSED" << endl;
 
         // Check for file IO error and write file lines to shared memory.
         // NOTE: '0' at response[0] indicates error to client, else normal.
-        string response;
-        if (file_read) {
-            response = string("1") + END_OF_TRANSMISSION;
+        //string response;
+        //if (file_read) {
+        //    response = string("1") + END_OF_TRANSMISSION;
             // Write retrieved file lines to shared memory.                                                 TODO figure out writing to shm
-        } else {
-            response = string("0") + END_OF_TRANSMISSION;
-        }
+        //} else {
+        //    response = string("0") + END_OF_TRANSMISSION;
+        //}
         
 
         // Release server's hold on shared memory.                                                           TODO figure out closing shm

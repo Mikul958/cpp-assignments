@@ -16,14 +16,19 @@
 
 #define END_OF_TRANSMISSION '\004'
 
-#define BUFFER_SIZE         16384           // 16KB = 4 pages
+#define BUFFER_ROWS         4                // 4 threads, 1 row each
+#define BUFFER_ROW_SIZE     524288           // Max expected file size / 4
 #define SHM_PATH            "MP_SHM"
 
 #define SEM_SERVER          "/MP_SEM_SERVER"
 #define SEM_CLIENT          "/MP_SEM_CLIENT"
 
+// message is main message, contains client request and main server response
+// buffer will contain file lines written back by server
 struct shm_buffer {
-    char buffer[BUFFER_SIZE];
+    int lines;
+    char message[BUFFER_ROW_SIZE];
+    char buffer[BUFFER_ROWS][BUFFER_ROW_SIZE];
 };
 
 # endif  // PROJ3_SHARED_MEM_H_
