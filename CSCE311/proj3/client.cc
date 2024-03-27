@@ -17,7 +17,7 @@ void Run(string path, int num_lines) {
     }
 
     // Set size of shared memory buffer.
-    if(::ftruncate(shm_fd, sizeof(struct shm_info)) == -1 ) {
+    if(::ftruncate(shm_fd, sizeof(struct shm_info)) == -1) {
         cerr << "Client::Run: failed to set size of shared memory object" << endl;
         ::shm_unlink(SHM_PATH);
         return;
@@ -68,7 +68,7 @@ void Run(string path, int num_lines) {
         pthread_create(&threads[t_id], NULL, EvaluateSHM, reinterpret_cast<void *>(&t_args_array[t_id]));
     for (pthread_t t_id=0; t_id < 4; t_id++)
         pthread_join(threads[t_id], NULL);
-    
+
     // STEP 4. Print results of each thread and sum to console.
     double total = 0;
     for (int i=0; i < 4; i++) {
@@ -83,12 +83,12 @@ void Run(string path, int num_lines) {
     ::shm_unlink(SHM_PATH);
 }
 
-void *EvaluateSHM(void * input) {
+void * EvaluateSHM(void * input) {
     // Cast void pointer back to struct to get parameters.
-    struct thread_args * args = (struct thread_args *) input;
+    struct thread_args * args = reinterpret_cast<struct thread_args *>(input);
     struct shm_info * shm_ptr = args->data;
     int row = args->segment;
-    
+
     // Evaluate lines from shared memory buffer.
     int start = 0, current;
     char * buffer_row = shm_ptr->buffer[row];

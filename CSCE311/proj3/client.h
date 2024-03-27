@@ -46,7 +46,7 @@ void Run(string filepath, int num_lines);
 * @param input struct containing pointer to string<vector>, int start,
 *              int end, and double out; sum of section is returned at out.
 */
-void *EvaluateSHM(void * input);
+void * EvaluateSHM(void * input);
 
 // Trims and splits a line from the server and evaluates its equation
 double EvaluateLine(string line);
