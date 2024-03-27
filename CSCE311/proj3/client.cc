@@ -5,7 +5,8 @@
 void Run(string path, int num_lines) {
     // STEP 1. Create shared memory and store pointer to its location.
     struct shm_info * shm_ptr = CreateSHM();
-    cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_info) << " BYTES" << endl;
+    cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_info)
+         << " BYTES" << endl;
 
     // Open named semaphores created by server
     sem_t * sem_server = ::sem_open(SEM_SERVER, 0);
@@ -37,7 +38,11 @@ void Run(string path, int num_lines) {
 
     pthread_t threads[4];
     for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_create(&threads[t_id], NULL, EvaluateSHM, reinterpret_cast<void *>(&t_args_array[t_id]));
+        pthread_create(&threads[t_id], NULL, EvaluateSHM,
+                       reinterpret_cast<void *>(&t_args_array[t_id]));
+    cout << "THREADS CREATED" << endl;
+
+    // Wait on threads to finish executing.
     for (pthread_t t_id=0; t_id < 4; t_id++)
         pthread_join(threads[t_id], NULL);
 
@@ -46,7 +51,8 @@ void Run(string path, int num_lines) {
     for (int i=0; i < 4; i++) {
         struct thread_args current = t_args_array[i];
         total += current.sum;
-        cout << "THREAD " << i << ":  " << current.operations << " LINES, " << current.sum << endl;
+        cout << "THREAD " << i << ":  " << current.operations
+             << " LINES, " << current.sum << endl;
     }
     cout << "SUM:  " << total << endl;
 
@@ -63,13 +69,13 @@ struct shm_info * CreateSHM() {
     shm_fd = ::shm_open(SHM_PATH, O_CREAT | O_EXCL | O_RDWR,
                                   S_IRUSR | S_IWUSR);
     if (shm_fd == -1) {
-        cerr << "Client::Run: failed to create shared memory, may already exist" << endl;
+        cerr << "client.cc::Run: failed to create shared memory" << endl;
         exit(2);
     }
 
     // Set size of shared memory location using shm_info struct.
-    if(::ftruncate(shm_fd, sizeof(struct shm_info)) == -1) {
-        cerr << "Client::Run: failed to set size of shared memory object" << endl;
+    if (::ftruncate(shm_fd, sizeof(struct shm_info)) == -1) {
+        cerr << "client.cc::Run: failed to set size of shared memory" << endl;
         ::shm_unlink(SHM_PATH);
         exit(3);
     }
@@ -79,7 +85,7 @@ struct shm_info * CreateSHM() {
                                                    PROT_READ | PROT_WRITE,
                                                    MAP_SHARED, shm_fd, 0));
     if (shm_ptr == MAP_FAILED) {
-        cerr << "Client::Run: failed to map shared memory" << endl;
+        cerr << "client.cc::Run: failed to map shared memory" << endl;
         ::shm_unlink(SHM_PATH);
         exit(4);
     }
@@ -145,7 +151,7 @@ int main(int argc, char* argv[]) {
              << "  <filepath> <number of lines in file>\n" << endl;
         exit(1);
     }
-    
+
     string path = argv[1];
     int num_lines;
     try {

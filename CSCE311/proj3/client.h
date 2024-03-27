@@ -1,7 +1,5 @@
 // Copyright 2024 Michael Pikula
 
-// TODO modify for project 3
-
 #ifndef PROJ3_CLIENT_H_
 #define PROJ3_CLIENT_H_
 

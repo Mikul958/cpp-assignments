@@ -29,7 +29,10 @@ void Run() {
         int shm_fd;
         struct shm_info * shm_ptr;
         shm_fd = ::shm_open(SHM_PATH, O_RDWR, 0);
-        shm_ptr = reinterpret_cast<struct shm_info*>(mmap(NULL, sizeof(*shm_ptr), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
+        shm_ptr = reinterpret_cast<struct shm_info *>
+                  (mmap(NULL, sizeof(*shm_ptr),
+                        PROT_READ | PROT_WRITE,
+                        MAP_SHARED, shm_fd, 0));
         cout << "\tMEMORY OPEN" << endl;
 
         // Read client message from shared memory.
