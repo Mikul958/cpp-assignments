@@ -78,8 +78,14 @@ void Run(string path, int num_lines) {
     ::sem_post(sem_server);
     ::sem_wait(sem_client);
 
-    // Read in main server response and check for errors.
+    // Read in main server response and check for errors.                                                   TODO integrate with threads
+    char temp_response[BUFFER_ROW_SIZE];
+    cout << "RESPONSE FROM SERVER:" << endl;
 
+    for (int i=0; i<4; i++) {
+        snprintf(temp_response, BUFFER_ROW_SIZE, "%s", shm_ptr->buffer[i]);
+        cout << "\nFROM SEGMENT " << (i+1) << ":\n" << temp_response << endl;
+    }
 
 
     // 

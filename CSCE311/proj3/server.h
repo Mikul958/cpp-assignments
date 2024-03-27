@@ -39,7 +39,7 @@ void DestroySemaphores(int signum);
 * @param output Output parameter; contains all lines read from file.
 * @return true if file exists and was successfully read.
 */
-bool ReadFile(string path, vector<string>* output);
+int ReadFile(string path, int num_lines, struct shm_buffer * output);
 
 void Run();
 
