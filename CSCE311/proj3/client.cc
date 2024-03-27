@@ -72,17 +72,17 @@ void Run(string path, int num_lines) {
     // STEP 2. Write message and number of lines to shared memory.
     string request = path + '\n';
     ::snprintf(shm_ptr->message, MESSAGE_SIZE, "%s", request.c_str());                                               // TODO use strncpy instead?
-    shm_ptr->lines = num_lines;
+    shm_ptr->num = num_lines;
 
     // Unblock server, block client until server is done writing back.
     ::sem_post(sem_server);
     ::sem_wait(sem_client);
 
-    // Read in lines from shared memory buffer and populate equations vector.                                             TODO
+    // Read in main server response and check for errors.
 
 
 
-    // Check equations vector for errors
+    // 
 
 
 

@@ -21,15 +21,16 @@
 #define BUFFER_ROW_SIZE     524288          // ~1.2MB / 4 threads
 #define SHM_PATH            "MP_SHM"
 
+#define BAD_READ            -1
+
 #define SEM_SERVER          "/MP_SEM_SERVER"
 #define SEM_CLIENT          "/MP_SEM_CLIENT"
 
-// message is main message, contains client request and main server response
-// buffer will contain file lines written back by server
+
 struct shm_buffer {
-    int lines;
-    char message[MESSAGE_SIZE];
-    char buffer[THREAD_COUNT][BUFFER_ROW_SIZE];
+    int num;                                    // Lines/error status
+    char message[MESSAGE_SIZE];                 // Request path/potential error
+    char buffer[THREAD_COUNT][BUFFER_ROW_SIZE]; // Main buffer
 };
 
 # endif  // PROJ3_SHARED_MEM_H_

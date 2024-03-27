@@ -60,7 +60,7 @@ void Run() {
         char request[MESSAGE_SIZE];
         // std::getline(shm_ptr->message, request);
         snprintf(request, MESSAGE_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
-        int num_lines = shm_ptr->lines;
+        int num_lines = shm_ptr->num;
 
         cout << "\tOPENING: " << request << endl;                                                        // TODO request includes a newline, not broken.
         cout << "NUMBER OF LINES: " << num_lines << endl;
