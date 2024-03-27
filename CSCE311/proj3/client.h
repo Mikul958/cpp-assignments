@@ -40,7 +40,7 @@ double EvaluateLine(string line);
 * @param input struct containing pointer to string<vector>, int start,
 *              int end, and double out; sum of section is returned at out.
 */
-void *EvaluateResult(void * input);
+void *EvaluateSHM(void * input);
 
 // Struct containing args for EvaluateSHM
 struct thread_args {

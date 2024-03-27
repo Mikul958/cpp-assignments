@@ -20,7 +20,7 @@ double EvaluateLine(string line) {
     return Calculate(equation);  // Using calculate.h from Project 1
 }
 
-void *EvaluateResult(void * input) {
+void *EvaluateSHM(void * input) {
     // Cast void pointer back to struct to get parameters.
     struct thread_args * args = (struct thread_args *) input;
     vector<string> data = *(args->data);
@@ -135,7 +135,7 @@ void Run(string path, int num_lines) {
     for (pthread_t t_id=0; t_id < 4; t_id++)
         pthread_create(&threads[t_id],
                        NULL,
-                       EvaluateResult,
+                       EvaluateSHM,
                        (void *) &t_args_array[t_id]);
     cout << "THREADS CREATED" << endl;
     for (pthread_t t_id=0; t_id < 4; t_id++)
