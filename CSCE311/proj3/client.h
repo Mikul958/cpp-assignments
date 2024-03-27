@@ -52,6 +52,12 @@ void Run(string filepath, int num_lines);
 struct shm_info * CreateSHM();
 
 /**
+ * Unmaps and unlinks shared memory location.
+ * @param shm_ptr Pointer to shared memory location.
+ */
+void DestroySHM(struct shm_info * shm_ptr);
+
+/**
  * Evaluates the specified segment of shared memory buffer.
  * Intended to be called via pthreads.
  * @param input struct thread_args containing pointer to shared memory, row of

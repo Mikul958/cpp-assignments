@@ -24,8 +24,7 @@ void Run(string path, int num_lines) {
     if (status == BAD_READ) {
         string error = shm_ptr->message;
         cout << error << endl;
-        ::munmap(shm_ptr, sizeof(struct shm_info));
-        ::shm_unlink(SHM_PATH);
+        DestroySHM(shm_ptr);
         return;
     }
 
@@ -51,9 +50,8 @@ void Run(string path, int num_lines) {
     }
     cout << "SUM:  " << total << endl;
 
-    // STEP 5. Unmap and destroy shared memory.                                                                              TODO move to cleanup function
-    ::munmap(shm_ptr, sizeof(struct shm_info));
-    ::shm_unlink(SHM_PATH);
+    // STEP 5. Unmap and destroy shared memory.
+    DestroySHM(shm_ptr);
 }
 
 struct shm_info * CreateSHM() {
@@ -88,6 +86,11 @@ struct shm_info * CreateSHM() {
 
     // Return pointer to shared memory location.
     return shm_ptr;
+}
+
+void DestroySHM(struct shm_info * shm_ptr) {
+    ::munmap(shm_ptr, sizeof(struct shm_info));
+    ::shm_unlink(SHM_PATH);
 }
 
 void * EvaluateSHM(void * input) {
