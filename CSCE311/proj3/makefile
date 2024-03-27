@@ -1,9 +1,8 @@
 # Set file path and compiler flags
 path = ..
-flags = -std=c++2a -Wall -pedantic -I $(path) -g
+flags = -std=c++2a -Wall -pedantic -I $(path) -g -pthread
 
 compile = g++ $(flags) -c -o
-compile_thread = g++ $(flags) -c -o
 link = g++ $(flags) -o
 
 
@@ -22,7 +21,7 @@ server.o : server.cc server.h shared_mem.h
 	$(compile) $@ $<
 
 client.o : client.cc client.h shared_mem.h
-	$(compile_thread) $@ $<
+	$(compile) $@ $<
 
 calculate.o : calculate.cc calculate.h
 	$(compile) $@ $<

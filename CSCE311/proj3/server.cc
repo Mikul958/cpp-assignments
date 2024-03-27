@@ -85,7 +85,7 @@ void ReadFile(string path, int num_lines, struct shm_info * output) {
             segment++;
             offset = 0;
             if (segment > 3) {
-                line_number++;    // Ensure final error check fails
+                line_number = -1;    // Ensure final error check fails
                 break;
             }
         }
@@ -95,8 +95,10 @@ void ReadFile(string path, int num_lines, struct shm_info * output) {
             line.pop_back();
         line += '\n';
 
-        // Append line to main shared memory buffer and update information.
-        // NOTE: offset + BUFFER_ROW_SIZE - offset = BUFFER_ROW_SIZE
+        // Check for overflow and append line to main shared memory buffer.
+        if (offset + line.size() + 1 >= BUFFER_ROW_SIZE)  // Overflow
+            break;
+        // NOTE: offset + BUFFER_ROW_SIZE - offset = BUFFER_ROW_SIZE.
         ::strncpy(output->buffer[segment] + offset, line.c_str(),
                                                     BUFFER_ROW_SIZE - offset);
         offset += line.size();
