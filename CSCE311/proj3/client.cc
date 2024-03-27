@@ -69,9 +69,9 @@ void Run(string path, int num_lines) {
     sem_t * sem_server = ::sem_open(SEM_SERVER, 0);
     sem_t * sem_client = ::sem_open(SEM_CLIENT, 0);
 
-    // STEP 2. Write message and number of lines to shared memory.
+    // STEP 2. Write message to shared memory buffer and num_lines to num
     string request = path + '\n';
-    ::snprintf(shm_ptr->message, MESSAGE_SIZE, "%s", request.c_str());                                               // TODO use strncpy instead?
+    ::strncpy(shm_ptr->message, request.c_str(), MESSAGE_SIZE);
     shm_ptr->num = num_lines;
 
     // Unblock server, block client until server is done writing back.

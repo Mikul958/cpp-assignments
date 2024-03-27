@@ -26,6 +26,7 @@ using std::string;
 using std::vector;
 
 using std::cout;
+using std::cin;
 using std::cerr;
 using std::clog;
 using std::endl;
