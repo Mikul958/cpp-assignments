@@ -29,7 +29,7 @@ calculate.o : calculate.cc calculate.h
 
 
 # Check style with cpplint
-lint : server.cc server.h client.cc client.h domain_socket.cc domain_socket.h calculate.cc calculate.h
+lint : server.cc server.h client.cc client.h calculate.cc calculate.h shared_mem.h
 	cpplint --root=$(path) $^
 
 
