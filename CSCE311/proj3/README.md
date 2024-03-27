@@ -1,17 +1,28 @@
 # Program 3 - Client/Server with Shared Memory
 
 **server.cc / server.h:**  
-Provides functionality for the server, including the ability to read in messages from the client and respond accordingly, as well as read in specified lines from a text file. Also serves as the entry point for the server.  
-- Makes use of domain_socket.h to interact with client.  
+Provides functionality for the server:
+- Creates named semaphores for the server and client, and destroys them upon termination.
+- Opens shared memory created by the client:
+    - Reads in file path and line numbers to from shared memory and reads specified file.
+    - Responds to client with file lines, or file read errors if any.
+
+Includes:
+- shared_mem.h
 
 **client.cc / client.h:**  
-Provides functionality for the client, including the ability to interact with the server and evaluate the equations in lines received from server. Also serves as the entry point for the client.  
-- Makes use of domain_socket.h to interact with server.
-- Makes use of calculate.h to evaluate equations returned by the server.  
+Provides functionality for the client:
+- Creates a shared memory location for the server and client, and destroys it upon completion.
+    - Sends file path and line count through shared memory.
+    - Receives error status through shared memory, and file lines through main shared memory buffer.
+- Synchronizes using named semaphores created by the server.
 
-**domain_socket.cc / domain_socket.h:**  
-Provided by CSCE311 GitHub repository. Provides functionality for the use of UNIX Domain Sockets, including the ability to start a server, connect clients, and pass messages between the two.  
-- Modified to include the ability to build and parse messages in a standardized format so that the server and client do not have to determine their own format or build/parse message strings manually.  
+Includes:
+- shared_mem.h
+- calculate.h
+
+**shared_mem.h**
+Contains structure of shared memory location, as well as hard-coded values related to shared memory and semaphores shared by the client and server.
 
 **calculate.cc / calculate.h:**  
-Included (and slightly modified) from Project 1. Called on by the client to evaluate equations obtained from the server after operands and operators are formatted as a vector by the client.
+Included (and slightly modified) from Project 1. Used by the client to evaluate the equations located in main shared memory buffer.
