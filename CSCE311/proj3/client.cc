@@ -87,11 +87,24 @@ void *EvaluateSHM(void * input) {
     // Cast void pointer back to struct to get parameters.
     struct thread_args * args = (struct thread_args *) input;
     struct shm_info * shm_ptr = args->data;
+    int row = args->segment;
+    
+    // Evaluate lines from shared memory buffer.
+    int start = 0, current;
+    char * buffer_row = shm_ptr->buffer[row];
+    for (current=0; buffer_row[current] != '\0'; current++) {
+        if (buffer_row[current] == '\n') {
+            // Hit newline, store line in string and update start for next.
+            string file_line;
+            for (int i=start; i < current; i++)
+                file_line += buffer_row[i];
+            start = current + 1;
 
-    // Test code
-    cout << "Called EvaluateSHM for segment " << args->segment << endl;
-    args->operations = 15;
-    args->sum = 100;
+            // Update operation count and sum.
+            args->operations++;
+            args->sum += EvaluateLine(file_line);
+        }
+    }
 
     pthread_exit(0);
 }
