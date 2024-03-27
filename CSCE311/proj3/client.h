@@ -44,9 +44,10 @@ void *EvaluateSHM(void * input);
 
 // Struct containing args for EvaluateSHM
 struct thread_args {
-    struct shm_info * data;
-    int segment;
-    double sum = 0;
+    struct shm_info * data;  // Pointer to mapped shared memory struct
+    int segment;             // Index of shared memory to evaluate
+    int operations = 0;      // Amount of lines evaluated; output parameter
+    double sum = 0;          // Total for thread; output parameter
 }; 
 
 void Run(string filepath, int num_lines);

@@ -22,13 +22,13 @@ double EvaluateLine(string line) {
 
 void *EvaluateSHM(void * input) {
     // Cast void pointer back to struct to get parameters.
-    //struct thread_args * args = (struct thread_args *) input;
-    //vector<string> data = *(args->data);
+    struct thread_args * args = (struct thread_args *) input;
+    struct shm_info * shm_ptr = args->data;
     
     // Evaluate designated of shared memory and add to section total.
     //for (int i=args->start; i < args->end; i++)
     //    args->sum += EvaluateLine(data[i]);
-    cout << "Called EvaluateSHM" << endl;
+    cout << "Called EvaluateSHM for segment " << args->segment << endl;
     pthread_exit(0);
 }
 
