@@ -18,7 +18,7 @@
 
 #define MESSAGE_SIZE        4096            // 4KB, anything over is ridiculous
 #define THREAD_COUNT        4               
-#define BUFFER_ROW_SIZE     524288          // ~1.2MB / 4 threads
+#define BUFFER_ROW_SIZE     524288          // 2^19 bytes, more than enough
 #define SHM_PATH            "MP_SHM"
 
 #define BAD_READ            -1

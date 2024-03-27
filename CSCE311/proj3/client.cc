@@ -79,6 +79,18 @@ void Run(string path, int num_lines) {
     ::sem_wait(sem_client);
 
     // Read in main server response and check for errors.                                                   TODO integrate with threads
+    int status = shm_ptr->num;
+    if (status == BAD_READ) {
+        char error[MESSAGE_SIZE];
+        ::snprintf(error, MESSAGE_SIZE, "%s", shm_ptr->message);
+        cout << "Client::Run: " << error << endl;
+        ::munmap(shm_ptr, sizeof(struct shm_buffer));
+        ::shm_unlink(SHM_PATH);
+        return;
+    }
+
+
+
     char temp_response[BUFFER_ROW_SIZE];
     cout << "RESPONSE FROM SERVER:" << endl;
 

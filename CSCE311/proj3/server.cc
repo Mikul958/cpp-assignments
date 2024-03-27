@@ -9,11 +9,15 @@ void DestroySemaphores(int signum) {
     ::sem_unlink(SEM_CLIENT);
 }
 
-int ReadFile(string path, int num_lines, struct shm_buffer * output) {
-    // Check for invalid file path
+void ReadFile(string path, int num_lines, struct shm_buffer * output) {
+    // Check for invalid file path.
     std::ifstream file(path.c_str());
-    if (!file.is_open())
-        return BAD_READ;
+    if (!file.is_open()) {
+        output->num = BAD_READ;
+        string error = "INVALID FILE";
+        ::strncpy(output->message, error.c_str(), MESSAGE_SIZE);
+        return;
+    }
 
     // Determine how many lines go in each shared memory segment.
     int ends[4];
@@ -28,12 +32,14 @@ int ReadFile(string path, int num_lines, struct shm_buffer * output) {
     int line_number = 0, segment = 0, offset = 0;
     string line;
     while (std::getline(file, line)) {
-        // Check segment, move to next segment if necessary
+        // Check line number against segment bound, increment segment if >=
         if (line_number >= ends[segment]) {
             segment++;
-            if (segment > 3)
-                return BAD_READ;
             offset = 0;
+            if (segment > 3) {
+                line_number++;    // Ensure final error check fails
+                break;
+            }
         }
         
         // Prepare line for output.
@@ -42,23 +48,25 @@ int ReadFile(string path, int num_lines, struct shm_buffer * output) {
         line += '\n';
 
         // Copy line to output buffer
-        ::strncpy(output->buffer[segment] + offset, line.c_str(), BUFFER_ROW_SIZE);
+        ::strncpy(output->buffer[segment] + offset, line.c_str(), BUFFER_ROW_SIZE/4);   // TODO equations50000 segfaults; with /4 at end no segfault but everything still goes through?
         offset += line.size();
         line_number++;
     }
     file.close();
 
     // Check discrepancy between entered line number and actual amount
-    if (line_number != num_lines)
-        return BAD_READ;
-
-    return 0;
+    if (line_number != num_lines) {
+        output->num = BAD_READ;
+        string error = "INCORRECT NUMBER OF LINES ENTERED";
+        ::strncpy(output->message, error.c_str(), MESSAGE_SIZE);
+    }
 }
 
 void Run() {
     // Create signal handler to destroy named semaphores upon termination
     ::signal(SIGTERM, DestroySemaphores);
     ::signal(SIGINT, DestroySemaphores);
+    //::signal(SIGSEGV, DestroySemaphores);
 
     // Pre-delete named semaphores in case they still exist from past run.
     ::sem_unlink(SEM_SERVER);
@@ -87,7 +95,7 @@ void Run() {
         cout << "CLIENT REQUEST RECEIVED\n\tMEMORY OPEN" << endl;
         char request[MESSAGE_SIZE];
         //cin.getline(shm_ptr->message, request);
-        snprintf(request, MESSAGE_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
+        ::snprintf(request, MESSAGE_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
 
         string path = request;
         path.pop_back();                // Pop newline char
@@ -95,21 +103,14 @@ void Run() {
 
         // STEP 4. Read file and write to shared memory.
         cout << "\tOPENING: " << path << endl;
-        int status = ReadFile(path, num_lines, shm_ptr);
+        ReadFile(path, num_lines, shm_ptr);
         cout << "\tFILE CLOSED" << endl;
 
-
-
-        if (status == BAD_READ)                                                                     // TODO have ReadFile send error through shm
-            cout << "BAD_READ" << endl;
-
-
-
-        clog << "\tMEMORY CLOSED" << endl;                                                                 // TODO actually close the memory
-
-        
-        // Unblock client                                                                                   TODO possible temporary
+        // STEP 5. Unblock client and close shared memory.
         ::sem_post(sem_client);
+        ::munmap(shm_ptr, sizeof(struct shm_buffer));
+        ::close(shm_fd);
+        clog << "\tMEMORY CLOSED" << endl;
     }
 }
 

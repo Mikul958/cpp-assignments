@@ -8,6 +8,8 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "deque": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "*.tcc": "cpp",
+        "system_error": "cpp"
     }
 }
