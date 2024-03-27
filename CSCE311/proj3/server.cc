@@ -57,8 +57,9 @@ void Server::Run() {
 
         // STEP 2. Read client message through shared memory.                                         TODO this section is really sketch
         cout << "CLIENT REQUEST RECEIVED" << endl;
-        char request[BUFFER_ROW_SIZE];
-        snprintf(request, BUFFER_ROW_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead?
+        string request;
+        // std::getline(shm_ptr->message, request);
+        snprintf(request, BUFFER_ROW_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
         int num_lines = shm_ptr->lines;
         cout << "PATH: ";
         for (char c : request) {
