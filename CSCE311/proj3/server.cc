@@ -8,41 +8,37 @@ void Run() {
     ::signal(SIGINT, DestroySemaphores);
 
     // Pre-delete named semaphores in case they still exist from past run.
-    ::sem_unlink(SEM_SERVER);
-    ::sem_unlink(SEM_CLIENT);
+    DestroySemaphores(0);
 
     // Open named semaphores for communication, both with count 0.
     sem_t * sem_server = ::sem_open(SEM_SERVER, O_CREAT, 0660, 0);
     sem_t * sem_client = ::sem_open(SEM_CLIENT, O_CREAT, 0660, 0);
     if (sem_server == SEM_FAILED || sem_client == SEM_FAILED) {
         cout << "Server::Run: ::sem_open " << strerror(errno) << endl;
-        ::sem_unlink(SEM_SERVER);
-        ::sem_unlink(SEM_CLIENT);
+        DestroySemaphores(0);
         exit(-1);
     }
     cout << "SERVER STARTED" << endl;
 
     while (true) {
-        // Wait on a client to unblock server and open/map shared memory.
+        // STEP 2. Wait on a client to unblock server.
         ::sem_wait(sem_server);
+        cout << "CLIENT REQUEST RECEIVED" << endl;
+
+        // STEP 3. Open shared memory.
         int shm_fd;
         struct shm_info * shm_ptr;
         shm_fd = ::shm_open(SHM_PATH, O_RDWR, 0);
         shm_ptr = reinterpret_cast<struct shm_info*>(mmap(NULL, sizeof(*shm_ptr), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
+        cout << "\tMEMORY OPEN" << endl;
 
-        // STEP 2 AND 3. Read client message through shared memory.
-        cout << "CLIENT REQUEST RECEIVED\n\tMEMORY OPEN" << endl;
-        char request[MESSAGE_SIZE];
-        //cin.getline(shm_ptr->message, request);
-        ::snprintf(request, MESSAGE_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
-
-        string path = request;
-        path.pop_back();                // Pop newline char
+        // Read client message from shared memory.
+        string path = shm_ptr->message;
         int num_lines = shm_ptr->num;
 
         // STEP 4. Read file and write to shared memory.
         cout << "\tOPENING: " << path << endl;
-        ReadFile(path, num_lines, shm_ptr);    // Responds fully to client
+        ReadFile(path, num_lines, shm_ptr);     // Handles response to client
         cout << "\tFILE CLOSED" << endl;
 
         // STEP 5. Unblock client and close shared memory.
@@ -91,12 +87,12 @@ void ReadFile(string path, int num_lines, struct shm_info * output) {
             }
         }
 
-        // Prepare line for output.
+        // Clean potential trailing \r and add newline delimiter.
         if (line.back() == '\r')
             line.pop_back();
         line += '\n';
 
-        // Append line to output buffer and update information.
+        // Append line to main shared memory buffer and update information.
         // NOTE: offset + BUFFER_ROW_SIZE - offset = BUFFER_ROW_SIZE
         ::strncpy(output->buffer[segment] + offset, line.c_str(),
                                                     BUFFER_ROW_SIZE - offset);

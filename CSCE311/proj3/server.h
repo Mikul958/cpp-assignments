@@ -9,7 +9,7 @@
 
 #include <sys/un.h>
 #include <unistd.h>
-#include <signal.h>
+#include <signal.h>  // Signal handler
 
 #include <cassert>
 #include <cerrno>

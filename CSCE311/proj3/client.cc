@@ -38,21 +38,19 @@ void Run(string path, int num_lines) {
     sem_t * sem_server = ::sem_open(SEM_SERVER, 0);
     sem_t * sem_client = ::sem_open(SEM_CLIENT, 0);
 
-    // STEP 2. Write message to shared memory buffer and num_lines to num
-    string request = path + '\n';
-    ::strncpy(shm_ptr->message, request.c_str(), MESSAGE_SIZE);
+    // STEP 2. Write file path to shared memory message and num_lines to num
+    ::strncpy(shm_ptr->message, path.c_str(), MESSAGE_SIZE);
     shm_ptr->num = num_lines;
 
     // Unblock server, block client until server is done writing back.
     ::sem_post(sem_server);
     ::sem_wait(sem_client);
 
-    // Read in main server response and check for errors.                                                   TODO integrate with threads
+    // Read in main server response and check for errors.
     int status = shm_ptr->num;
     if (status == BAD_READ) {
-        char error[MESSAGE_SIZE];
-        ::snprintf(error, MESSAGE_SIZE, "%s", shm_ptr->message);
-        cout << "Client::Run: " << error << endl;
+        string error = shm_ptr->message;
+        cout << error << endl;
         ::munmap(shm_ptr, sizeof(struct shm_info));
         ::shm_unlink(SHM_PATH);
         return;
@@ -61,23 +59,24 @@ void Run(string path, int num_lines) {
     // STEP 3. Create 4 threads, each evaluating 1/4 of shared memory.
     struct thread_args t_args_array[4];
     for (int i=0; i < 4; i++) {
-        t_args_array[i].data = shm_ptr;
-        t_args_array[i].segment = i;
+        t_args_array[i].data = shm_ptr;    // Pass in pointer to shm
+        t_args_array[i].segment = i;       // Pass in segment to evaluate
     }
 
     pthread_t threads[4];
     for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_create(&threads[t_id], NULL, EvaluateSHM, (void *) &t_args_array[t_id]);
+        pthread_create(&threads[t_id], NULL, EvaluateSHM, reinterpret_cast<void *>(&t_args_array[t_id]));
     for (pthread_t t_id=0; t_id < 4; t_id++)
         pthread_join(threads[t_id], NULL);
     
-    
-
-
-
-
-    // Create 4 threads executing EvaluateResult(t_args_array) and wait.
-    
+    // STEP 4. Print results of each thread and sum to console.
+    double total = 0;
+    for (int i=0; i < 4; i++) {
+        struct thread_args current = t_args_array[i];
+        total += current.sum;
+        cout << "THREAD " << i << ":  " << current.operations << " LINES, " << current.sum << endl;
+    }
+    cout << "SUM:  " << total << endl;
 
     // STEP 5. Unmap and close shared memory.                                                                              TODO move to cleanup function
     ::munmap(shm_ptr, sizeof(struct shm_info));
@@ -88,11 +87,12 @@ void *EvaluateSHM(void * input) {
     // Cast void pointer back to struct to get parameters.
     struct thread_args * args = (struct thread_args *) input;
     struct shm_info * shm_ptr = args->data;
-    
-    // Evaluate designated of shared memory and add to section total.
-    //for (int i=args->start; i < args->end; i++)
-    //    args->sum += EvaluateLine(data[i]);
+
+    // Test code
     cout << "Called EvaluateSHM for segment " << args->segment << endl;
+    args->operations = 15;
+    args->sum = 100;
+
     pthread_exit(0);
 }
 
