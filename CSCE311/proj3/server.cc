@@ -1,6 +1,4 @@
-// Copyright 2024 mpikula
-
-// TODO modify for project 3
+// Copyright 2024 Michael Pikula
 
 #include <proj3/server.h>
 
@@ -41,7 +39,7 @@ void ReadFile(string path, int num_lines, struct shm_buffer * output) {
                 break;
             }
         }
-        
+
         // Prepare line for output.
         if (line.back() == '\r')
             line.pop_back();
@@ -68,7 +66,6 @@ void Run() {
     // Create signal handler to destroy named semaphores upon termination
     ::signal(SIGTERM, DestroySemaphores);
     ::signal(SIGINT, DestroySemaphores);
-    //::signal(SIGSEGV, DestroySemaphores);
 
     // Pre-delete named semaphores in case they still exist from past run.
     ::sem_unlink(SEM_SERVER);
@@ -84,8 +81,8 @@ void Run() {
         exit(-1);
     }
     cout << "SERVER STARTED" << endl;
-    
-    while (true) {        
+
+    while (true) {
         // Wait on a client to unblock server and open/map shared memory.
         ::sem_wait(sem_server);
         int shm_fd;

@@ -1,4 +1,4 @@
-// Copyright 2024 mpikula
+// Copyright 2024 Michael Pikula
 
 // TODO modify for project 3
 

@@ -1,4 +1,4 @@
-// Copyright 2024 mpikula
+// Copyright 2024 Michael Pikula
 
 #ifndef PROJ3_CALCULATE_H_
 #define PROJ3_CALCULATE_H_
