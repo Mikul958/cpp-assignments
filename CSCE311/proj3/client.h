@@ -30,9 +30,15 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+// Struct containing args for EvaluateSHM
+struct thread_args {
+    struct shm_info * data;  // Pointer to mapped shared memory struct
+    int segment;             // Index of shared memory to evaluate
+    int operations = 0;      // Amount of lines evaluated; output parameter
+    double sum = 0;          // Total for thread; output parameter
+};
 
-// Trims and splits a line from the server and evaluates its equation
-double EvaluateLine(string line);
+void Run(string filepath, int num_lines);
 
 /**
 * Evaluates the specified range of shared memory and returns sum of results
@@ -42,14 +48,7 @@ double EvaluateLine(string line);
 */
 void *EvaluateSHM(void * input);
 
-// Struct containing args for EvaluateSHM
-struct thread_args {
-    struct shm_info * data;  // Pointer to mapped shared memory struct
-    int segment;             // Index of shared memory to evaluate
-    int operations = 0;      // Amount of lines evaluated; output parameter
-    double sum = 0;          // Total for thread; output parameter
-}; 
-
-void Run(string filepath, int num_lines);
+// Trims and splits a line from the server and evaluates its equation
+double EvaluateLine(string line);
 
 #endif  // PROJ3_CLIENT_H_

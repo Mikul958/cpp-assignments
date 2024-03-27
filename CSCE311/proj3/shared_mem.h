@@ -14,7 +14,6 @@
 #include <semaphore.h>
 #include <string.h>
 
-
 #define MESSAGE_SIZE        4096            // 4KB, anything over is ridiculous
 #define THREAD_COUNT        4               
 #define BUFFER_ROW_SIZE     524288          // 2^19 bytes, more than enough

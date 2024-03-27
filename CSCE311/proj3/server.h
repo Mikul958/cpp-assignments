@@ -31,6 +31,8 @@ using std::cerr;
 using std::clog;
 using std::endl;
 
+void Run();
+
 void DestroySemaphores(int signum);
 
 /**
@@ -40,8 +42,5 @@ void DestroySemaphores(int signum);
 * @return true if file exists and was successfully read.
 */
 void ReadFile(string path, int num_lines, struct shm_info * output);
-
-void Run();
-
 
 #endif  // PROJ3_SERVER_H_

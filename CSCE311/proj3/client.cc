@@ -2,38 +2,7 @@
 
 #include <proj3/client.h>
 
-double EvaluateLine(string line) {
-    vector<string> equation;
-
-    string current;
-    for (char c : line) {
-        if (c == ' ') {
-            equation.push_back(current);
-            current.clear();
-        } else {
-            current += c;
-        }
-    }
-    if (current.length() > 0)
-        equation.push_back(current);
-
-    return Calculate(equation);  // Using calculate.h from Project 1
-}
-
-void *EvaluateSHM(void * input) {
-    // Cast void pointer back to struct to get parameters.
-    struct thread_args * args = (struct thread_args *) input;
-    struct shm_info * shm_ptr = args->data;
-    
-    // Evaluate designated of shared memory and add to section total.
-    //for (int i=args->start; i < args->end; i++)
-    //    args->sum += EvaluateLine(data[i]);
-    cout << "Called EvaluateSHM for segment " << args->segment << endl;
-    pthread_exit(0);
-}
-
 void Run(string path, int num_lines) {
-
     // STEP 1. Create shared memory between this client and the server                                              TODO move to createSharedMem function?
     int shm_fd;
     struct shm_info * shm_ptr;  // Pointer to mapped area of shared memory
@@ -113,6 +82,36 @@ void Run(string path, int num_lines) {
     // STEP 5. Unmap and close shared memory.                                                                              TODO move to cleanup function
     ::munmap(shm_ptr, sizeof(struct shm_info));
     ::shm_unlink(SHM_PATH);
+}
+
+void *EvaluateSHM(void * input) {
+    // Cast void pointer back to struct to get parameters.
+    struct thread_args * args = (struct thread_args *) input;
+    struct shm_info * shm_ptr = args->data;
+    
+    // Evaluate designated of shared memory and add to section total.
+    //for (int i=args->start; i < args->end; i++)
+    //    args->sum += EvaluateLine(data[i]);
+    cout << "Called EvaluateSHM for segment " << args->segment << endl;
+    pthread_exit(0);
+}
+
+double EvaluateLine(string line) {
+    vector<string> equation;
+
+    string current;
+    for (char c : line) {
+        if (c == ' ') {
+            equation.push_back(current);
+            current.clear();
+        } else {
+            current += c;
+        }
+    }
+    if (current.length() > 0)
+        equation.push_back(current);
+
+    return Calculate(equation);  // Using calculate.h from Project 1
 }
 
 int main(int argc, char* argv[]) {
