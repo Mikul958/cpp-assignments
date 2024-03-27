@@ -14,7 +14,6 @@
 #include <semaphore.h>
 #include <string.h>
 
-#define END_OF_TRANSMISSION '\004'
 
 #define MESSAGE_SIZE        4096            // 4KB, anything over is ridiculous
 #define THREAD_COUNT        4               

@@ -89,8 +89,6 @@ void Run(string path, int num_lines) {
         return;
     }
 
-
-
     char temp_response[BUFFER_ROW_SIZE];
     cout << "RESPONSE FROM SERVER:" << endl;
 
@@ -98,7 +96,6 @@ void Run(string path, int num_lines) {
         snprintf(temp_response, BUFFER_ROW_SIZE, "%s", shm_ptr->buffer[i]);
         cout << "\nFROM SEGMENT " << (i+1) << ":\n" << temp_response << endl;
     }
-
 
     // 
 
@@ -120,36 +117,10 @@ void Run(string path, int num_lines) {
     
 
 
-    // TEST CODE: VECTOR NOT FINAL                                                                                  TODO remove when ready
-    vector<string> equations;
-    for (int i=0; i<num_lines; i++)
-        equations.push_back(std::to_string(i));
-
-    for (int i=0; i<4; i++)
-        t_args_array[i].data = &equations;  // Allow each thread to reference equations vector
-
 
 
     // Create 4 threads executing EvaluateResult(t_args_array) and wait.
-    pthread_t threads[4];
-    for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_create(&threads[t_id],
-                       NULL,
-                       EvaluateSHM,
-                       (void *) &t_args_array[t_id]);
-    cout << "THREADS CREATED" << endl;
-    for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_join(threads[t_id], NULL);
     
-    // STEP 4. Report results of threads to console.
-    double total = 0;
-    for (int i=0; i < 4; i++) {
-        struct thread_args current = t_args_array[i];
-        cout << "THREAD " << i << ":  " << current.end - current.start
-             << " LINES, " << current.sum << endl;
-        total += current.sum;
-    }
-    cout << "SUM:  " << total << endl;
 
     // STEP 5. Unmap and close shared memory.                                                                              TODO move to cleanup function
     ::munmap(shm_ptr, sizeof(struct shm_buffer));
