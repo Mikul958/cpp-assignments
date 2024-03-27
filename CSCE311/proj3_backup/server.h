@@ -1,16 +1,15 @@
-// Copyright 2024 mpikula
+// Copyright 2024 Michael Pikula
 
 // TODO modify for project 3
 
 #ifndef PROJ3_SERVER_H_
 #define PROJ3_SERVER_H_
 
-#include <proj3/domain_socket.h>
+#include <proj3/shared_mem.h>
 
-#include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
-#include <sys/sysinfo.h>  // Using get_nprocs_conf
+#include <signal.h>
 
 #include <cassert>
 #include <cerrno>
@@ -27,23 +26,21 @@ using std::string;
 using std::vector;
 
 using std::cout;
+using std::cin;
 using std::cerr;
 using std::clog;
 using std::endl;
 
-class Server : public DomainSocket {
- public:
-    using ::DomainSocket::DomainSocket;
+void Run();
 
-    /**
-    * Opens file at the specified path and returns all lines to output vector.
-    * @param path The path of the file to read.
-    * @param output Output parameter; contains all lines read from file.
-    * @return true if file exists and was successfully read.
-    */
-    bool ReadFile(string path, vector<string>* output);
+void DestroySemaphores(int signum);
 
-    void Run();
-};
+/**
+* Opens file at the specified path and returns all lines to output vector.
+* @param path The path of the file to read.
+* @param output Output parameter; contains all lines read from file.
+* @return true if file exists and was successfully read.
+*/
+void ReadFile(string path, int num_lines, struct shm_info * output);
 
 #endif  // PROJ3_SERVER_H_

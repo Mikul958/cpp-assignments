@@ -1,94 +1,115 @@
-// Copyright 2024 mpikula
-
-// TODO modify for project 3
+// Copyright 2024 Michael Pikula
 
 #include <proj3/server.h>
 
-bool Server::ReadFile(string path, vector<string>* output) {
-    // Check for invalid file path
-    std::ifstream file(path.c_str());
-    if (!file.is_open())
-        return false;
+void Run() {
+    // Create signal handler to destroy named semaphores upon termination
+    ::signal(SIGTERM, DestroySemaphores);
+    ::signal(SIGINT, DestroySemaphores);
 
-    // Read all file lines and add to output vector
-    string line;
-    while (std::getline(file, line)) {
-        if (line.back() == '\r')
-            line.pop_back();     // Clean possible trailing \r from newline
-        output->push_back(line);
-    }
-    file.close();
+    // Pre-delete named semaphores in case they still exist from past run.
+    ::sem_unlink(SEM_SERVER);
+    ::sem_unlink(SEM_CLIENT);
 
-    return true;
-}
-
-void Server::Run() {
-    int socket_fd;  // Socket file descriptor
-
-    // Establish domain socket and begin listening for clients
-    if (!Init())
+    // Open named semaphores for communication, both with count 0.
+    sem_t * sem_server = ::sem_open(SEM_SERVER, O_CREAT, 0660, 0);
+    sem_t * sem_client = ::sem_open(SEM_CLIENT, O_CREAT, 0660, 0);
+    if (sem_server == SEM_FAILED || sem_client == SEM_FAILED) {
+        cout << "Server::Run: ::sem_open " << strerror(errno) << endl;
+        ::sem_unlink(SEM_SERVER);
+        ::sem_unlink(SEM_CLIENT);
         exit(-1);
-    if (!Bind())
-        exit(-2);
-    if (!Listen())
-        exit(-3);
+    }
     cout << "SERVER STARTED" << endl;
 
     while (true) {
-        // Accept client connection using domain socket
-        if (!Accept(&socket_fd) || socket_fd < 0) {
-            cerr << "Socket connection: " << ::strerror(errno) << endl;
-            continue;
-        }
-        cout << "CLIENT CONNECTED" << endl;
+        // Wait on a client to unblock server and open/map shared memory.
+        ::sem_wait(sem_server);
+        int shm_fd;
+        struct shm_info * shm_ptr;
+        shm_fd = ::shm_open(SHM_PATH, O_RDWR, 0);
+        shm_ptr = reinterpret_cast<struct shm_info*>(mmap(NULL, sizeof(*shm_ptr), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
 
-        while (true) {
-            // STEP 2. Read client message through domain socket.
-            string message;
-            ::ssize_t bytes_read = Read(&message, socket_fd);
-            if (bytes_read < 0) {
-                exit(0);
-            } else if (bytes_read == 0) {
-                close(socket_fd);
+        // STEP 2 AND 3. Read client message through shared memory.
+        cout << "CLIENT REQUEST RECEIVED\n\tMEMORY OPEN" << endl;
+        char request[MESSAGE_SIZE];
+        //cin.getline(shm_ptr->message, request);
+        ::snprintf(request, MESSAGE_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
+
+        string path = request;
+        path.pop_back();                // Pop newline char
+        int num_lines = shm_ptr->num;
+
+        // STEP 4. Read file and write to shared memory.
+        cout << "\tOPENING: " << path << endl;
+        ReadFile(path, num_lines, shm_ptr);    // Responds fully to client
+        cout << "\tFILE CLOSED" << endl;
+
+        // STEP 5. Unblock client and close shared memory.
+        ::sem_post(sem_client);
+        ::munmap(shm_ptr, sizeof(struct shm_info));
+        ::close(shm_fd);
+        clog << "\tMEMORY CLOSED" << endl;
+    }
+}
+
+void DestroySemaphores(int signum) {
+    ::sem_unlink(SEM_SERVER);
+    ::sem_unlink(SEM_CLIENT);
+}
+
+void ReadFile(string path, int num_lines, struct shm_info * output) {
+    // Check for invalid file path.
+    std::ifstream file(path.c_str());
+    if (!file.is_open()) {
+        output->num = BAD_READ;
+        string error = "INVALID FILE";
+        ::strncpy(output->message, error.c_str(), MESSAGE_SIZE);
+        return;
+    }
+
+    // Determine how many lines go in each shared memory segment.
+    int ends[4];
+    int range = num_lines / 4;
+    int remainder = num_lines % 4;
+    for (int i=0; i < 4; i++)
+        ends[i] = range * (i+1);
+    for (int i=0; i < remainder; i++)
+        ends[3-i] += remainder - i;
+
+    // Read all file lines and write to respective segment of shared memory
+    int line_number = 0, segment = 0, offset = 0;
+    string line;
+    while (std::getline(file, line)) {
+        // Check line number against segment bound, increment segment if >=
+        if (line_number >= ends[segment]) {
+            segment++;
+            offset = 0;
+            if (segment > 3) {
+                line_number++;    // Ensure final error check fails
                 break;
             }
-
-            // Confirm request received in output stream and get file path.
-            cout << "CLIENT REQUEST RECEIVED" << endl;
-            vector<string> request = ParseMessage(message);
-            string path = request[0];
-
-            // STEP 3. Open the shared memory created by client.                                                 TODO figure out opening shm
-            // pretend i did shm stuff
-            cout << "\tMEMORY OPEN" << endl;
-
-            // STEP 4. Open and read file at desired path.
-            cout << "\tOPENING: " << path << endl;
-            vector<string> retrieved;
-            bool file_read = ReadFile(path, &retrieved);
-            cout << "\tFILE CLOSED" << endl;
-
-            // Check for file IO error and write file lines to shared memory.
-            // NOTE: '0' at response[0] indicates error to client, else normal.
-            string response;
-            if (file_read) {
-                response = string("1") + DomainSocket::kEoT;
-                // Write retrieved file lines to shared memory.                                                 TODO figure out writing to shm
-            } else {
-                response = string("0") + DomainSocket::kEoT;
-            }
-            // NOTE: Client blocks waiting for server response, so response
-            // must be written after server is done writing to shared memory
-            Write(response, socket_fd);
-
-            // Release server's hold on shared memory.                                                           TODO figure out closing shm
-            // pretend i did shm stuff
-            clog << "\tMEMORY CLOSED" << endl;
-
-            // Close client connection.
-            Close(socket_fd);
-            break;
         }
+
+        // Prepare line for output.
+        if (line.back() == '\r')
+            line.pop_back();
+        line += '\n';
+
+        // Append line to output buffer and update information.
+        // NOTE: offset + BUFFER_ROW_SIZE - offset = BUFFER_ROW_SIZE
+        ::strncpy(output->buffer[segment] + offset, line.c_str(),
+                                                    BUFFER_ROW_SIZE - offset);
+        offset += line.size();
+        line_number++;
+    }
+    file.close();
+
+    // Check discrepancy between entered line number and actual amount
+    if (line_number != num_lines) {
+        output->num = BAD_READ;
+        string error = "INCORRECT NUMBER OF LINES ENTERED";
+        ::strncpy(output->message, error.c_str(), MESSAGE_SIZE);
     }
 }
 
@@ -98,8 +119,7 @@ int main(int argc, char* argv[]) {
         exit(-4);
     }
 
-    Server server("MP_SOCKET");
-    server.Run();
+    Run();
 
     return 0;
 }

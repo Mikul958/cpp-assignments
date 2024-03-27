@@ -5,6 +5,11 @@
         "cstddef": "cpp",
         "array": "cpp",
         "string_view": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "deque": "cpp",
+        "vector": "cpp",
+        "*.tcc": "cpp",
+        "system_error": "cpp"
     }
 }
