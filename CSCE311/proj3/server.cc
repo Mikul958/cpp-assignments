@@ -57,18 +57,13 @@ void Run() {
 
         // STEP 2. Read client message through shared memory.                                         TODO this section is really sketch
         cout << "CLIENT REQUEST RECEIVED" << endl;
-        char request[BUFFER_ROW_SIZE];
+        char request[MESSAGE_SIZE];
         // std::getline(shm_ptr->message, request);
-        snprintf(request, BUFFER_ROW_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
+        snprintf(request, MESSAGE_SIZE, "%s", shm_ptr->message);                                    // TODO use getline instead? (line above, broken atm)
         int num_lines = shm_ptr->lines;
-        cout << "PATH: ";
-        for (char c : request) {
-            if (c == '\n')
-                break;
-            else
-                cout << c;
-        }
-        cout << endl << "NUMBER OF LINES: " << num_lines << endl;
+
+        cout << "\tOPENING: " << request << endl;                                                        // TODO request includes a newline, not broken.
+        cout << "NUMBER OF LINES: " << num_lines << endl;
 
         // Confirm request received in output stream and get file path.
         //vector<string> request = ParseMessage(message);

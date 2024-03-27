@@ -18,10 +18,10 @@ client : client.o calculate.o
 
 
 # Compiled object code
-server.o : server.cc server.h
+server.o : server.cc server.h shared_mem.h
 	$(compile) $@ $<
 
-client.o : client.cc client.h
+client.o : client.cc client.h shared_mem.h
 	$(compile_thread) $@ $<
 
 calculate.o : calculate.cc calculate.h

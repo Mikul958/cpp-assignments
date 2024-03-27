@@ -71,7 +71,7 @@ void Run(string path, int num_lines) {
 
     // STEP 2. Write message and number of lines to shared memory.
     string request = path + '\n';
-    ::snprintf(shm_ptr->message, BUFFER_ROW_SIZE, "%s", request.c_str());                                               // TODO use strncpy instead?
+    ::snprintf(shm_ptr->message, MESSAGE_SIZE, "%s", request.c_str());                                               // TODO use strncpy instead?
     shm_ptr->lines = num_lines;
 
     // Unblock server, block client until server is done writing back.

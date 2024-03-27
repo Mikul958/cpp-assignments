@@ -16,8 +16,9 @@
 
 #define END_OF_TRANSMISSION '\004'
 
-#define BUFFER_ROWS         4                // 4 threads, 1 row each
-#define BUFFER_ROW_SIZE     524288           // Max expected file size / 4
+#define MESSAGE_SIZE        4096            // 4KB, anything over is ridiculous
+#define THREAD_COUNT        4               
+#define BUFFER_ROW_SIZE     524288          // ~1.2MB / 4 threads
 #define SHM_PATH            "MP_SHM"
 
 #define SEM_SERVER          "/MP_SEM_SERVER"
@@ -27,8 +28,8 @@
 // buffer will contain file lines written back by server
 struct shm_buffer {
     int lines;
-    char message[BUFFER_ROW_SIZE];
-    char buffer[BUFFER_ROWS][BUFFER_ROW_SIZE];
+    char message[MESSAGE_SIZE];
+    char buffer[THREAD_COUNT][BUFFER_ROW_SIZE];
 };
 
 # endif  // PROJ3_SHARED_MEM_H_

@@ -30,6 +30,7 @@ using std::cerr;
 using std::clog;
 using std::endl;
 
+void DestroySemaphores(int signum);
 
 /**
 * Opens file at the specified path and returns all lines to output vector.
