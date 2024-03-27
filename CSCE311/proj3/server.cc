@@ -47,8 +47,9 @@ void ReadFile(string path, int num_lines, struct shm_buffer * output) {
             line.pop_back();
         line += '\n';
 
-        // Copy line to output buffer
-        ::strncpy(output->buffer[segment] + offset, line.c_str(), BUFFER_ROW_SIZE/4);   // TODO equations50000 segfaults; with /4 at end no segfault but everything still goes through?
+        // Append line to output buffer and update information.
+        ::strncpy(output->buffer[segment] + offset, line.c_str(),
+                                            BUFFER_ROW_SIZE - offset);
         offset += line.size();
         line_number++;
     }
