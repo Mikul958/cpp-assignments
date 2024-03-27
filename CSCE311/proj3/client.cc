@@ -3,36 +3,9 @@
 #include <proj3/client.h>
 
 void Run(string path, int num_lines) {
-    // STEP 1. Create shared memory between this client and the server                                              TODO move to createSharedMem function?
-    int shm_fd;
-    struct shm_info * shm_ptr;  // Pointer to mapped area of shared memory
-    ::shm_unlink(SHM_PATH);       // Pre-delete in case of previous error.
-
-    // Open shared memory
-    shm_fd = ::shm_open(SHM_PATH, O_CREAT | O_EXCL | O_RDWR,
-                                  S_IRUSR | S_IWUSR);
-    if (shm_fd == -1) {
-        cerr << "Client::Run: failed to create shared memory, may already exist" << endl;
-        return;
-    }
-
-    // Set size of shared memory buffer.
-    if(::ftruncate(shm_fd, sizeof(struct shm_info)) == -1) {
-        cerr << "Client::Run: failed to set size of shared memory object" << endl;
-        ::shm_unlink(SHM_PATH);
-        return;
-    }
+    // STEP 1. Create shared memory and store pointer to its location.
+    struct shm_info * shm_ptr = CreateSHM();
     cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_info) << " BYTES" << endl;
-
-    // Map shared memory and return location at shm_ptr.
-    shm_ptr = reinterpret_cast<struct shm_info*>(mmap(NULL, sizeof(*shm_ptr),
-                                                   PROT_READ | PROT_WRITE,
-                                                   MAP_SHARED, shm_fd, 0));
-    if (shm_ptr == MAP_FAILED) {
-        cerr << "Client::Run: failed to map shared memory" << endl;
-        ::shm_unlink(SHM_PATH);
-        return;
-    }
 
     // Open named semaphores created by server
     sem_t * sem_server = ::sem_open(SEM_SERVER, 0);
@@ -78,9 +51,43 @@ void Run(string path, int num_lines) {
     }
     cout << "SUM:  " << total << endl;
 
-    // STEP 5. Unmap and close shared memory.                                                                              TODO move to cleanup function
+    // STEP 5. Unmap and destroy shared memory.                                                                              TODO move to cleanup function
     ::munmap(shm_ptr, sizeof(struct shm_info));
     ::shm_unlink(SHM_PATH);
+}
+
+struct shm_info * CreateSHM() {
+    int shm_fd;
+    struct shm_info * shm_ptr;  // Pointer to mapped area of shared memory
+    ::shm_unlink(SHM_PATH);       // Pre-delete in case of previous error.
+
+    // Open new shared memory location.
+    shm_fd = ::shm_open(SHM_PATH, O_CREAT | O_EXCL | O_RDWR,
+                                  S_IRUSR | S_IWUSR);
+    if (shm_fd == -1) {
+        cerr << "Client::Run: failed to create shared memory, may already exist" << endl;
+        exit(2);
+    }
+
+    // Set size of shared memory location using shm_info struct.
+    if(::ftruncate(shm_fd, sizeof(struct shm_info)) == -1) {
+        cerr << "Client::Run: failed to set size of shared memory object" << endl;
+        ::shm_unlink(SHM_PATH);
+        exit(3);
+    }
+
+    // Map shared memory and return location at shm_ptr.
+    shm_ptr = reinterpret_cast<struct shm_info*>(mmap(NULL, sizeof(*shm_ptr),
+                                                   PROT_READ | PROT_WRITE,
+                                                   MAP_SHARED, shm_fd, 0));
+    if (shm_ptr == MAP_FAILED) {
+        cerr << "Client::Run: failed to map shared memory" << endl;
+        ::shm_unlink(SHM_PATH);
+        exit(4);
+    }
+
+    // Return pointer to shared memory location.
+    return shm_ptr;
 }
 
 void * EvaluateSHM(void * input) {
@@ -112,6 +119,7 @@ void * EvaluateSHM(void * input) {
 double EvaluateLine(string line) {
     vector<string> equation;
 
+    // Split line at spaces and add pieces to equations vector.
     string current;
     for (char c : line) {
         if (c == ' ') {
@@ -128,14 +136,13 @@ double EvaluateLine(string line) {
 }
 
 int main(int argc, char* argv[]) {
-    // Validate usage
+    // Validate arguments.
     if (argc != 3) {
         cerr << "\n    Usage : " << argv[0]
              << "  <filepath> <number of lines in file>\n" << endl;
-        exit(5);
+        exit(1);
     }
-
-    // Obtain args from command line and check validity.
+    
     string path = argv[1];
     int num_lines;
     try {
@@ -145,11 +152,12 @@ int main(int argc, char* argv[]) {
     }
     catch (const std::invalid_argument &e) {
         cout << "  client: invalid number of lines entered" << endl;
-        exit(6);
+        exit(1);
     }
 
-    // Connect to server with given socket name and request
+    // Run client.
     Run(path, num_lines);
 
+    // STEP 6. Return 0 to indicate nominative exit status.
     return 0;
 }

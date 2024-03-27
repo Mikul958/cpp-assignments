@@ -110,12 +110,13 @@ void ReadFile(string path, int num_lines, struct shm_info * output) {
 }
 
 int main(int argc, char* argv[]) {
+    // Validate arguments.
     if (argc != 1) {
         cerr << "\n    Usage : " << argv[0] << "\n" << endl;
-        exit(-4);
+        exit(-2);
     }
 
+    // Run server.
     Run();
-
     return 0;
 }

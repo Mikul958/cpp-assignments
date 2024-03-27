@@ -30,7 +30,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-// Struct containing args for EvaluateSHM
+// Struct containing arguments for EvaluateSHM
 struct thread_args {
     struct shm_info * data;  // Pointer to mapped shared memory struct
     int segment;             // Index of shared memory to evaluate
@@ -38,17 +38,31 @@ struct thread_args {
     double sum = 0;          // Total for thread; output parameter
 };
 
+/**
+ * Runs the client.
+ * @param filepath The path of the file for the server to read from.
+ * @param num_lines The number of lines in the specified file; must be correct.
+ */
 void Run(string filepath, int num_lines);
 
 /**
-* Evaluates the specified range of shared memory and returns sum of results
-* Intended to be called through EvaluateResultHelper() from pthreads
-* @param input struct containing pointer to string<vector>, int start,
-*              int end, and double out; sum of section is returned at out.
-*/
+ * Creates and maps a shared memory location for the client and server.
+ * @return Pointer to the start of shared memory struct.
+ */
+struct shm_info * CreateSHM();
+
+/**
+ * Evaluates the specified segment of shared memory buffer.
+ * Intended to be called via pthreads.
+ * @param input struct thread_args containing pointer to shared memory, row of
+ *              shm buffer, number of operations (output), and sum (output).
+ */
 void * EvaluateSHM(void * input);
 
-// Trims and splits a line from the server and evaluates its equation
+/**
+ * Evaluates the equation contained in the specified line.
+ * @param line Line to be evaluated.
+*/
 double EvaluateLine(string line);
 
 #endif  // PROJ3_CLIENT_H_
