@@ -7,7 +7,7 @@ void DestroySemaphores(int signum) {
     ::sem_unlink(SEM_CLIENT);
 }
 
-void ReadFile(string path, int num_lines, struct shm_buffer * output) {
+void ReadFile(string path, int num_lines, struct shm_info * output) {
     // Check for invalid file path.
     std::ifstream file(path.c_str());
     if (!file.is_open()) {
@@ -86,9 +86,9 @@ void Run() {
         // Wait on a client to unblock server and open/map shared memory.
         ::sem_wait(sem_server);
         int shm_fd;
-        struct shm_buffer * shm_ptr;
+        struct shm_info * shm_ptr;
         shm_fd = ::shm_open(SHM_PATH, O_RDWR, 0);
-        shm_ptr = reinterpret_cast<struct shm_buffer*>(mmap(NULL, sizeof(*shm_ptr), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
+        shm_ptr = reinterpret_cast<struct shm_info*>(mmap(NULL, sizeof(*shm_ptr), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
 
         // STEP 2 AND 3. Read client message through shared memory.
         cout << "CLIENT REQUEST RECEIVED\n\tMEMORY OPEN" << endl;
@@ -107,7 +107,7 @@ void Run() {
 
         // STEP 5. Unblock client and close shared memory.
         ::sem_post(sem_client);
-        ::munmap(shm_ptr, sizeof(struct shm_buffer));
+        ::munmap(shm_ptr, sizeof(struct shm_info));
         ::close(shm_fd);
         clog << "\tMEMORY CLOSED" << endl;
     }

@@ -26,7 +26,7 @@
 #define SEM_CLIENT          "/MP_SEM_CLIENT"
 
 
-struct shm_buffer {
+struct shm_info {
     int num;                                    // Lines/error status
     char message[MESSAGE_SIZE];                 // Request path/potential error
     char buffer[THREAD_COUNT][BUFFER_ROW_SIZE]; // Main buffer

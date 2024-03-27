@@ -22,12 +22,12 @@ double EvaluateLine(string line) {
 
 void *EvaluateSHM(void * input) {
     // Cast void pointer back to struct to get parameters.
-    struct thread_args * args = (struct thread_args *) input;
-    vector<string> data = *(args->data);
+    //struct thread_args * args = (struct thread_args *) input;
+    //vector<string> data = *(args->data);
     
     // Evaluate designated of shared memory and add to section total.
-    for (int i=args->start; i < args->end; i++)
-        args->sum += EvaluateLine(data[i]);
+    //for (int i=args->start; i < args->end; i++)
+    //    args->sum += EvaluateLine(data[i]);
 
     pthread_exit(0);
 }
@@ -36,7 +36,7 @@ void Run(string path, int num_lines) {
 
     // STEP 1. Create shared memory between this client and the server                                              TODO move to createSharedMem function?
     int shm_fd;
-    struct shm_buffer * shm_ptr;  // Pointer to mapped area of shared memory
+    struct shm_info * shm_ptr;  // Pointer to mapped area of shared memory
     ::shm_unlink(SHM_PATH);       // Pre-delete in case of previous error.
 
     // Open shared memory
@@ -48,15 +48,15 @@ void Run(string path, int num_lines) {
     }
 
     // Set size of shared memory buffer.
-    if(::ftruncate(shm_fd, sizeof(struct shm_buffer)) == -1 ) {
+    if(::ftruncate(shm_fd, sizeof(struct shm_info)) == -1 ) {
         cerr << "Client::Run: failed to set size of shared memory object" << endl;
         ::shm_unlink(SHM_PATH);
         return;
     }
-    cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_buffer) << " BYTES" << endl;
+    cout << "SHARED MEMORY ALLOCATED: " << sizeof(struct shm_info) << " BYTES" << endl;
 
     // Map shared memory and return location at shm_ptr.
-    shm_ptr = reinterpret_cast<struct shm_buffer*>(mmap(NULL, sizeof(*shm_ptr),
+    shm_ptr = reinterpret_cast<struct shm_info*>(mmap(NULL, sizeof(*shm_ptr),
                                                    PROT_READ | PROT_WRITE,
                                                    MAP_SHARED, shm_fd, 0));
     if (shm_ptr == MAP_FAILED) {
@@ -84,36 +84,13 @@ void Run(string path, int num_lines) {
         char error[MESSAGE_SIZE];
         ::snprintf(error, MESSAGE_SIZE, "%s", shm_ptr->message);
         cout << "Client::Run: " << error << endl;
-        ::munmap(shm_ptr, sizeof(struct shm_buffer));
+        ::munmap(shm_ptr, sizeof(struct shm_info));
         ::shm_unlink(SHM_PATH);
         return;
     }
 
-    char temp_response[BUFFER_ROW_SIZE];
-    cout << "RESPONSE FROM SERVER:" << endl;
-
-    for (int i=0; i<4; i++) {
-        snprintf(temp_response, BUFFER_ROW_SIZE, "%s", shm_ptr->buffer[i]);
-        cout << "\nFROM SEGMENT " << (i+1) << ":\n" << temp_response << endl;
-    }
-
-    // 
-
-
-
-    // STEP 3. Create 4 threads, each evaluating 1/4 of equations vector.
-    int range = num_lines / 4;
-    int remainder = num_lines % 4;
-    struct thread_args t_args_array[4];
-
-    // Obtain upper and lower bounds for each thread based on num_lines.
-    for (int i=0; i < 4; i++)
-        t_args_array[i].end = (i+1) * range;
-    for (int i=0; i < remainder; i++)
-        t_args_array[3-i].end += remainder-i;
-    t_args_array[0].start = 0;
-    for (int i=1; i < 4; i++)
-        t_args_array[i].start = t_args_array[i-1].end;
+    // STEP 3. Create 4 threads, each evaluating 1/4 of shared memory.
+    
     
 
 
@@ -123,7 +100,7 @@ void Run(string path, int num_lines) {
     
 
     // STEP 5. Unmap and close shared memory.                                                                              TODO move to cleanup function
-    ::munmap(shm_ptr, sizeof(struct shm_buffer));
+    ::munmap(shm_ptr, sizeof(struct shm_info));
     ::shm_unlink(SHM_PATH);
 }
 
