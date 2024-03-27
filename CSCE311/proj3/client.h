@@ -44,7 +44,7 @@ void *EvaluateSHM(void * input);
 
 // Struct containing args for EvaluateSHM
 struct thread_args {
-    struct shm_info read_from;
+    struct shm_info * data;
     int segment;
     double sum = 0;
 }; 

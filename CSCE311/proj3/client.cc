@@ -28,7 +28,7 @@ void *EvaluateSHM(void * input) {
     // Evaluate designated of shared memory and add to section total.
     //for (int i=args->start; i < args->end; i++)
     //    args->sum += EvaluateLine(data[i]);
-
+    cout << "Called EvaluateSHM" << endl;
     pthread_exit(0);
 }
 
@@ -90,6 +90,17 @@ void Run(string path, int num_lines) {
     }
 
     // STEP 3. Create 4 threads, each evaluating 1/4 of shared memory.
+    struct thread_args t_args_array[4];
+    for (int i=0; i < 4; i++) {
+        t_args_array[i].data = shm_ptr;
+        t_args_array[i].segment = i;
+    }
+
+    pthread_t threads[4];
+    for (pthread_t t_id=0; t_id < 4; t_id++)
+        pthread_create(&threads[t_id], NULL, EvaluateSHM, (void *) &t_args_array[t_id]);
+    for (pthread_t t_id=0; t_id < 4; t_id++)
+        pthread_join(threads[t_id], NULL);
     
     
 
