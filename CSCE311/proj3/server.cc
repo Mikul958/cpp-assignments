@@ -48,8 +48,9 @@ void ReadFile(string path, int num_lines, struct shm_buffer * output) {
         line += '\n';
 
         // Append line to output buffer and update information.
+        // NOTE: offset + BUFFER_ROW_SIZE - offset = BUFFER_ROW_SIZE
         ::strncpy(output->buffer[segment] + offset, line.c_str(),
-                                            BUFFER_ROW_SIZE - offset);
+                                                    BUFFER_ROW_SIZE - offset);
         offset += line.size();
         line_number++;
     }
