@@ -31,7 +31,7 @@ using std::endl;
 // Struct containing arguments for EvaluateSHM
 struct thread_args {
     struct shm_info * data;  // Pointer to mapped shared memory struct
-    int segment;             // Index of shared memory to evaluate
+    int segment;             // Row of shared memory buffer to evaluate
     int operations = 0;      // Amount of lines evaluated; output parameter
     double sum = 0;          // Total for thread; output parameter
 };
