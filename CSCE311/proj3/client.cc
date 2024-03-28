@@ -62,7 +62,7 @@ void Run(string path, int num_lines) {
 
 struct shm_info * CreateSHM() {
     int shm_fd;
-    struct shm_info * shm_ptr;  // Pointer to mapped area of shared memory
+    struct shm_info * shm_ptr;    // Pointer to mapped area of shared memory.
     ::shm_unlink(SHM_PATH);       // Pre-delete in case of previous error.
 
     // Open new shared memory location.
