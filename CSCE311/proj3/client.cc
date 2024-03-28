@@ -38,13 +38,13 @@ void Run(string path, int num_lines) {
 
     pthread_t threads[4];
     for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_create(&threads[t_id], NULL, EvaluateSHM,
+        ::pthread_create(&threads[t_id], NULL, EvaluateSHM,
                        reinterpret_cast<void *>(&t_args_array[t_id]));
     cout << "THREADS CREATED" << endl;
 
     // Wait on threads to finish executing.
     for (pthread_t t_id=0; t_id < 4; t_id++)
-        pthread_join(threads[t_id], NULL);
+        ::pthread_join(threads[t_id], NULL);
 
     // STEP 4. Print results of each thread and sum to console.
     double total = 0;
@@ -122,7 +122,7 @@ void * EvaluateSHM(void * input) {
         }
     }
 
-    pthread_exit(0);
+    ::pthread_exit(0);
 }
 
 double EvaluateLine(string line) {
