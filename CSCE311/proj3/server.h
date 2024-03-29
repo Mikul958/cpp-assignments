@@ -5,23 +5,14 @@
 
 #include <proj3/shared_mem.h>
 
-#include <sys/un.h>
-#include <unistd.h>
-#include <signal.h>  // Signal handler
-
-#include <cassert>
-#include <cerrno>
-#include <cstddef>
-#include <cstdlib>
-#include <cstring>
+#include <unistd.h>     // UNIX standard header
+#include <csignal>     // Signal handler
 
 #include <string>
-#include <vector>
 #include <iostream>
-#include <fstream>  // Using ifstream to read file
+#include <fstream>      // Use ifstream to read file
 
 using std::string;
-using std::vector;
 
 using std::cout;
 using std::cin;

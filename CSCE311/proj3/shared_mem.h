@@ -4,15 +4,10 @@
 #ifndef PROJ3_SHARED_MEM_H_
 #define PROJ3_SHARED_MEM_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/sysinfo.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <string.h>
+#include <sys/mman.h>       // Shared memory functions
+#include <fcntl.h>          // O_CREAT, O_RDWR, ...
+#include <semaphore.h>      // Synchronization
+#include <cstring>          // strncpy
 
 #define MESSAGE_SIZE        4096            // 4KB, anything over is ridiculous
 #define THREAD_COUNT        4

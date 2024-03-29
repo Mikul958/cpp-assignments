@@ -47,6 +47,8 @@ void Run(string path, int num_lines) {
         ::pthread_join(threads[t_id], NULL);
 
     // STEP 4. Print results of each thread and sum to console.
+    
+    
     double total = 0;
     for (int i=0; i < 4; i++) {
         struct thread_args current = t_args_array[i];

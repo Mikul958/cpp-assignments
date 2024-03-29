@@ -2,19 +2,6 @@
 
 #include <proj3/calculate.h>
 
-#include <iostream>
-using std::cout;
-#include <string>
-using std::string;
-#include <vector>
-using std::vector;
-#include <algorithm>
-#include <stack>
-using std::stack;
-#include <stdexcept>
-using std::exception;
-using std::invalid_argument;
-
 void PopulateStacks(vector<string> input, stack<double>* operands,
                     stack<string>* operators) {
     bool need_operand = true;  // Alternates to make sure args are in order

@@ -6,23 +6,14 @@
 #include <proj3/shared_mem.h>    // Contains shared mem path & buffer info
 #include <proj3/calculate.h>     // Contains calculate functions
 
-#include <sys/unistd.h>  // UNIX standard header
-#include <sys/mman.h>    // Shared memory functions
-#include <fcntl.h>       // O_CREAT, ...
-#include <string.h>      // strlen, write
-#include <pthread.h>     // POSIX threads
-
-#include <cassert>
-#include <cerrno>
-#include <cstddef>
-#include <cstdlib>
+#include <sys/unistd.h>     // UNIX standard header
+#include <pthread.h>        // POSIX threads
 
 #include <string>
-#include <vector>
 #include <iostream>
+#include <locale>           // Make client output pretty
 
 using std::string;
-using std::vector;
 
 using std::cout;
 using std::cerr;
