@@ -3,14 +3,14 @@
 #ifndef PROJ3_SERVER_H_
 #define PROJ3_SERVER_H_
 
-#include <proj3/shared_mem.h>
+#include <proj3/shared_mem.h>   // Contains shared mem path & buffer info
 
-#include <unistd.h>     // UNIX standard header
-#include <csignal>     // Signal handler
+#include <sys/unistd.h>     // UNIX standard header
+#include <csignal>          // Signal handler
 
 #include <string>
 #include <iostream>
-#include <fstream>      // Use ifstream to read file
+#include <fstream>          // Use ifstream to read file
 
 using std::string;
 
