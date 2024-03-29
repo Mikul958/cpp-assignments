@@ -10,6 +10,7 @@
 #include <pthread.h>        // POSIX threads
 
 #include <string>
+#include <vector>
 #include <iostream>
 #include <locale>           // Make client output pretty
 
