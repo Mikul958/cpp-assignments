@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <locale>           // Make client output pretty
+#include <iomanip>          // Long-form numbers in output.
 
 using std::string;
 
