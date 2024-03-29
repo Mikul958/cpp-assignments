@@ -12,7 +12,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+
 #include <iomanip>          // Long-form numbers in output.
+#include <locale>           // Commas in output numbers.
 
 using std::string;
 
