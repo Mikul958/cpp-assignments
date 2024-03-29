@@ -39,7 +39,7 @@ void Run(string path, int num_lines) {
     pthread_t threads[4];
     for (pthread_t t_id=0; t_id < 4; t_id++)
         ::pthread_create(&threads[t_id], NULL, EvaluateSHM,
-                       reinterpret_cast<void *>(&t_args_array[t_id]));
+                         reinterpret_cast<void *>(&t_args_array[t_id]));
     cout << "THREADS CREATED" << endl;
 
     // Wait on threads to finish executing.
@@ -161,7 +161,7 @@ int main(int argc, char* argv[]) {
             throw std::invalid_argument("negative line count");
     }
     catch (const std::invalid_argument &e) {
-        cout << "  client: invalid number of lines entered" << endl;
+        cerr << "INVALID NUMBER OF LINES ENTERED" << endl;
         exit(1);
     }
 
