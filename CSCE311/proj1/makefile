@@ -14,8 +14,10 @@ compile = g++ $(flags) -c -o
 # Link to executable
 link = g++ $(flags) -o
 
+all : calculate clean
+
 # Link main.o and calculator.o to one executable file
-calculate : main.o calculate.o
+calculate : calculate.o main.o
 	$(link) $@ $^
 
 # Compile main.cc to .o, ensuring it exists

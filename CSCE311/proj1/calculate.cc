@@ -1,92 +1,86 @@
-// Copyright 2024 mpikula
+// Copyright 2024 Michael Pikula
 
 #include <proj1/calculate.h>
 
-#include <iostream>
-using std::cout;
-#include <string>
-using std::string;
-#include <vector>
-using std::vector;
-#include <algorithm>
-#include <stack>
-using std::stack;
-#include <stdexcept>
-using std::exception;
-using std::invalid_argument;
+const string bad_order = "Invalid expression, verify the character order.";
+const string bad_operator = "Invalid operator, please use only +, -, x, or /.";
 
-void PopulateStacks(vector<string> input, stack<double>* operands,
-                    stack<string>* operators) {
+double Calculate(vector<string> input) {
+    // Initialize vectors for operands/operators.
+    vector<double> operands;
+    vector<string> operators;
+
+    // Evaluate * and / and store remaining work in operands/operators.
+    PopulateVectors(input, &operands, &operators);
+
+    // Evaluate remaining addition and subtraction and return result.
+    return EvaluateVectors(operands, operators);
+}
+
+void PopulateVectors(vector<string> input, vector<double>* operands,
+                    vector<string>* operators) {
     bool need_operand = true;  // Alternates to make sure args are in order
     for (string item : input) {
-        string bad_order = "Invalid expression, verify the character order.";
-        string bad_char = "Invalid expression, use only +, -, x, or /.";
-        string divide_by_zero = "Invalid expression, contains division by 0.";
         try {
-            double current = std::stod(item);
+            double operand = std::stod(item);
+
             // If last arg was also an operand, exit
             if (!need_operand)
                 throw invalid_argument(bad_order);
 
-            // Check last operator to uphold order of operations.
+            // If last operator was * or /, evaluate immediately,
+            // else push operand onto stack.
             if (operators->empty()) {
-                operands->push(current);
-            } else if (operators->top() == "x" || operators->top() == "X") {
-                operands->top() = current * operands->top();
-                operators->pop();
-            } else if (operators->top() == "/") {
-                if (operands->top() == 0)
-                    throw invalid_argument(divide_by_zero);
-                operands->top() = current / operands->top();
-                operators->pop();
+                operands->push_back(operand);
+            } else if (operators->back() == "x" || operators->back() == "X") {
+                operands->back() = operands->back() * operand;
+                operators->pop_back();
+            } else if (operators->back() == "/") {
+                operands->back() = operands->back() / operand;
+                operators->pop_back();
             } else {
-                operands->push(current);
+                operands->push_back(operand);
             }
 
+            // Require next arg to be an operator.
             need_operand = false;
         }
-        // Arg is not a numerical value.
+        // Arg is not a numerical value, must be operator.
         catch(const invalid_argument& e) {
-            string current = item;
             // If last arg was also an operator, exit
             if (need_operand)
                 throw invalid_argument(bad_order);
 
             // Check validity of operators.
-            if (current == "+" || current == "-" || current == "x"
-            || current == "X" || current == "/")
-                operators->push(current);
+            if (isValidOperator(item))
+                operators->push_back(item);
             else
-                throw invalid_argument(bad_char);
-
+                throw invalid_argument(bad_operator);
+            
+            // Require next arg to be an operand.
             need_operand = true;
         }
     }
 }
 
-double EvaluateStacks(stack<double>* operands, stack<string>* operators) {
-    double result = operands->top();
-    operands->pop();
-    while (!operators->empty()) {
-        if (operators->top() == "+")
-            result = result + operands->top();
-        else if (operators->top() == "-")
-            result = result - operands->top();
-        operands->pop();
-        operators->pop();
+double EvaluateVectors(vector<double> operands, vector<string> operators) {
+    double result = operands.front();
+    operands.erase(operands.begin());
+    while (!operators.empty()) {
+        if (operators.front() == "+")
+            result = result + operands.front();
+        else if (operators.front() == "-")
+            result = result - operands.front();
+        operands.erase(operands.begin());
+        operators.erase(operators.begin());
     }
     return result;
 }
 
-double Calculate(vector<string> input) {
-    // Set up stacks for operands/operators and add args
-    // Note: Args added to stacks are now back in forwards order
-    stack<double> operands;
-    stack<string> operators;
-
-    // Reverses order of input vector so that stacks evaluate left to right
-    std::reverse(input.begin(), input.end());
-
-    PopulateStacks(input, &operands, &operators);
-    return EvaluateStacks(&operands, &operators);
+bool isValidOperator(string input) {
+    return input == "+" ||
+           input == "-" ||
+           input == "x" ||
+           input == "X" ||
+           input == "/";
 }
