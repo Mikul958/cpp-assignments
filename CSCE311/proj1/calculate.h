@@ -16,7 +16,7 @@ using std::string;
 using std::vector;
 
 /**
- * Takes in a vector of equation arguments and calculates the result.
+ * Takes in a tokenized equation and calculates the result.
  * Supports addition, subtraction, multiplication, and division.
  */
 double Calculate(vector<string>);

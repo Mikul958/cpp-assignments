@@ -1,18 +1,42 @@
-// Copyright 2024 mpikula
+// Copyright 2024 Michael Pikula
 
 #ifndef PROJ2_CALCULATE_H_
 #define PROJ2_CALCULATE_H_
 
+#include <iostream>
+#include <stdexcept>
 #include <string>
-using std::string;
 #include <vector>
+
+using std::cout;
+using std::exception;
+using std::invalid_argument;
+
+using std::string;
 using std::vector;
-#include <stack>
-using std::stack;
 
-void PopulateStacks(vector<string>, stack<double>&, stack<string>&);
-double EvaluateStacks(stack<double>&, stack<string>&);
-
+/**
+ * Takes in a tokenized equation and calculates the result.
+ * Supports addition, subtraction, multiplication, and division.
+ */
 double Calculate(vector<string>);
+
+/**
+ * Takes in a vector of equation arguments, evaluates multiplication and
+ * division, and populates the corresponding output vectors with the remaining
+ * operands/operators for addition and subtraction.
+ * @exception Throws std::invalid argument upon invalid operator or order.
+ */
+void PopulateVectors(vector<string> input, vector<double> * operands,
+                                           vector<string> * operators);
+
+/**
+ * Takes in vectors of operands and operators and evaluates the remaining
+ * addition and subtraction.
+ */
+double EvaluateVectors(vector<double> operands, vector<string> operators);
+
+// Checks if the entered operator is accounted for in this program.
+bool isValidOperator(string input);
 
 #endif  // PROJ2_CALCULATE_H_
