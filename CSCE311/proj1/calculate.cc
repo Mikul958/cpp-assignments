@@ -2,8 +2,8 @@
 
 #include <proj1/calculate.h>
 
-const string bad_order = "Invalid expression, verify the character order.";
-const string bad_operator = "Invalid operator, please use only +, -, x, or /.";
+const char bad_order[] = "Invalid expression, verify the character order.";
+const char bad_operator[] = "Invalid operator, please use only +, -, x, or /.";
 
 double Calculate(vector<string> input) {
     // Initialize vectors for operands/operators.
@@ -56,7 +56,7 @@ void PopulateVectors(vector<string> input, vector<double>* operands,
                 operators->push_back(item);
             else
                 throw invalid_argument(bad_operator);
-            
+
             // Require next arg to be an operand.
             need_operand = true;
         }

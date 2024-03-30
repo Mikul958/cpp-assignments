@@ -1,11 +1,9 @@
 // Copyright 2024 Michael Pikula
 
-#ifndef PROJ3_CALCULATE_H_
-#define PROJ3_CALCULATE_H_
+#ifndef PROJ1_CALCULATE_H_
+#define PROJ1_CALCULATE_H_
 
 #include <iostream>
-#include <algorithm>
-
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -41,4 +39,4 @@ double EvaluateVectors(vector<double> operands, vector<string> operators);
 // Checks if the entered operator is accounted for in this program.
 bool isValidOperator(string input);
 
-#endif  // PROJ3_CALCULATE_H_
+#endif  // PROJ1_CALCULATE_H_
