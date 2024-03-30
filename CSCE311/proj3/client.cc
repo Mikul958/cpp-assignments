@@ -56,8 +56,8 @@ void Run(string path, int num_lines) {
     for (int i=0; i < 4; i++) {
         struct thread_args current = t_args_array[i];
         total += current.sum;
-        cout << "THREAD " << i << ":  " << current.operations << " LINES, "
-             << std::fixed << std::setprecision(2) << current.sum << endl;
+        cout << "THREAD " << i << ":  " << current.operations
+             << " LINES, " << current.sum << endl;
     }
     cout << "SUM:  " << total << endl;
 
