@@ -16,6 +16,8 @@ Provides functionality for the client:
     - Sends file path and line count through shared memory.
     - Receives error status through shared memory, and file lines through main shared memory buffer.
 - Synchronizes using named semaphores created by the server.
+- Tokenizes lines from server and calculates them using functions from calculate.h.
+    - Creates 4 threads to quarter amount of shared memory evaluated and speed up the process.
 
 Includes:
 - shared_mem.h
