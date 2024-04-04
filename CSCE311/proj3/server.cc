@@ -95,9 +95,12 @@ void ReadFile(string path, int num_lines, struct shm_info * output) {
             line.pop_back();
         line += '\n';
 
-        // Check for overflow and append line to main shared memory buffer.
-        if (offset + line.size() + 1 >= BUFFER_ROW_SIZE)  // Overflow
+        // Check for overflow.
+        if (offset + line.size() + 1 >= BUFFER_ROW_SIZE) {
+            line_number = -1;       // Ensure final error check fails
             break;
+        }
+        // Append line to main shared memory buffer at current row.
         // NOTE: offset + BUFFER_ROW_SIZE - offset = BUFFER_ROW_SIZE.
         ::strncpy(output->buffer[segment] + offset, line.c_str(),
                                                     BUFFER_ROW_SIZE - offset);
