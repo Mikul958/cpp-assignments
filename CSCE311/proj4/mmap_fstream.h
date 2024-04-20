@@ -4,6 +4,7 @@
 #include <ios>
 #include <string>
 
+using std::string;
 
 namespace mem_map {
 
@@ -27,7 +28,7 @@ class fstream {
   //   You may use default parameter values to allow following constructor to
   //   absorb this one
   //
-  explicit fstream(const std::string& fname);
+  explicit fstream(const string& fname);
 
 
   // Creates Memory-mapped file stream obj with file name and open mode
@@ -39,7 +40,7 @@ class fstream {
   //     - std::ios_base::in  (open with read privileges)
   //     - std::ios_base::out  (open with write privileges)
   //
-  fstream(const std::string& fname, std::ios_base::openmode mode);
+  fstream(const string& fname, std::ios_base::openmode mode);
 
 
   // Attempts to open file given by file_name
@@ -55,7 +56,7 @@ class fstream {
   //
   //   Simplifying assumption: no file will ever be larger than 2^12 bytes
   //
-  void open(const std::string& fname);
+  void open(const string& fname);
 
 
   // Attempts to open file given by name with open mode specified by mode
@@ -71,7 +72,7 @@ class fstream {
   //
   //   Simplifying assumption: no file will ever be larger than 2^12 bytes
   //
-  void open(const std::string& fname, std::ios_base::openmode mode);
+  void open(const string& fname, std::ios_base::openmode mode);
 
 
   // Attempts to close an open file
@@ -113,7 +114,7 @@ class fstream {
   //  This method must not modify a file; only updates cursor position if not
   //  at end of file and possibly modifies eof flag
   //
-  fstream& getline(std::string* line);
+  fstream& getline(string* line);
 
 
   // Writes character at "next" space in the file and updates cursor
