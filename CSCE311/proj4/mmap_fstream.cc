@@ -63,7 +63,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     fstat(file_descriptor_, &file_stats);
     file_size_ = file_stats.st_size;
 
-    // Get number of pages to allocate from file size and truncate memory
+    // Get number of pages to allocate from file size and truncate memory                                        TODO check is this is necessary/sufficient
     pages_used_ = file_size_ / kPageSize + 1;
     if (::ftruncate(file_descriptor_, kPageSize * pages_used_)) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
