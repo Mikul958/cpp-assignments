@@ -52,6 +52,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     }
 
     // Open file and store file descriptor
+    // O_CREAT allows file to be created if it doesn't already exist
     file_descriptor_ = ::open(filepath.c_str(), O_CREAT | O_RDWR, open_perms);
     if (file_descriptor_ == -1) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
@@ -111,8 +112,17 @@ void fstream::close() {
         cerr << "fstream::close(): " << strerror(errno) << endl;
     ::close(file_descriptor_);
 
-    // Indicate that the file is now closed
+    // Reset all data members to defaults
+    // Only is_open_ should matter, but better safe than sorry!
+    filename_ = "";
+    open_mode_ = ios_base::in | ios_base::out;
+    file_descriptor_ = -1;
+    cursor_ = -1;
+    file_size_ = -1;
+    pages_used_ = -1;
     is_open_ = false;
+    end_of_file_ = false;
+    file_info_ptr_ = nullptr;
 }
 
 // Set to true on file open, set to false on file close
