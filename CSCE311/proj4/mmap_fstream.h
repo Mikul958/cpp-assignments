@@ -120,7 +120,7 @@ class fstream {
   off_t file_size_;               // Can change, must be updated accordingly.
   bool is_open_;
   bool end_of_file_;
-  char* buffer_ptr_;              // Buffer holding file information.
+  char* file_info_ptr_;           // Buffer holding file information.
 };
 
 }  // namespace mem_map

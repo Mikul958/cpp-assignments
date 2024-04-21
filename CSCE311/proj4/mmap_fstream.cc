@@ -19,7 +19,7 @@ fstream::fstream(const string &filepath, ios_base::openmode mode) {
     file_size_ = -1;
     is_open_ = false;
     end_of_file_ = false;
-    buffer_ptr_ = nullptr;
+    file_info_ptr_ = nullptr;
 
     // Only open file if name was given
     if (filename_ != "")
@@ -31,12 +31,12 @@ fstream::~fstream() {
 }
 
 void fstream::open(const string &filepath, ios_base::openmode mode) {
-    // Check if a file is already open, do nothing if yes
-    if (is_open_)
+    // Check if a file is already open or filepath is invalid
+    if (is_open_ || filepath == "")
         return;
 
-    // Initalize permissions (S_..., PROT_... and MAP_... respectively)
-    int open_perms = 0000;
+    // Initalize permissions (S_..., PROT_..., and MAP_... respectively)
+    int open_perms = 0;
     int prot_perms = 0;
     int map_perms = 0;
 
@@ -64,20 +64,26 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     fstat(file_descriptor_, &file_stats);
     file_size_ = file_stats.st_size;
 
-    // If size is 0, file is new or was empty, default to 1 page of memory.
-    if (file_size_ == 0) {
-        const int kPageSize = 4096;                      // 4KB = 1 page
-        if (::ftruncate(file_descriptor_, kPageSize)) {
-            cout << "fstream::open(): " << strerror(errno) << endl;
-            ::close(file_descriptor_);
-            exit(-2);
-        }
-        file_size_ = kPageSize;
+    // Might need a truncate and/or close call in here somewhere?                                                            TODO
+
+
+    // Map file to created memory location.
+    file_info_ptr_ = reinterpret_cast<char *>(
+        mmap(NULL, file_size_, prot_perms, map_perms, file_descriptor_, 0));
+    if (file_info_ptr_ == MAP_FAILED) {
+        cerr << "fstream::open(): " << strerror(errno) << endl;
+        ::close(file_descriptor_);
+        exit (-2);
     }
 
-    // Map file to created memory location.                                                     TODO
-    
+    // Set cursor based on std::ios_base::ate and update EoF status
+    cursor_ = 0;
+    if (mode & ios_base::ate)
+        cursor_ = file_size_;
+    if (cursor_ >= file_size_)
+        end_of_file_ = true;
 
+    // Indicate that a file is now open.
     is_open_ = true;
 }
 
@@ -85,7 +91,7 @@ void fstream::close() {
     if (!is_open_)
         return;
     
-    // stuff                                                                                    TODO
+    // stuff                                                                                               TODO
 
     is_open_ = false;
 }
@@ -105,15 +111,18 @@ std::size_t fstream::size() const {
 }
 
 char fstream::get() {
-    // Get next character (update cursor)
+    // Get next character (update cursor)                                                                         TODO
+    return 'A';
 }
 
 fstream& fstream::getline(string* line) {
-    // Call get until newline character or end of file
+    // Call get until newline character or end of file                                                            TODO
+    return *this;
 }
 
 fstream& fstream::put(char c) {
-    // Add character to end of file, MAY CHANGE FILE SIZE, MAKE SURE TO UPDATE
+    // Add character to end of file, MAY CHANGE FILE SIZE, MAKE SURE TO UPDATE                                     TODO
+    return *this;
 }
 
 }  // namespace mem_map
