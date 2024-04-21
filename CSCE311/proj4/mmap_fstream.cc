@@ -2,7 +2,7 @@
 
 #include <proj4/mmap_fstream.h>
 
-#include <iostream>
+#include <iostream>                                                                                  // TODO use some c equivalent for this instead
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -16,7 +16,7 @@ fstream::fstream(const string &filepath, ios_base::openmode mode) {
     file_size_ = -1;
     pages_used_ = -1;
     is_open_ = false;
-    end_of_file_ = false;
+    end_of_file_ = true;        // Unopened file is at EoF apparently
     file_info_ptr_ = nullptr;
 
     // Open file; fails if specified name is empty or file already open
@@ -87,8 +87,8 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     cursor_ = 0;
     if (mode & ios_base::ate)
         cursor_ = file_size_;
-    if (cursor_ >= file_size_)
-        end_of_file_ = true;
+    if (cursor_ < file_size_)
+        end_of_file_ = false;
 
     // Indicate that a file is now open
     is_open_ = true;
@@ -140,12 +140,30 @@ std::size_t fstream::size() const {
 }
 
 char fstream::get() {
-    // Get next character (update cursor)                                                                         TODO
-    return 'A';
+    // Check for eof, return '\0' if true
+    if (end_of_file_)
+        return '\0';
+    
+    // Get character at cursor, increment, and check for EoF
+    char next = file_info_ptr_[cursor_];
+    cursor_++;
+    if (cursor_ >= file_size_)
+        end_of_file_ = true;
+    return next;
 }
 
 fstream& fstream::getline(string* line) {
-    // Call get until newline character or end of file                                                            TODO
+    // Call get until newline character or EoF, add to new string                                            TODO error with eof
+    string new_line;
+    while (!end_of_file_) {
+        char next = get();
+        if (next == '\n')
+            break;
+        new_line += next;
+    }
+
+    // Update output string and return this fstream
+    line->assign(new_line);
     return *this;
 }
 
