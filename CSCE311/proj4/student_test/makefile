@@ -14,7 +14,7 @@ all : test clean
 
 # Link to executable tests
 test : test_driver.o mmap_fstream.o
-	$(link) -o $@ $^
+	$(link) $@ $^
 
 
 # Compile to object code
