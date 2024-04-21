@@ -9,9 +9,9 @@ fstream::fstream(const string &filepath, ios_base::openmode mode) {
     open_mode_ = mode;
     file_descriptor_ = -1;
     cursor_ = -1;
-    size_ = -1;
-    size_final_ = -1;                                                                       // TODO delete if needed
-    file_open_ = false;
+    file_size_ = -1;
+    // size_final_ = -1;                                                                       // TODO delete if needed
+    is_open_ = false;
     end_of_file_ = false;
     buffer_ptr_ = nullptr;
 
@@ -25,16 +25,26 @@ fstream::~fstream() {
 }
 
 void fstream::open(const string &filepath, ios_base::openmode mode) {
+    if (is_open_)
+        return;
+    
+    // stuff                                                                                    TODO
 
+    is_open_ = true;
 }
 
 void fstream::close() {
+    if (!is_open_)
+        return;
+    
+    // stuff                                                                                    TODO
 
+    is_open_ = false;
 }
 
 // Set to true on file open, set to false on file close
 bool fstream::is_open() const {
-    return file_open_;
+    return is_open_;
 }
 
 // Set to true if cursor is >= file size
@@ -43,7 +53,7 @@ bool fstream::eof() const {
 }
 
 std::size_t fstream::size() const {
-    return size_;
+    return file_size_;
 }
 
 char fstream::get() {
@@ -55,7 +65,7 @@ fstream& fstream::getline(string* line) {
 }
 
 fstream& fstream::put(char c) {
-    // Add character to end of file (not quite sure how?)
+    // Add character to end of file, MAY CHANGE FILE SIZE, MAKE SURE TO UPDATE
 }
 
 }  // namespace mem_map

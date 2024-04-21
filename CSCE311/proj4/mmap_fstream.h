@@ -50,7 +50,8 @@ class fstream {
   fstream(const string& filepath = "",
           ios_base::openmode mode = ios_base::in | ios_base::out);
 
-  // Destructor, closes open file if there is one.
+  // Destructor, cleans up all information associated with this fstream
+  //   Closes the open file in case the user did not.
   ~fstream();
 
   // Attempts to open file given by file_name
@@ -140,9 +141,9 @@ class fstream {
   ios_base::openmode open_mode_;
   int file_descriptor_;
   off_t cursor_;
-  off_t size_;
-  off_t size_final_;      // Updated when saving                                                  TODO delete if not needed
-  bool file_open_;
+  off_t file_size_;
+  // off_t size_final_;      // Updated when saving                                                  TODO delete if not needed
+  bool is_open_;
   bool end_of_file_;
   char* buffer_ptr_;  
 };
