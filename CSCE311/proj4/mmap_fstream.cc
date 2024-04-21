@@ -15,6 +15,7 @@ fstream::fstream(const string &filepath, ios_base::openmode mode) {
     cursor_ = -1;
     file_size_ = -1;
     pages_used_ = -1;
+    mem_size_ = -1;
     is_open_ = false;
     end_of_file_ = true;        // Unopened file is at EoF apparently
     file_info_ptr_ = nullptr;
@@ -51,8 +52,8 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
         map_perms = MAP_SHARED;
     }
 
-    // Open file and store file descriptor
-    // O_CREAT allows file to be created if it doesn't already exist
+    // Note: O_CREAT allows file to be created if it doesn't already exist
+    // MEMORY MAP OPEN FILE
     file_descriptor_ = ::open(filepath.c_str(), O_CREAT | O_RDWR, open_perms);
     if (file_descriptor_ == -1) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
@@ -61,22 +62,23 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
 
     // Get file size using stat.h and file descriptor
     struct stat file_stats;
-    fstat(file_descriptor_, &file_stats);
+    ::fstat(file_descriptor_, &file_stats);
     file_size_ = file_stats.st_size;
 
-    // Get number of pages to allocate from file size and truncate memory                                        TODO check is this is necessary/sufficient
+    // Get number of pages to allocate from file size
     pages_used_ = file_size_ / kPageSize + 1;
-    if (::ftruncate(file_descriptor_, kPageSize * pages_used_)) {
+    mem_size_ = kPageSize * pages_used_;
+
+    // ALLOCATE FILE MEMORY
+    if (::ftruncate(file_descriptor_, mem_size_)) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
         ::close(file_descriptor_);
         return;
     }
 
     // Map file to created memory location
-    file_info_ptr_ = reinterpret_cast<char *>(::mmap(NULL,
-                                              kPageSize * pages_used_,
-                                              prot_perms, map_perms,
-                                              file_descriptor_, 0));
+    file_info_ptr_ = reinterpret_cast<char *>(
+        ::mmap(NULL, mem_size_, prot_perms, map_perms, file_descriptor_, 0));
     if (file_info_ptr_ == MAP_FAILED) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
         ::close(file_descriptor_);
@@ -99,7 +101,7 @@ void fstream::close() {
     if (!is_open_)
         return;
     
-    // Write file in memory to the file on disk
+    // SAVE TO DISK
     if (::msync(file_info_ptr_, file_size_, MS_SYNC) == -1)
         cerr << "fstream::close(): " << strerror(errno) << endl;
 
@@ -120,6 +122,7 @@ void fstream::close() {
     cursor_ = -1;
     file_size_ = -1;
     pages_used_ = -1;
+    mem_size_ = -1;
     is_open_ = false;
     end_of_file_ = false;
     file_info_ptr_ = nullptr;
@@ -140,11 +143,11 @@ std::size_t fstream::size() const {
 }
 
 char fstream::get() {
-    // Check for eof, return '\0' if true
-    if (end_of_file_)
+    // Ensure file is open and cursor isn't at the end
+    if (!is_open_ || end_of_file_)
         return '\0';
     
-    // Get character at cursor, increment, and check for EoF
+    // READ FROM FILE
     char next = file_info_ptr_[cursor_];
     cursor_++;
     if (cursor_ >= file_size_)
@@ -153,7 +156,11 @@ char fstream::get() {
 }
 
 fstream& fstream::getline(string* line) {
-    // Call get until newline character or EoF, add to new string                                            TODO error with eof
+    // Ensure file is open
+    if (!is_open_)
+        return *this;
+    
+    // Call get until newline character or EoF, add each result to new string
     string new_line;
     while (!end_of_file_) {
         char next = get();
@@ -168,7 +175,31 @@ fstream& fstream::getline(string* line) {
 }
 
 fstream& fstream::put(char c) {
-    // Add character at cursor and increment cursor, MAY CHANGE FILE SIZE / PAGE COUNT, MAKE SURE TO UPDATE                         TODO
+    // Ensure file is open
+    if (!is_open_)
+        return *this;
+    
+    // WRITE TO FILE
+    file_info_ptr_[cursor_] = c;
+    cursor_++;
+    file_size_ = cursor_;                                                                                    // TODO issues with file size
+    end_of_file_ = true;
+
+    // Allocate another page of memory if cursor has moved out of bounds
+    if (cursor_ >= mem_size_) {
+        pages_used_++;
+        int new_size = kPageSize * pages_used_;
+        
+        // Re-map memory with new_size, allowing kernel to move it if needed
+        file_info_ptr_ = reinterpret_cast<char *>(
+            ::mremap(file_info_ptr_, mem_size_, new_size, MREMAP_MAYMOVE));
+        if (file_info_ptr_ == MAP_FAILED) {
+            cerr << "fstream::put(): " << strerror(errno) << endl;
+            close();
+            return *this;
+        }
+    }
+
     return *this;
 }
 

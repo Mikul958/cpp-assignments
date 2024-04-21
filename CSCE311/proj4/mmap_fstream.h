@@ -120,7 +120,8 @@ class fstream {
   int file_descriptor_;           // File descriptor for memory location.
   off_t cursor_;                  // Current offset in memory representing file.
   off_t file_size_;               // Tracks current size of the file itself.
-  int pages_used_;                // Tracks memory in use along with kPageSize.
+  int pages_used_;                // Amount of pages in use.
+  int mem_size_;                  // kPageSize * pages_used_
   bool is_open_;
   bool end_of_file_;
   char* file_info_ptr_;           // Buffer holding file information.
