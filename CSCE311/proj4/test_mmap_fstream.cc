@@ -163,7 +163,7 @@ bool TestOpenIsOpenAndGetline(const char _[]) {
   std::size_t i = 0;
   do {
     fstream.getline(&line);
-    
+
     std::cout << "\tExpected get: \"" << kTestValues[i]
       << "\", Actual get: \"" << line << "\"" << std::endl;
     passed = passed && kTestValues[i] == line;
@@ -184,7 +184,7 @@ bool TestOpenIsOpenAndGetline(const char _[]) {
       passed = false;
     }
   } while (i < kTestSize);
-    
+
   fstream.close();
 
   return passed;

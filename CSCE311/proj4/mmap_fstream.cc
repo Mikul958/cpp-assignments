@@ -100,7 +100,7 @@ void fstream::close() {
     // Ensure a file is open to begin with
     if (!is_open_)
         return;
-    
+
     // SAVE TO DISK
     if (::msync(file_info_ptr_, file_size_, MS_SYNC) == -1)
         cerr << "fstream::close(): " << strerror(errno) << endl;
@@ -108,7 +108,7 @@ void fstream::close() {
     // Unmap the file from memory
     if (::munmap(file_info_ptr_, kPageSize * pages_used_) == -1)
         cerr << "fstream::close(): " << strerror(errno) << endl;
-    
+
     // Truncate the file that was just written to and close
     if (::ftruncate(file_descriptor_, file_size_))
         cerr << "fstream::close(): " << strerror(errno) << endl;
@@ -146,7 +146,7 @@ char fstream::get() {
     // Ensure file is open and cursor isn't at the end
     if (!is_open_ || end_of_file_)
         return '\0';
-    
+
     // READ FROM FILE
     char next = file_info_ptr_[cursor_];
     cursor_++;
@@ -159,7 +159,7 @@ fstream& fstream::getline(string* line) {
     // Ensure file is open
     if (!is_open_)
         return *this;
-    
+
     // Call get until newline character or EoF, add each result to new string
     string new_line;
     while (!end_of_file_) {
@@ -189,7 +189,7 @@ fstream& fstream::put(char c) {
     if (cursor_ >= mem_size_) {
         pages_used_++;
         int new_size = kPageSize * pages_used_;
-        
+
         // Truncate file to a new size and remap memory with an extra page
         ::ftruncate(file_descriptor_, new_size);
         file_info_ptr_ = reinterpret_cast<char *>(

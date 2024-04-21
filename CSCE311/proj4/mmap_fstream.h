@@ -27,14 +27,14 @@ class fstream {
   //
   //   Defaults filepath to "" if none given
   //   Defaults openmode to std::ios_base::in | std::ios_base::out if none given
-  //   
+  //
   //   Result of constructor can be checked with is_open
   //
   //   Must handle any combination of modes
   //     - std::ios_base::ate  (open with cursor at the end of the file)
   //     - std::ios_base::in  (open with read privileges)
   //     - std::ios_base::out  (open with write privileges)
-  // 
+  //
   //  Default parameters to absord above constructors.
   fstream(const string& filepath = "",
           ios_base::openmode mode = ios_base::in | ios_base::out);
