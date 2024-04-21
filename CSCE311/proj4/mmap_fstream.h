@@ -121,6 +121,10 @@ class fstream {
   bool is_open_;
   bool end_of_file_;
   char* file_info_ptr_;           // Buffer holding file information.
+
+  // Page info
+  const int page_size_ = 4096;    // 4KB = 1 Page
+  int pages_allocated_;
 };
 
 }  // namespace mem_map

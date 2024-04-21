@@ -10,9 +10,6 @@ using std::endl;
 namespace mem_map {
 
 fstream::fstream(const string &filepath, ios_base::openmode mode) {
-    filename_ = filepath;
-    open_mode_ = mode;
-    
     // All default values, properly set in open() if open successful
     file_descriptor_ = -1;
     cursor_ = -1;
@@ -20,10 +17,12 @@ fstream::fstream(const string &filepath, ios_base::openmode mode) {
     is_open_ = false;
     end_of_file_ = false;
     file_info_ptr_ = nullptr;
+    pages_allocated_ = -1;
 
-    // Only open file if name was given
-    if (filename_ != "")
-        open(filename_);
+    // Open file; fails if specified name is empty or file already open
+    filename_ = filepath;
+    open_mode_ = mode;
+    open(filename_);
 }
 
 fstream::~fstream() {
