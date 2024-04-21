@@ -55,7 +55,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     file_descriptor_ = ::open(filepath.c_str(), O_CREAT | O_RDWR, open_perms);
     if (file_descriptor_ == -1) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
-        exit (-1);
+        return;
     }
 
     // Get file size using stat.h and file descriptor
@@ -68,7 +68,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     if (::ftruncate(file_descriptor_, kPageSize * pages_used_)) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
         ::close(file_descriptor_);
-        exit(-2);
+        return;
     }
 
     // Map file to created memory location
@@ -79,7 +79,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     if (file_info_ptr_ == MAP_FAILED) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
         ::close(file_descriptor_);
-        exit (-2);
+        return;
     }
 
     // Set cursor based on std::ios_base::ate and update EoF status
@@ -89,16 +89,29 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     if (cursor_ >= file_size_)
         end_of_file_ = true;
 
-    // Indicate that a file is now open.
+    // Indicate that a file is now open
     is_open_ = true;
 }
 
 void fstream::close() {
+    // Ensure a file is open to begin with
     if (!is_open_)
         return;
     
-    // stuff                                                                                               TODO
+    // Write file in memory to the file on disk
+    if (::msync(file_info_ptr_, file_size_, MS_SYNC) == -1)
+        cerr << "fstream::close(): " << strerror(errno) << endl;
 
+    // Unmap the file from memory
+    if (::munmap(file_info_ptr_, kPageSize * pages_used_) == -1)
+        cerr << "fstream::close(): " << strerror(errno) << endl;
+    
+    // Truncate the file that was just written to and close
+    if (::ftruncate(file_descriptor_, file_size_))
+        cerr << "fstream::close(): " << strerror(errno) << endl;
+    ::close(file_descriptor_);
+
+    // Indicate that the file is now closed
     is_open_ = false;
 }
 
