@@ -1,6 +1,10 @@
 // YOUR DOCUMENTATION GOES HERE
 //
 //
+#ifndef PROJ4_MMAP_FSTREAM_H_
+#define PROJ4_MMAP_FSTREAM_H_
+
+
 #include <ios>
 #include <string>
 
@@ -151,3 +155,5 @@ class fstream {
 };
 
 }  // namespace mem_map
+
+#endif  // PROJ4_MMAP_FSTREAM_H_

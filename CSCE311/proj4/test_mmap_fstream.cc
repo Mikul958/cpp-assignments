@@ -1,8 +1,9 @@
 // Copyright 2024 CSCE 311
 //
-#include <proj4_24sp/mmap_fstream.h>
-#include <proj4_24sp/mmap_fstream.h>  // DO NOT DELETE
+#include <proj4/mmap_fstream.h>
+#include <proj4/mmap_fstream.h>  // DO NOT DELETE
 
+#include <cstring>  // Needed to compile, remove later?
 #include <cstddef>
 #include <iostream>
 #include <string>
