@@ -4,11 +4,11 @@
 #ifndef PROJ4_MMAP_FSTREAM_H_
 #define PROJ4_MMAP_FSTREAM_H_
 
-
 #include <ios>
 #include <string>
 
 using std::string;
+using std::ios_base;
 
 namespace mem_map {
 
@@ -20,7 +20,7 @@ class fstream {
   //   You may use default parameter values to allow following constructors to
   //   absorb this one
   //
-  fstream();
+  // fstream();
 
 
   // Creates Memory-mapped file stream obj with file name
@@ -46,10 +46,11 @@ class fstream {
   //     - std::ios_base::in  (open with read privileges)
   //     - std::ios_base::out  (open with write privileges)
   // 
-  fstream(const string& fname,
-         std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
+  //  Default parameters to absord above constructors.
+  fstream(const string& fname = "",
+          ios_base::openmode mode = ios_base::in | ios_base::out);
 
-  // Destructor
+  // Destructor, closes open file if there is one.
   ~fstream();
 
   // Attempts to open file given by file_name
@@ -65,7 +66,7 @@ class fstream {
   //
   //   Simplifying assumption: no file will ever be larger than 2^12 bytes
   //
-  void open(const string& fname);
+  // void open(const string& fname);
 
 
   // Attempts to open file given by name with open mode specified by mode
@@ -80,8 +81,9 @@ class fstream {
   //     - std::ios_base::out  (open with write privileges)
   //
   //   Simplifying assumption: no file will ever be larger than 2^12 bytes
-  //
-  void open(const string& fname, std::ios_base::openmode mode);
+  //   Default openmode parameter to absorb above
+  void open(const string& fname,
+            ios_base::openmode mode = ios_base::in | ios_base::out);
 
 
   // Attempts to close an open file
@@ -134,24 +136,15 @@ class fstream {
 
  private:
   // File information
-  off_t cursor_ = -1;
-  off_t size_ = -1;
-  off_t size_final_ = -1;  // Updated when saving
-  string filepath_;
-  char* buffer_ptr_ = nullptr;
-  int file_descriptor_ = -1;
-
-  // Cursor controls
-  inline void IncrementCursor(off_t amount) {
-    cursor_ += amount;
-    if (cursor_ > size_final_)
-      size_final_ = cursor_;
-  }
-  inline void SetCursor(off_t location) {
-    cursor_ = location;
-    if (cursor_ > size_final_)
-      size_final_ = cursor_;
-  }
+  string filename_;
+  ios_base::openmode open_mode_;
+  int file_descriptor_;
+  off_t cursor_;
+  off_t size_;
+  off_t size_final_;      // Updated when saving                                                  TODO delete if not needed
+  bool file_open_;
+  bool end_of_file_;
+  char* buffer_ptr_;  
 };
 
 }  // namespace mem_map
