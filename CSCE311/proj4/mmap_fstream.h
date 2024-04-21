@@ -1,11 +1,21 @@
+// Copyright 2024 Michael Pikula
+
 // YOUR DOCUMENTATION GOES HERE
 //
 //
 #ifndef PROJ4_MMAP_FSTREAM_H_
 #define PROJ4_MMAP_FSTREAM_H_
 
-#include <ios>
+#include <fcntl.h>      // O_CREAT, O_RDWR, etc.
+#include <sys/mman.h>   // Memory mapping functions
+#include <sys/stat.h>   // System info, ex. file sizes
+#include <unistd.h>     // UNIX standard header
+
+#include <ios>          // File open permissions
 #include <string>
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
 
 using std::string;
 using std::ios_base;
@@ -14,31 +24,11 @@ namespace mem_map {
 
 class fstream {
  public:
-  // Creates Memory-mapped file stream obj without file name; file name must be
-  //   specified in call to Open.
-  //
-  //   You may use default parameter values to allow following constructors to
-  //   absorb this one
-  //
-  // fstream();
-
-
-  // Creates Memory-mapped file stream obj with file name
-  //
-  //   Open mode is std::ios_base::in | std::ios_base:: out by default.
-  //
-  //   Result of constructor can be determined by is_open
-  //
-  //   You may use default parameter values to allow following constructor to
-  //   absorb this one
-  //
-  // Unnecessary, constructor below has default param
-  // explicit fstream(const string& fname);
-
-
   // Creates Memory-mapped file stream obj with file name and open mode
-  // Openmode defaults to in/out permissions
   //
+  //   Defaults filepath to "" if none given
+  //   Defaults openmode to std::ios_base::in | std::ios_base::out if none given
+  //   
   //   Result of constructor can be checked with is_open
   //
   //   Must handle any combination of modes
@@ -51,26 +41,12 @@ class fstream {
           ios_base::openmode mode = ios_base::in | ios_base::out);
 
   // Destructor, cleans up all information associated with this fstream
-  //   Closes the open file in case the user did not.
+  //   Closes any open file in case the user did not.
   ~fstream();
 
-  // Attempts to open file given by file_name
-  //
-  //   Open mode is std::ios_base::in | std::ios_base::out by default
-  //
-  //   Result can be determined by is_open
-  //
-  //   Does nothing if file is already open
-  //
-  //   You may use default parameter values to overload following method to
-  //   absorb this one
-  //
-  //   Simplifying assumption: no file will ever be larger than 2^12 bytes
-  //
-  // void open(const string& fname);
-
-
   // Attempts to open file given by name with open mode specified by mode
+  //
+  //   Defaults openmode to std::ios_base::in | std::ios_base::out if none given
   //
   //   Result can be determined by is_open
   //
@@ -136,16 +112,15 @@ class fstream {
   fstream& put(char c);
 
  private:
-  // File information
+  // File and position information
   string filename_;
   ios_base::openmode open_mode_;
-  int file_descriptor_;
-  off_t cursor_;
-  off_t file_size_;
-  // off_t size_final_;      // Updated when saving                                                  TODO delete if not needed
+  int file_descriptor_;           // File descriptor for memory location.
+  off_t cursor_;                  // Current offset in memory representing file.
+  off_t file_size_;               // Can change, must be updated accordingly.
   bool is_open_;
   bool end_of_file_;
-  char* buffer_ptr_;  
+  char* buffer_ptr_;              // Buffer holding file information.
 };
 
 }  // namespace mem_map
