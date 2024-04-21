@@ -23,7 +23,7 @@ fstream::fstream(const string &filepath, ios_base::openmode mode) {
     // Open file; fails if specified name is empty or file already open
     filename_ = filepath;
     open_mode_ = mode;
-    open(filename_);
+    open(filename_, open_mode_);
 }
 
 fstream::~fstream() {
@@ -41,12 +41,12 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     int map_perms = 0;
 
     // Check openmode's in/out and update permissions
-    if (mode & ios_base::in) {
+    if ((mode & ios_base::in) != 0) {
         open_perms = open_perms | S_IRUSR | S_IRGRP;
         prot_perms = prot_perms | PROT_READ;
         map_perms = MAP_PRIVATE;
     }
-    if (mode & ios_base::out) {
+    if ((mode & ios_base::out) != 0) {
         open_perms = open_perms | S_IWUSR | S_IWGRP;
         prot_perms = prot_perms | PROT_WRITE;
         map_perms = MAP_SHARED;
@@ -87,7 +87,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
 
     // Set cursor based on std::ios_base::ate and update EoF status
     cursor_ = 0;
-    if (mode & ios_base::ate)
+    if ((mode & ios_base::ate) != 0)
         cursor_ = file_size_;
     if (cursor_ < file_size_)
         end_of_file_ = false;
@@ -182,7 +182,7 @@ fstream& fstream::put(char c) {
     // WRITE TO FILE
     file_info_ptr_[cursor_] = c;
     cursor_++;
-    file_size_ = cursor_;                                                                                    // TODO issues with file size
+    file_size_ = cursor_;
     end_of_file_ = true;
 
     // Allocate another page of memory if cursor has moved out of bounds
