@@ -178,7 +178,7 @@ fstream& fstream::put(char c) {
     // Ensure file is open
     if (!is_open_)
         return *this;
-    
+
     // WRITE TO FILE
     file_info_ptr_[cursor_] = c;
     cursor_++;
@@ -190,14 +190,19 @@ fstream& fstream::put(char c) {
         pages_used_++;
         int new_size = kPageSize * pages_used_;
         
-        // Re-map memory with new_size, allowing kernel to move it if needed
+        // Truncate file to a new size and remap memory with an extra page
+        ::ftruncate(file_descriptor_, new_size);
         file_info_ptr_ = reinterpret_cast<char *>(
             ::mremap(file_info_ptr_, mem_size_, new_size, MREMAP_MAYMOVE));
+
         if (file_info_ptr_ == MAP_FAILED) {
             cerr << "fstream::put(): " << strerror(errno) << endl;
             close();
             return *this;
         }
+
+        // Update size of memory allocated.
+        mem_size_ = new_size;
     }
 
     return *this;

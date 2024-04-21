@@ -1,8 +1,5 @@
 // Copyright 2024 Michael Pikula
 
-// YOUR DOCUMENTATION GOES HERE
-//
-//
 #ifndef PROJ4_MMAP_FSTREAM_H_
 #define PROJ4_MMAP_FSTREAM_H_
 
