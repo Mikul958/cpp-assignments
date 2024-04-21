@@ -47,7 +47,7 @@ class fstream {
   //     - std::ios_base::out  (open with write privileges)
   // 
   //  Default parameters to absord above constructors.
-  fstream(const string& fname = "",
+  fstream(const string& filepath = "",
           ios_base::openmode mode = ios_base::in | ios_base::out);
 
   // Destructor, closes open file if there is one.
@@ -82,7 +82,7 @@ class fstream {
   //
   //   Simplifying assumption: no file will ever be larger than 2^12 bytes
   //   Default openmode parameter to absorb above
-  void open(const string& fname,
+  void open(const string& filepath,
             ios_base::openmode mode = ios_base::in | ios_base::out);
 
 

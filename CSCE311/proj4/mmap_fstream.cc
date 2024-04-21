@@ -4,8 +4,8 @@
 
 namespace mem_map {
 
-fstream::fstream(const string &filename, std::ios_base::openmode mode) {
-    filename_ = filename;
+fstream::fstream(const string &filepath, ios_base::openmode mode) {
+    filename_ = filepath;
     open_mode_ = mode;
     file_descriptor_ = -1;
     cursor_ = -1;
@@ -15,7 +15,7 @@ fstream::fstream(const string &filename, std::ios_base::openmode mode) {
     end_of_file_ = false;
     buffer_ptr_ = nullptr;
 
-    // Open file if name was given
+    // Only open file if name was given
     if (filename_ != "")
         open(filename_);
 }
@@ -24,7 +24,7 @@ fstream::~fstream() {
     close();
 }
 
-void fstream::open(const string &filename, std::ios_base::openmode mode) {
+void fstream::open(const string &filepath, ios_base::openmode mode) {
 
 }
 
