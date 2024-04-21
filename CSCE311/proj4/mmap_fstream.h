@@ -120,7 +120,7 @@ class fstream {
   int file_descriptor_;           // File descriptor for memory location.
   off_t cursor_;                  // Current offset in memory representing file.
   off_t file_size_;               // Can change, must be updated accordingly.
-  int pages_allocated_;
+  int pages_used_;
   bool is_open_;
   bool end_of_file_;
   char* file_info_ptr_;           // Buffer holding file information.

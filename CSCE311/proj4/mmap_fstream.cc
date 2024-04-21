@@ -14,7 +14,7 @@ fstream::fstream(const string &filepath, ios_base::openmode mode) {
     file_descriptor_ = -1;
     cursor_ = -1;
     file_size_ = -1;
-    pages_allocated_ = -1;
+    pages_used_ = -1;
     is_open_ = false;
     end_of_file_ = false;
     file_info_ptr_ = nullptr;
@@ -64,16 +64,18 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     file_size_ = file_stats.st_size;
 
     // Get number of pages to allocate from file size and truncate memory
-    pages_allocated_ = file_size_ / kPageSize + 1;
-    if (::ftruncate(file_descriptor_, kPageSize * pages_allocated_)) {
+    pages_used_ = file_size_ / kPageSize + 1;
+    if (::ftruncate(file_descriptor_, kPageSize * pages_used_)) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
         ::close(file_descriptor_);
         exit(-2);
     }
 
     // Map file to created memory location
-    file_info_ptr_ = reinterpret_cast<char *>(
-        ::mmap(NULL, file_size_, prot_perms, map_perms, file_descriptor_, 0));
+    file_info_ptr_ = reinterpret_cast<char *>(::mmap(NULL,
+                                              kPageSize * pages_used_,
+                                              prot_perms, map_perms,
+                                              file_descriptor_, 0));
     if (file_info_ptr_ == MAP_FAILED) {
         cerr << "fstream::open(): " << strerror(errno) << endl;
         ::close(file_descriptor_);
@@ -125,7 +127,7 @@ fstream& fstream::getline(string* line) {
 }
 
 fstream& fstream::put(char c) {
-    // Add character to end of file, MAY CHANGE FILE SIZE, MAKE SURE TO UPDATE                                     TODO
+    // Add character at cursor and increment cursor, MAY CHANGE FILE SIZE / PAGE COUNT, MAKE SURE TO UPDATE                         TODO
     return *this;
 }
 
