@@ -7,13 +7,12 @@ namespace mem_map {
 fstream::fstream() {
 
 }
-
-fstream::fstream(const string &filename) {
+fstream::fstream(const string &filename, std::ios_base::openmode mode) {
 
 }
 
-fstream::fstream(const string &filename, std::ios_base::openmode mode) {
-
+fstream::~fstream() {
+    close();
 }
 
 void fstream::open(const string &filename) {
@@ -49,7 +48,7 @@ fstream& fstream::getline(string* line) {
 }
 
 fstream& fstream::put(char c) {
-    
+
 }
 
-}  // end namespace mem_map
+}  // namespace mem_map

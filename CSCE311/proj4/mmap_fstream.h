@@ -28,10 +28,12 @@ class fstream {
   //   You may use default parameter values to allow following constructor to
   //   absorb this one
   //
-  explicit fstream(const string& fname);
+  // Unnecessary, constructor below has default param
+  // explicit fstream(const string& fname);
 
 
   // Creates Memory-mapped file stream obj with file name and open mode
+  // Openmode defaults to in/out permissions
   //
   //   Result of constructor can be checked with is_open
   //
@@ -39,9 +41,12 @@ class fstream {
   //     - std::ios_base::ate  (open with cursor at the end of the file)
   //     - std::ios_base::in  (open with read privileges)
   //     - std::ios_base::out  (open with write privileges)
-  //
-  fstream(const string& fname, std::ios_base::openmode mode);
+  // 
+  fstream(const string& fname,
+         std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out);
 
+  // Destructor
+  ~fstream();
 
   // Attempts to open file given by file_name
   //
@@ -122,6 +127,27 @@ class fstream {
   //  This method may increase the size of a file
   //
   fstream& put(char c);
+
+ private:
+  // File information
+  off_t cursor_ = -1;
+  off_t size_ = -1;
+  off_t size_final_ = -1;  // Updated when saving
+  string filepath_;
+  char* buffer_ptr_ = nullptr;
+  int file_descriptor_ = -1;
+
+  // Cursor controls
+  inline void IncrementCursor(off_t amount) {
+    cursor_ += amount;
+    if (cursor_ > size_final_)
+      size_final_ = cursor_;
+  }
+  inline void SetCursor(off_t location) {
+    cursor_ = location;
+    if (cursor_ > size_final_)
+      size_final_ = cursor_;
+  }
 };
 
 }  // namespace mem_map
