@@ -22,6 +22,8 @@ using std::ios_base;
 
 namespace mem_map {
 
+const int kPageSize = 4096;    // 4KB = 1 Page
+
 class fstream {
  public:
   // Creates Memory-mapped file stream obj with file name and open mode
@@ -112,19 +114,16 @@ class fstream {
   fstream& put(char c);
 
  private:
-  // File and position information
+  // File, cursor, and page information
   string filename_;
   ios_base::openmode open_mode_;
   int file_descriptor_;           // File descriptor for memory location.
   off_t cursor_;                  // Current offset in memory representing file.
   off_t file_size_;               // Can change, must be updated accordingly.
+  int pages_allocated_;
   bool is_open_;
   bool end_of_file_;
   char* file_info_ptr_;           // Buffer holding file information.
-
-  // Page info
-  const int page_size_ = 4096;    // 4KB = 1 Page
-  int pages_allocated_;
 };
 
 }  // namespace mem_map
