@@ -1,6 +1,6 @@
 # Program 4 - Implement Custom fstream Interface
 
-**mmap_fstream.cc / mmap_fstream.h**  
+**mmap_fstream.cc / mmap_fstream.h:**  
 Provides functionality for the fstream interface, including the ability to:
 - Open files (creating a new file if it doesn't exist)
 - Read from and write to open files
