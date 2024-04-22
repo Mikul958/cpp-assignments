@@ -112,7 +112,7 @@ void fstream::close() {
     ::close(file_descriptor_);
 
     // Reset all data members to defaults
-    // Only is_open_ should matter, but better safe than sorry!
+    // Only is_open_ and eof_ should matter, but better safe than sorry!
     filename_ = "";
     open_mode_ = ios_base::in | ios_base::out;
     file_descriptor_ = -1;
@@ -121,7 +121,7 @@ void fstream::close() {
     pages_used_ = -1;
     mem_size_ = -1;
     is_open_ = false;
-    end_of_file_ = false;
+    end_of_file_ = true;
     file_info_ptr_ = nullptr;
 }
 
