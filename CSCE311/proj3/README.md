@@ -23,7 +23,7 @@ Includes:
 - shared_mem.h
 - calculate.h
 
-**shared_mem.h**  
+**shared_mem.h:**  
 Contains structure of shared memory location, as well as hard-coded values related to shared memory and semaphores shared by the client and server.
 
 **calculate.cc / calculate.h:**  
