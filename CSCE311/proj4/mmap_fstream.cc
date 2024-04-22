@@ -184,7 +184,7 @@ fstream& fstream::put(char c) {
         pages_used_++;
         int new_size = kPageSize * pages_used_;
 
-        // Truncate file to a new size and remap memory with an extra page
+        // Truncate file and remap memory to updated size 
         ::ftruncate(file_descriptor_, new_size);
         file_info_ptr_ = reinterpret_cast<char *>(
             ::mremap(file_info_ptr_, mem_size_, new_size, MREMAP_MAYMOVE));
