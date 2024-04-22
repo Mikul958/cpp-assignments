@@ -33,9 +33,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
 
     // Set permissions based on openmode's in/out portions
     // Note: variables track S_..., PROT_... and MAP_... respectively
-    int s_perms = 0;
-    int prot_perms = 0;
-    int map_perms = 0;
+    int s_perms = 0, prot_perms = 0, map_perms = 0;
     if ((mode & ios_base::in) != 0) {
         s_perms = s_perms | S_IRUSR | S_IRGRP;
         prot_perms = prot_perms | PROT_READ;
