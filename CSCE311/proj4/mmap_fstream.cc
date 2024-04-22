@@ -31,7 +31,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     if (is_open_ || filepath == "")
         return;
 
-    // Set permissions based on openmode's in/out portions
+    // Set open permissions based on openmode's in/out portions
     // Note: variables track S_..., PROT_... and MAP_... respectively
     int s_perms = 0, prot_perms = 0, map_perms = 0;
     if ((mode & ios_base::in) != 0) {
@@ -45,8 +45,8 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
         map_perms = MAP_SHARED;
     }
 
+    // Open the file as specified path and store file descriptor
     // Note: O_CREAT allows file to be created if it doesn't already exist
-    // MEMORY MAP OPEN FILE
     file_descriptor_ = ::open(filepath.c_str(), O_CREAT | O_RDWR, s_perms);
     if (file_descriptor_ == -1) {
         // Note: perror appends strerror(errno) + '\n' and writes to stderr
@@ -63,7 +63,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     pages_used_ = file_size_ / kPageSize + 1;
     mem_size_ = kPageSize * pages_used_;
 
-    // ALLOCATE FILE MEMORY
+    // Set the size of the file in memory map
     if (::ftruncate(file_descriptor_, mem_size_)) {
         ::perror("fstream::open() - Failed to set the size of file in map");
         ::close(file_descriptor_);
@@ -95,7 +95,7 @@ void fstream::close() {
     if (!is_open_)
         return;
 
-    // SAVE TO DISK
+    // Save file information in memory map back to disk
     if (::msync(file_info_ptr_, file_size_, MS_SYNC) == -1)
         ::perror("fstream::close() - Failed to write file to disk");
 
@@ -141,7 +141,7 @@ char fstream::get() {
     if (!is_open_ || end_of_file_)
         return '\0';
 
-    // READ FROM FILE
+    // Get the character at the cursor and update cursor/EoF state
     char next = file_info_ptr_[cursor_];
     cursor_++;
     if (cursor_ >= file_size_)
@@ -173,7 +173,7 @@ fstream& fstream::put(char c) {
     if (!is_open_)
         return *this;
 
-    // WRITE TO FILE
+    // Replace character at cursor with c and update cursor/EoF state
     file_info_ptr_[cursor_] = c;
     cursor_++;
     file_size_ = cursor_;
