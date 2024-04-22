@@ -2,10 +2,6 @@
 
 #include <proj4/mmap_fstream.h>
 
-#include <iostream>                                                                                  // TODO use some c equivalent for this instead
-using std::cout;
-using std::cerr;
-using std::endl;
 
 namespace mem_map {
 
@@ -56,7 +52,8 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     // MEMORY MAP OPEN FILE
     file_descriptor_ = ::open(filepath.c_str(), O_CREAT | O_RDWR, open_perms);
     if (file_descriptor_ == -1) {
-        cerr << "fstream::open(): " << strerror(errno) << endl;
+        // Note: perror appends strerror(errno) + '\n' and writes to stderr
+        ::perror("fstream::open() - Failed to open file");
         return;
     }
 
@@ -71,7 +68,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
 
     // ALLOCATE FILE MEMORY
     if (::ftruncate(file_descriptor_, mem_size_)) {
-        cerr << "fstream::open(): " << strerror(errno) << endl;
+        ::perror("fstream::open() - Failed to set the size of file in map");
         ::close(file_descriptor_);
         return;
     }
@@ -80,7 +77,7 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     file_info_ptr_ = reinterpret_cast<char *>(
         ::mmap(NULL, mem_size_, prot_perms, map_perms, file_descriptor_, 0));
     if (file_info_ptr_ == MAP_FAILED) {
-        cerr << "fstream::open(): " << strerror(errno) << endl;
+        ::perror("fstream::open() - Failed to map file to memory");
         ::close(file_descriptor_);
         return;
     }
@@ -103,15 +100,15 @@ void fstream::close() {
 
     // SAVE TO DISK
     if (::msync(file_info_ptr_, file_size_, MS_SYNC) == -1)
-        cerr << "fstream::close(): " << strerror(errno) << endl;
+        ::perror("fstream::close() - Failed to write file to disk");
 
     // Unmap the file from memory
     if (::munmap(file_info_ptr_, kPageSize * pages_used_) == -1)
-        cerr << "fstream::close(): " << strerror(errno) << endl;
+        ::perror("fstream::close() - Filed to unmap file from memory");
 
     // Truncate the file that was just written to and close
     if (::ftruncate(file_descriptor_, file_size_))
-        cerr << "fstream::close(): " << strerror(errno) << endl;
+        ::perror("fstream::close() - Failed to set the size of file on disk");
     ::close(file_descriptor_);
 
     // Reset all data members to defaults
@@ -196,7 +193,7 @@ fstream& fstream::put(char c) {
             ::mremap(file_info_ptr_, mem_size_, new_size, MREMAP_MAYMOVE));
 
         if (file_info_ptr_ == MAP_FAILED) {
-            cerr << "fstream::put(): " << strerror(errno) << endl;
+            ::perror("fstream::put() - Failed to grow max size of file in map");
             close();
             return *this;
         }

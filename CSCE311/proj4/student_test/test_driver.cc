@@ -1,7 +1,8 @@
 // Copyright 2024 Michael Pikula
 //
-// Extensive personal test for Project 4 using custom fstream object
-// Must be moved into parent proj4 with makefile directory to work
+// Large-scale personal test for Project 4 using custom fstream object
+// Not submitted with rest of project, must be moved into parent proj4
+// with makefile directory to work
 //
 
 #include <proj4/mmap_fstream.h>
@@ -57,6 +58,7 @@ int main(int argc, char* argv[]) {
     string message = argv[3];
     for (char c : message)
         my_fstream.put(c);
+    my_fstream.put('\n');
     
     return 0;
 }
