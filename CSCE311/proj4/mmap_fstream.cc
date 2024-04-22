@@ -31,26 +31,25 @@ void fstream::open(const string &filepath, ios_base::openmode mode) {
     if (is_open_ || filepath == "")
         return;
 
-    // Initalize permissions (S_..., PROT_..., and MAP_... respectively)
-    int open_perms = 0;
+    // Set permissions based on openmode's in/out portions
+    // Note: variables track S_..., PROT_... and MAP_... respectively
+    int s_perms = 0;
     int prot_perms = 0;
     int map_perms = 0;
-
-    // Check openmode's in/out and update permissions
     if ((mode & ios_base::in) != 0) {
-        open_perms = open_perms | S_IRUSR | S_IRGRP;
+        s_perms = s_perms | S_IRUSR | S_IRGRP;
         prot_perms = prot_perms | PROT_READ;
         map_perms = MAP_PRIVATE;
     }
     if ((mode & ios_base::out) != 0) {
-        open_perms = open_perms | S_IWUSR | S_IWGRP;
+        s_perms = s_perms | S_IWUSR | S_IWGRP;
         prot_perms = prot_perms | PROT_WRITE;
         map_perms = MAP_SHARED;
     }
 
     // Note: O_CREAT allows file to be created if it doesn't already exist
     // MEMORY MAP OPEN FILE
-    file_descriptor_ = ::open(filepath.c_str(), O_CREAT | O_RDWR, open_perms);
+    file_descriptor_ = ::open(filepath.c_str(), O_CREAT | O_RDWR, s_perms);
     if (file_descriptor_ == -1) {
         // Note: perror appends strerror(errno) + '\n' and writes to stderr
         ::perror("fstream::open() - Failed to open file");
