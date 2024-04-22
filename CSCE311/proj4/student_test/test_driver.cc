@@ -2,7 +2,7 @@
 //
 // Large-scale personal test for Project 4 using custom fstream object
 // Not submitted with rest of project, must be moved into parent proj4
-// with makefile directory to work
+// directory with makefile to work
 //
 
 #include <proj4/mmap_fstream.h>
