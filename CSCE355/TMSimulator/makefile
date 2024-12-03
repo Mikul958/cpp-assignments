@@ -23,7 +23,7 @@ tm_simulator : turing_machine.o tape.o
 
 # Compile turing_machine.cc, ensuring both turing_machine.cc and turing_machine.h exist
 turing_machine.o : turing_machine.cc turing_machine.h
-	$(compile) $@ $^
+	$(compile) $@ $<
 
 # Compile tape.cc, ensuring both tape.cc and tape.h exist
 tape.o : tape.cc tape.h
