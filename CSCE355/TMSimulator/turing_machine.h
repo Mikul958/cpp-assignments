@@ -3,15 +3,16 @@
 #ifndef _TURINGMACHINE_H_
 #define _TURINGMACHINE_H_
 
+#include "tape.h"
+
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <fstream>          // Using ifstream to read files
 
 using std::string;
 using std::vector;
 using std::unordered_map;
-
-#include "Tape.h"
 
 // Transition associated with a specific state and input
 struct Transition {
@@ -29,11 +30,18 @@ struct State {
 class TuringMachine
 {
     public:
-        explicit TuringMachine(string);
+        bool Initialize(string);
+        bool ReadInputs(string);
+        
+        bool Run();
 
     private:
         vector<State> states;
         Tape tape;
+
+        bool isTransducer;
+        vector<string> inputs;   // List of whole input strings
+        vector<string> results;  // List of tests on each input string
 };
 
 #endif  // _TURINGMACHINE_H_

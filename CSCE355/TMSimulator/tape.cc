@@ -48,18 +48,3 @@ void Tape::printTape()
 
     std::cout << output << std::endl;
 }
-
-// FOR TESTING ONLY;
-int main(int argc, char* argv[])
-{
-    Tape t;
-
-    for (int i=1; i < argc; i++) {
-        if (argv[i][2] == 'L')
-            t.goLeft(argv[i][0]);
-        else
-            t.goRight(argv[i][0]);
-    }
-
-    t.printTape();
-}
