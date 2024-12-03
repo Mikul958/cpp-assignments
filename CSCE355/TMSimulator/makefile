@@ -12,31 +12,24 @@ compile = g++ $(flags) -c -o
 # Link to executable
 link = g++ $(flags) -o
 
-# all : calculate clean
 
-# Link main.o and calculator.o to one executable file
-#calculate : calculate.o main.o
-#	$(link) $@ $^
+# Create tm_simulator executable and clean .o files
+all : tm_simulator clean
 
-# Compile main.cc to .o, ensuring it exists
-#main.o : main.cc
-#	$(compile) $@ $<
-
-
-
-# Use for testing tape
-tape: tape.o
+# Create tm_simulator executable
+tm_simulator : turing_machine.o tape.o
 	$(link) $@ $^
 
+
+# Compile turing_machine.cc, ensuring both turing_machine.cc and turing_machine.h exist
+turing_machine.o : turing_machine.cc turing_machine.h
+	$(compile) $@ $^
 
 # Compile tape.cc, ensuring both tape.cc and tape.h exist
 tape.o : tape.cc tape.h
 	$(compile) $@ $<
 
-# Use cpplint on all source files (will not work on Windows)
-#lint : calculate.cc calculate.h main.cc
-#	cpplint --root=$(path) $^
 
-# Removes intermediary .o files
+# Remove intermediary .o files
 clean:
 	$(RM) *.o
