@@ -5,7 +5,7 @@
 #include <iostream>
 
 // Initialize all states of Turing machine using given TM text file
-bool TuringMachine::Initialize(string filename)
+bool TuringMachine::LoadTM(string filename)
 {
     // Open file using ifstream
     std::ifstream file(filename.c_str());
@@ -25,7 +25,7 @@ bool TuringMachine::Initialize(string filename)
 }
 
 // Simulate Turing machine using given input text file
-bool TuringMachine::ReadInputs(string filename)
+bool TuringMachine::LoadInputs(string filename)
 {
     // Open file using ifstream
     std::ifstream file(filename.c_str());
@@ -64,6 +64,6 @@ bool TuringMachine::Run()
 
 int main() {
     TuringMachine m;
-    m.ReadInputs("data/wwr_input.txt");
+    m.LoadInputs("data/wwr_input.txt");
 }
 

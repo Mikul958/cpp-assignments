@@ -4,10 +4,10 @@
 #define _TAPE_H_
 
 #include <vector>
-
-// TODO remove later
-#include <iostream>
 #include <string>
+
+using std::vector;
+using std::string;
 
 const char kBlank = '\037';
 
@@ -20,12 +20,13 @@ class Tape
         void goLeft(char);
         void goRight(char);
 
-        void printTape();
+        void resetTape();
+        string getContents();
 
     private:
         int head;                 // Index of head
         int tapeSize;             // Running size of tape
-        std::vector<char> tape;   // Tape with initial length
+        vector<char> tape;        // Contents of tape
 };
 
 #endif  // _TAPE_H_

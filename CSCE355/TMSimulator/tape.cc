@@ -5,9 +5,7 @@
 // Add initial element to tape vector and set head and tapeSize
 Tape::Tape()
 {
-    head = 0;
-    tapeSize = 1;
-    tape.push_back(kBlank);
+    resetTape();
 }
 
 // Mark current cell with new symbol and move left
@@ -35,16 +33,21 @@ void Tape::goRight(char newSymbol)
     }
 }
 
-// FOR TESTING ONLY; prints all contents of tape
-void Tape::printTape()
-{
-    std::string output = "";
-    for (int i=0; i < tapeSize; i++) {
-        if (tape[i] == kBlank)
-            output += "_";
-        else
-            output += tape[i];
-    }
+// Resets (or initializes) tape
+void Tape::resetTape() {
+    tape.clear();
+    head = 0;
+    tapeSize = 1;
+    tape.push_back(kBlank);
+}
 
-    std::cout << output << std::endl;
+// Returns contents right of current head until first blank on tape
+string Tape::getContents()
+{
+    string output = "";
+    while (head < tapeSize && tape[head] != kBlank) {
+        output += tape[head];
+        head++;
+    }
+    return output;
 }
