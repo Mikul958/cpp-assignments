@@ -1,6 +1,6 @@
 // Copyright 2024 Michael Pikula
 
-#include "Tape.h"
+#include "tape.h"
 
 // Add initial element to tape vector and set head and tapeSize
 Tape::Tape()
