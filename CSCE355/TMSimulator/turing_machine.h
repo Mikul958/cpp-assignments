@@ -78,6 +78,7 @@ class TuringMachine
         // Returned to main
         vector<string> inputs;   // List of whole input strings
         vector<string> results;  // List of test results for each input string
+        int fileLine;            // Tracks line of open file, used for error tracking
         string error;            // Contains Turing Machine error, if applicable
 };
 

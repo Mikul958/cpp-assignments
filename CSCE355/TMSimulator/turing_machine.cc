@@ -30,8 +30,10 @@ bool TuringMachine::loadTuringMachine(string filename)
 
     // LINE 0: Check first uncommented line reads "TM"
     cleanLine(&currentLine);
-    if (currentLine != "TM")
+    if (currentLine != "TM") {
+        this->error = "file header reads \"" + currentLine + "\", expected \"TM\"";
         return false;
+    }
 
     // LINE 1: Add empty states to TM hash map
     std::getline(file, currentLine);
@@ -117,12 +119,15 @@ bool TuringMachine::loadInputs(string filename)
         return false;
     }
 
-    // Get and clean first line of file
+    // Read lines until all comments are skipped
     string currentLine;
-    std::getline(file, currentLine);
-    cleanLine(&currentLine);
+    while (std::getline(file, currentLine)) {
+        if (currentLine.substr(0, 2) != "//")
+            break;
+    }
 
     // Check first line to ensure file is an input file and check simulation type
+    cleanLine(&currentLine);
     if (currentLine == "Recognizer") {
         this->isTransducer = false;
     }
