@@ -301,7 +301,7 @@ int main(int argc, char* argv[])
     
     // Load Turing Machine and inputs
     TuringMachine simulator;
-    if (!simulator.loadTM(argv[1])); {
+    if (!simulator.loadTM(argv[1])) {
         cout << "turing_machine.cc::TuringMachine::loadTM(): " << simulator.getError() << endl;
         return -2;
     }
@@ -311,7 +311,7 @@ int main(int argc, char* argv[])
     }
 
     // Run Turing Machine
-    if (!simulator.run()); {
+    if (!simulator.run()) {
         cout << "turing_machine.cc::TuringMachine::run(): " << simulator.getError() << endl;
         return -4;
     }
