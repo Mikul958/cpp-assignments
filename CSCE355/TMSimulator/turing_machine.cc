@@ -38,7 +38,7 @@ bool TuringMachine::loadTM(string filename)
     vector<string> tokens = split(currentLine, ',');
     for (string name : tokens) {
         struct State newState = {name};     // Create new State with name of current string
-        stateList.insert({name, newState});
+        this->stateList.insert({name, newState});
     }
 
     // LINE 2: Read in input alphabet (sigma)
@@ -47,7 +47,7 @@ bool TuringMachine::loadTM(string filename)
 
     tokens = split(currentLine, ',');
     for (string symbol : tokens)
-        sigma.push_back(symbol.front());
+        this->sigma.push_back(symbol.front());
 
     // LINE 3: Read in tape alphabet (gamma)
     std::getline(file, currentLine);
@@ -55,17 +55,17 @@ bool TuringMachine::loadTM(string filename)
     
     tokens = split(currentLine, ',');
     for (string symbol : tokens)
-        gamma.push_back(symbol.front());
+        this->gamma.push_back(symbol.front());
 
     // LINE 4: Set initial state
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    initialState = currentLine;
+    this->initialState = currentLine;
 
     // LINE 5: Set blank symbol
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    tape.setBlank(currentLine.front());
+    this->tape.setBlank(currentLine.front());
 
     // LINE 6: Get list of final states and set all existing states as such
     std::getline(file, currentLine);
@@ -73,14 +73,14 @@ bool TuringMachine::loadTM(string filename)
 
     vector<string> finalStates = split(currentLine, ',');
     for (string name : finalStates)
-        stateList[name].isFinal = true;
+        this->stateList[name].isFinal = true;
 
-    // LINE 7+: Read deltas and set up transitions (current state name, input, next state name, char to write, head direction)
+    // LINE 7+: Read in deltas and add transitions to states; delta = (currentState, input, nextState, toWrite, direction)
     while (std::getline(file, currentLine)) {
         cleanLine(&currentLine);
         vector<string> delta = split(currentLine, ',');
 
-        // These are necessary for readability, it sucks otherwise
+        // Retrieve information as correct data types from split delta
         string currentName = delta[0];
         char input = delta[1].front();
         string nextName = delta[2];
@@ -89,7 +89,7 @@ bool TuringMachine::loadTM(string filename)
 
         // Create new transition and add at specified state + input
         struct Transition newTransition = {nextName, toWrite, headRight};
-        stateList[currentName].transitions.insert({input, newTransition});
+        this->stateList[currentName].transitions.insert({input, newTransition});
 
         // TODO return false if input is not part of tape alphabet
     }
@@ -116,16 +116,16 @@ bool TuringMachine::loadInputs(string filename)
 
     // Check first line to ensure file is an input file and check simulation type
     if (currentLine == "Recognizer")
-        isTransducer = false;
+        this->isTransducer = false;
     else if (currentLine == "Transducer")
-        isTransducer = true;
+        this->isTransducer = true;
     else
         return false;
 
     // Load inputs and close file
     while (std::getline(file, currentLine)) {
         cleanLine(&currentLine);
-        inputs.push_back(currentLine);
+        this->inputs.push_back(currentLine);
 
         // TODO return false if string contains char not in input alphabet
     }
@@ -139,39 +139,39 @@ bool TuringMachine::loadInputs(string filename)
  */
 bool TuringMachine::run()
 {
-    for (string inputString : inputs)
+    for (string inputString : this->inputs)
     {
         // Reset all ephemeral properties
-        currentState = initialState;
-        tape.resetTape(inputString);  // Reset tape and load current input string onto it
-        isAccepting = false;
+        this->currentState = initialState;
+        this->tape.resetTape(inputString);   // Reset tape and load current input string onto it
+        this->isAccepting = false;
 
         // Process tape inputs until halt accept or reject
         while (true)
         {
             // Test to see if current state is final, halt accept if yes
-            if (stateList[currentState].isFinal) {
-                isAccepting = true;
+            if (this->stateList[this->currentState].isFinal) {
+                this->isAccepting = true;
                 break;
             }
             
             // Get current state from hash map using its name, then get its transition table
-            unordered_map<char, struct Transition> transitions = stateList[currentState].transitions;
+            unordered_map<char, struct Transition> transitions = this->stateList[this->currentState].transitions;
 
             // Get tape input at TM head and check if it is in state's transition table, reject if not
-            char input = tape.getAtHead();
+            char input = this->tape.getAtHead();
             if (transitions.find(input) == transitions.end())
                 break;
 
             // Get transition for the given input and process
-            currentState = transitions[input].nextState;
+            this->currentState = transitions[input].nextState;
             if (transitions[input].goRight)
-                tape.goRight(transitions[input].write);
+                this->tape.goRight(transitions[input].write);
             else
-                tape.goLeft(transitions[input].write);
+                this->tape.goLeft(transitions[input].write);
         }
         // Process result and add to results vector
-        if (isTransducer)
+        if (this->isTransducer)
             addResultTransducer();
         else
             addResult();
@@ -184,10 +184,10 @@ bool TuringMachine::run()
  */
 void TuringMachine::addResult()
 {
-    if (isAccepting)
-        results.push_back("accept");
+    if (this->isAccepting)
+        this->results.push_back("accept");
     else
-        results.push_back("reject");
+        this->results.push_back("reject");
 }
 
 /**
@@ -195,7 +195,7 @@ void TuringMachine::addResult()
  */
 void TuringMachine::addResultTransducer()
 {
-    results.push_back(tape.transduce());
+    this->results.push_back(tape.transduce());
 }
 
 /**
@@ -232,19 +232,19 @@ vector<string> TuringMachine::split(string line, char delim)
 // TODO do we need?
 vector<string> TuringMachine::getInputs()
 {
-    return inputs;
+    return this->inputs;
 }
 
 // TODO do we need?
 vector<string> TuringMachine::getResults()
 {
-    return results;
+    return this->results;
 }
 
 // TODO do we need?
 string TuringMachine::getError()
 {
-    return error;
+    return this->error;
 }
 
 /**
