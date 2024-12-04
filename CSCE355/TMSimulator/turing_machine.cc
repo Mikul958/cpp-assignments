@@ -3,6 +3,8 @@
 #include "turing_machine.h"
 
 #include <iostream>
+using std::cout;
+using std::endl;
 
 /**
  * Initializes states, alphabet, and blank symbol of Turing Machine using given TM text file
@@ -280,23 +282,43 @@ vector<string> TuringMachine::getResults()
     return results;
 }
 
+// TODO do we need?
+string TuringMachine::getError()
+{
+    return error;
+}
+
 /**
  * Runs a Turing Machine simulation given two files containing TM info and inputs, respectively
  */
-int main()
+int main(int argc, char* argv[])
 {
-    // Initialize simulator and load files
+    // Validate usage
+    if (argc != 3) {
+        cout << "\n\tusage: ./tm_simulator <turing machine file> <input file>\n" << endl;
+        return -1;
+    }
+    
+    // Load Turing Machine and inputs
     TuringMachine simulator;
-    simulator.loadTM("data/wwr_tm.txt");
-    simulator.loadInputs("data/wwr_input.txt");
+    if (!simulator.loadTM(argv[1])); {
+        cout << "turing_machine.cc::TuringMachine::loadTM(): " << simulator.getError() << endl;
+        return -2;
+    }
+    if (!simulator.loadInputs(argv[2])) {
+        cout << "turing_machine.cc::TuringMachine::loadInputs(): " << simulator.getError() << endl;
+        return -3;
+    }
 
-    // Run
-    simulator.run();
+    // Run Turing Machine
+    if (!simulator.run()); {
+        cout << "turing_machine.cc::TuringMachine::run(): " << simulator.getError() << endl;
+        return -4;
+    }
 
     // Print results
     for (size_t i=0; i < simulator.getResults().size(); i++)
-    {
-        std::cout << simulator.getInputs()[i] << " - " << simulator.getResults()[i] << std::endl;
-    }
-}
+        cout << simulator.getInputs()[i] << " - " << simulator.getResults()[i] << endl;
 
+    return 0;
+}

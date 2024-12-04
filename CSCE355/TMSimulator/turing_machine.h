@@ -45,6 +45,7 @@ class TuringMachine
 
         vector<string> getInputs();
         vector<string> getResults();
+        string getError();
 
     private:
         // Ephemeral info, reset with each run
@@ -62,6 +63,7 @@ class TuringMachine
         // Returned to main
         vector<string> inputs;   // List of whole input strings
         vector<string> results;  // List of tests on each input string
+        string error;            // Contains Turing Machine error, if applicable
 };
 
 #endif  // _TURINGMACHINE_H_
