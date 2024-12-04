@@ -78,7 +78,7 @@ bool TuringMachine::loadTM(string filename)
         char input = delta[1].front();
         string nextName = delta[2];
         char toWrite = delta[3].front();
-        bool headRight = (delta[4] == "R" ? true : false);
+        bool headRight = (delta[4] == "R");
 
         // Create new transition and add at specified state + input
         struct Transition newTransition = {nextName, toWrite, headRight};
@@ -153,8 +153,11 @@ bool TuringMachine::loadInputs(string filename)
 // Runs the Turing machine simulation for each input string and stores the results
 bool TuringMachine::run()
 {
-    for (string inputString : inputs)
+    // for (string inputString : inputs)
+    for (int i=0; i < 1; i++)
     {
+        string inputString = inputs[i];
+        
         // Reset all ephemeral properties
         currentState = initialState;
         tape.resetTape();
