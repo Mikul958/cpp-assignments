@@ -12,7 +12,7 @@ using std::endl;
  * @param filename Path of a text file containing Turing Machine info (Ex. data/wwr_tm.txt)
  * @return true if load successful, false otherwise
  */
-bool TuringMachine::loadTM(string filename)
+bool TuringMachine::loadTuringMachine(string filename)
 {
     // Open file using ifstream
     std::ifstream file(filename.c_str());
@@ -260,8 +260,8 @@ int main(int argc, char* argv[])
     
     // Load Turing Machine and inputs
     TuringMachine simulator;
-    if (!simulator.loadTM(argv[1])) {
-        cout << "turing_machine.cc::TuringMachine::loadTM(): " << simulator.getError() << endl;
+    if (!simulator.loadTuringMachine(argv[1])) {
+        cout << "turing_machine.cc::TuringMachine::loadTuringMachine(): " << simulator.getError() << endl;
         return -2;
     }
     if (!simulator.loadInputs(argv[2])) {

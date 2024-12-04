@@ -48,7 +48,7 @@ struct State
 class TuringMachine
 {
     public:
-        bool loadTM(string);
+        bool loadTuringMachine(string);
         bool loadInputs(string);
         
         bool run();
