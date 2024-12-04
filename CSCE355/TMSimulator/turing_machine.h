@@ -71,8 +71,8 @@ class TuringMachine
         // TM properties, persist between runs
         bool isTransducer;
         string initialState;
-        vector<char> sigma;                      // Input alphabet, used to ensure input strings are valid
-        vector<char> gamma;                      // Tape alphabet, used to ensure all transition inputs are valid
+        string sigma;                            // String containing input alphabet, used to ensure input strings are valid
+        string gamma;                            // String containing tape alphabet, used to ensure all transition inputs are valid
         unordered_map<string, State> stateList;  // Hash table mapping a state's name to itself
 
         // Returned to main

@@ -16,8 +16,10 @@ bool TuringMachine::loadTuringMachine(string filename)
 {
     // Open file using ifstream
     std::ifstream file(filename.c_str());
-    if (!file.is_open())
+    if (!file.is_open()) {
+        this->error = "path \"" + filename + "\' not found";
         return false;
+    }
 
     // Read lines until all comments are skipped
     string currentLine;
@@ -106,8 +108,10 @@ bool TuringMachine::loadInputs(string filename)
 {
     // Open file using ifstream
     std::ifstream file(filename.c_str());
-    if (!file.is_open())
+    if (!file.is_open()) {
+        this->error = "path \"" + filename + "\' not found";
         return false;
+    }
 
     // Get and clean first line of file
     string currentLine;
@@ -115,19 +119,29 @@ bool TuringMachine::loadInputs(string filename)
     cleanLine(&currentLine);
 
     // Check first line to ensure file is an input file and check simulation type
-    if (currentLine == "Recognizer")
+    if (currentLine == "Recognizer") {
         this->isTransducer = false;
-    else if (currentLine == "Transducer")
+    }
+    else if (currentLine == "Transducer") {
         this->isTransducer = true;
-    else
+    }
+    else {
+        this->error = "test type not recognized (expected \"Recognizer\" or \"Transducer\", actual \"" + currentLine + "\")";
         return false;
+    }
 
     // Load inputs and close file
     while (std::getline(file, currentLine)) {
         cleanLine(&currentLine);
         this->inputs.push_back(currentLine);
 
-        // TODO return false if string contains char not in input alphabet
+        // Abort if input string contains a character not in input alphabet
+        for (char input : currentLine) {
+            if (sigma.find(input) == string::npos) {
+                this->error = "found input character \'" + string(1, input) + "\' not in input alphabet specified by Turing Machine";
+                return false;
+            }
+        }
     }
     file.close();
     return true;
@@ -255,24 +269,24 @@ int main(int argc, char* argv[])
     // Validate usage
     if (argc != 3) {
         cout << "\n\tusage: ./tm_simulator <turing machine file> <input file>\n" << endl;
-        return -1;
+        return 1;
     }
     
     // Load Turing Machine and inputs
     TuringMachine simulator;
     if (!simulator.loadTuringMachine(argv[1])) {
-        cout << "turing_machine.cc::TuringMachine::loadTuringMachine(): " << simulator.getError() << endl;
-        return -2;
+        cout << "\n\tturing_machine.cc::TuringMachine::loadTuringMachine(): " << simulator.getError() << "\n" << endl;
+        return 2;
     }
     if (!simulator.loadInputs(argv[2])) {
-        cout << "turing_machine.cc::TuringMachine::loadInputs(): " << simulator.getError() << endl;
-        return -3;
+        cout << "\n\tturing_machine.cc::TuringMachine::loadInputs(): " << simulator.getError() << "\n" << endl;
+        return 3;
     }
 
     // Run Turing Machine
     if (!simulator.run()) {
-        cout << "turing_machine.cc::TuringMachine::run(): " << simulator.getError() << endl;
-        return -4;
+        cout << "\n\tturing_machine.cc::TuringMachine::run(): " << simulator.getError() << "\n" << endl;
+        return 4;
     }
 
     // Print results
