@@ -81,6 +81,10 @@ bool TuringMachine::loadTuringMachine(string filename)
     while (std::getline(file, currentLine)) {
         cleanLine(&currentLine);
         vector<string> delta = split(currentLine, ',');
+        if (delta.size() != 5) {
+            this->error = "Found delta of size " + std::to_string(delta.size()) + ", expected 5";  // TODO get line number
+            return false;
+        }
 
         // Retrieve information as correct data types from split delta
         string currentName = delta[0];
@@ -243,22 +247,33 @@ vector<string> TuringMachine::split(string line, char delim)
     return output;
 }
 
-// TODO do we need?
+/**
+ * Gets vector containing simulation inputs. Indices match those of TuringMachine->results
+ * @return TuringMachine->inputs
+ */
 vector<string> TuringMachine::getInputs()
 {
     return this->inputs;
 }
 
-// TODO do we need?
+/**
+ * Gets vector containing simulation results. Indices match those of TuringMachine->inputs
+ * @return TuringMachine->results
+ */
 vector<string> TuringMachine::getResults()
 {
     return this->results;
 }
 
-// TODO do we need?
+/**
+ * Gets Turing Machine error stored in TuringMachine->error
+ * @return error description as red text
+ */
 string TuringMachine::getError()
 {
-    return this->error;
+    const string COLOR_RED = "\u001B[31m";
+    const string COLOR_RESET = "\u001B[0m";
+    return COLOR_RED + this->error + COLOR_RESET;
 }
 
 /**
