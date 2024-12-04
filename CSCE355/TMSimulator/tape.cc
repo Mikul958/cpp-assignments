@@ -2,13 +2,6 @@
 
 #include "tape.h"
 
-// Add initial element to tape vector and set head and tapeSize
-Tape::Tape()
-{
-    blank = '_';  // Default blank symbol, changed later during TM initialization
-    resetTape();
-}
-
 // Sets the tape's blank symbol to the specified character
 void Tape::setBlank(char newBlank)
 {

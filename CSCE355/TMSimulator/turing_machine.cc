@@ -261,8 +261,8 @@ int main()
 {
     // Initialize simulator and load files
     TuringMachine simulator;
-    simulator.loadTM("data/reverse_trans_tm.txt");
-    simulator.loadInputs("data/reverse_trans_input.txt");
+    simulator.loadTM("data/wwr_tm.txt");
+    simulator.loadInputs("data/wwr_input.txt");
 
     // Run
     simulator.run();

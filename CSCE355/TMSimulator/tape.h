@@ -13,7 +13,6 @@ using std::string;
 class Tape
 {
     public:
-        explicit Tape();
         void setBlank(char);
 
         void resetTape(string = "");
