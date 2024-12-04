@@ -60,6 +60,7 @@ class TuringMachine
 
         vector<string> getInputs();
         vector<string> getResults();
+        int getFileLine();
         string getError();
 
     private:

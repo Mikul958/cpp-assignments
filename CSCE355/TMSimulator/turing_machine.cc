@@ -15,6 +15,7 @@ using std::endl;
 bool TuringMachine::loadTuringMachine(string filename)
 {
     // Open file using ifstream
+    this->fileLine = 0;
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
         this->error = "path \"" + filename + "\' not found";
@@ -24,11 +25,12 @@ bool TuringMachine::loadTuringMachine(string filename)
     // Read lines until all comments are skipped
     string currentLine;
     while (std::getline(file, currentLine)) {
+        fileLine++;
         if (currentLine.substr(0, 2) != "//")
             break;
     }
 
-    // LINE 0: Check first uncommented line reads "TM"
+    // LINE 0: Check first uncommented line reads "TM"                TODO figure out how to make file line start at 0, off by one atm
     cleanLine(&currentLine);
     if (currentLine != "TM") {
         this->error = "file header reads \"" + currentLine + "\", expected \"TM\"";
@@ -38,6 +40,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 1: Add empty states to TM hash map
     std::getline(file, currentLine);
     cleanLine(&currentLine);
+    this->fileLine++;
 
     vector<string> tokens = split(currentLine, ',');
     for (string name : tokens) {
@@ -48,6 +51,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 2: Read in input alphabet (sigma)
     std::getline(file, currentLine);
     cleanLine(&currentLine);
+    this->fileLine++;
 
     tokens = split(currentLine, ',');
     for (string symbol : tokens)
@@ -56,6 +60,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 3: Read in tape alphabet (gamma)
     std::getline(file, currentLine);
     cleanLine(&currentLine);
+    this->fileLine++;
     
     tokens = split(currentLine, ',');
     for (string symbol : tokens)
@@ -64,16 +69,19 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 4: Set initial state
     std::getline(file, currentLine);
     cleanLine(&currentLine);
+    this->fileLine++;
     this->initialState = currentLine;
 
     // LINE 5: Set blank symbol
     std::getline(file, currentLine);
     cleanLine(&currentLine);
+    this->fileLine++;
     this->tape.setBlank(currentLine.front());
 
     // LINE 6: Get list of final states and set all existing states as such
     std::getline(file, currentLine);
     cleanLine(&currentLine);
+    this->fileLine++;
 
     vector<string> finalStates = split(currentLine, ',');
     for (string name : finalStates)
@@ -82,6 +90,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 7+: Read in deltas and add transitions to states; delta = (currentState, input, nextState, toWrite, direction)
     while (std::getline(file, currentLine)) {
         cleanLine(&currentLine);
+        this->fileLine++;
         vector<string> delta = split(currentLine, ',');
         if (delta.size() != 5) {
             this->error = "Found delta of size " + std::to_string(delta.size()) + ", expected 5";  // TODO get line number
@@ -113,6 +122,7 @@ bool TuringMachine::loadTuringMachine(string filename)
 bool TuringMachine::loadInputs(string filename)
 {
     // Open file using ifstream
+    this->fileLine = 0;
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
         this->error = "path \"" + filename + "\' not found";
@@ -122,6 +132,7 @@ bool TuringMachine::loadInputs(string filename)
     // Read lines until all comments are skipped
     string currentLine;
     while (std::getline(file, currentLine)) {
+        this->fileLine++;
         if (currentLine.substr(0, 2) != "//")
             break;
     }
@@ -141,6 +152,7 @@ bool TuringMachine::loadInputs(string filename)
 
     // Load inputs and close file
     while (std::getline(file, currentLine)) {
+        this->fileLine++;
         cleanLine(&currentLine);
         this->inputs.push_back(currentLine);
 
@@ -271,6 +283,15 @@ vector<string> TuringMachine::getResults()
 }
 
 /**
+ * Gets last read line number of the last file opened
+ * @return File line number, starting at 1
+ */
+int TuringMachine::getFileLine()
+{
+    return this->fileLine;
+}
+
+/**
  * Gets Turing Machine error stored in TuringMachine->error
  * @return error description as red text
  */
@@ -295,11 +316,13 @@ int main(int argc, char* argv[])
     // Load Turing Machine and inputs
     TuringMachine simulator;
     if (!simulator.loadTuringMachine(argv[1])) {
-        cout << "\n\tturing_machine.cc::TuringMachine::loadTuringMachine(): " << simulator.getError() << "\n" << endl;
+        cout << "\n\tturing_machine.cc::TuringMachine::loadTuringMachine(): "
+             << argv[1] << ", line " << simulator.getFileLine() << ": " << simulator.getError() << "\n" << endl;
         return 2;
     }
     if (!simulator.loadInputs(argv[2])) {
-        cout << "\n\tturing_machine.cc::TuringMachine::loadInputs(): " << simulator.getError() << "\n" << endl;
+        cout << "\n\tturing_machine.cc::TuringMachine::loadInputs(): "
+             << argv[2] << ", line " << simulator.getFileLine() << ": " << simulator.getError() << "\n" << endl;
         return 3;
     }
 
