@@ -45,6 +45,9 @@ class TuringMachine
         Tape tape;                               // Tape that the TM will use
 
         bool isTransducer;
+        vector<char> sigma;       // Input alphabet, used to ensure input strings are valid
+        vector<char> gamma;       // Tape alphabet, used to ensure all transition inputs are valid
+
         vector<string> inputs;   // List of whole input strings
         vector<string> results;  // List of tests on each input string
 };

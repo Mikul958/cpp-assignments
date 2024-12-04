@@ -28,21 +28,27 @@ bool TuringMachine::loadTM(string filename)
     std::getline(file, currentLine);
     cleanLine(&currentLine);
 
-    vector<string> newStates = split(currentLine, ',');
-    for (string name : newStates) {
-        struct State newState = {name};    // Create new State with name of current string
+    vector<string> tokens = split(currentLine, ',');
+    for (string name : tokens) {
+        struct State newState = {name};     // Create new State with name of current string
         stateList.insert({name, newState});
     }
 
-    // LINE 2: Do we need input alphabet?
+    // LINE 2: Read in input alphabet (sigma)
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    // TODO
 
-    // LINE 3: Do we need tape alphabet?
+    tokens = split(currentLine, ',');
+    for (string symbol : tokens)
+        sigma.push_back(symbol.front());
+
+    // LINE 3: Read in tape alphabet (gamma)
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    // TODO
+    
+    tokens = split(currentLine, ',');
+    for (string symbol : tokens)
+        gamma.push_back(symbol.front());
 
     // LINE 4: Set initial state
     std::getline(file, currentLine);
@@ -52,7 +58,7 @@ bool TuringMachine::loadTM(string filename)
     // LINE 5: Set blank symbol
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    tape.setBlank(currentLine[0]);
+    tape.setBlank(currentLine.front());
 
     // LINE 6: Get list of final states and set all existing states as such
     std::getline(file, currentLine);
@@ -79,8 +85,18 @@ bool TuringMachine::loadTM(string filename)
         stateList[currentName].transitions.insert({input, newTransition});
     }
 
-    /*
+
+
+    // TEST EVERYTHING
     std::cout << "LOADED TURING MACHINE:\n-----------------------" << std::endl;
+    std::cout << "INPUT ALPHABET: ";
+    for (char c : sigma)
+        std::cout << c << ", ";
+    std::cout << "\nTAPE ALPHABET: ";
+    for (char c : gamma)
+        std::cout << c << ", ";
+    std::cout << std::endl;
+
     for (auto statePair : stateList) {
         std::cout << "STATE: " << statePair.first << std::endl;
         std::cout << "\tName: " << statePair.second.name << std::endl;
@@ -93,8 +109,9 @@ bool TuringMachine::loadTM(string filename)
             std::cout << "\t\t\tDirection: " << (transitionPair.second.goRight ? "Right" : "Left") << std::endl;
         }
     }
-    std::cout << "INITIAL STATE: " << currentState << std::endl;
-    */
+    std::cout << "INITIAL STATE: " << currentState << "\n----------------------------------------------------" << std::endl;
+    
+
 
     return true;
 }
@@ -126,6 +143,16 @@ bool TuringMachine::loadInputs(string filename)
         inputs.push_back(currentLine);
     }
     file.close();
+
+
+
+    // TEST EVERYTHING
+    std::cout << "LOADED INPUTS:" << std::endl;
+    for (string s : inputs)
+        std::cout << " - " << s << std::endl;
+
+
+
     return true;
 }
 
@@ -142,7 +169,7 @@ void TuringMachine::cleanLine(string * line)
         line->pop_back();
 }
 
-// Takes in a file line and splits at the specified delimiter, ignoring whitespace and parenthesis
+// Takes in a file line and splits at the specified delimiter, ignoring whitespace and parentheses
 vector<string> TuringMachine::split(string line, char delim)
 {
     vector<string> output;

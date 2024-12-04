@@ -22,7 +22,7 @@ class Tape
         void resetTape();
         string getContents();
 
-    private:
+    private:        
         int head;                 // Index of head
         int tapeSize;             // Running size of tape
         char blank;               // Blank character specified by TM file
