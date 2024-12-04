@@ -6,6 +6,7 @@
 using std::cout;
 using std::endl;
 
+
 /**
  * Initializes states, alphabet, and blank symbol of Turing Machine using given TM text file
  * @param filename Path of a text file containing Turing Machine info (Ex. data/wwr_tm.txt)
@@ -93,34 +94,6 @@ bool TuringMachine::loadTM(string filename)
         // TODO return false if input is not part of tape alphabet
     }
 
-
-
-    // TEST EVERYTHING
-    std::cout << "LOADED TURING MACHINE:\n-----------------------" << std::endl;
-    std::cout << "INPUT ALPHABET: ";
-    for (char c : sigma)
-        std::cout << c << ", ";
-    std::cout << "\nTAPE ALPHABET: ";
-    for (char c : gamma)
-        std::cout << c << ", ";
-    std::cout << std::endl;
-
-    for (auto statePair : stateList) {
-        std::cout << "STATE: " << statePair.first << std::endl;
-        std::cout << "\tName: " << statePair.second.name << std::endl;
-        std::cout << "\tisFinal: " << (statePair.second.isFinal ? "Yes" : "No") << std::endl;
-        std::cout << "\tTRANSITIONS:" << std::endl;
-        for (auto transitionPair : statePair.second.transitions) {
-            std::cout << "\t\tON INPUT: " << transitionPair.first << std::endl;
-            std::cout << "\t\t\tNext: " << transitionPair.second.nextState << std::endl;
-            std::cout << "\t\t\tWrite: " << transitionPair.second.write << std::endl;
-            std::cout << "\t\t\tDirection: " << (transitionPair.second.goRight ? "Right" : "Left") << std::endl;
-        }
-    }
-    std::cout << "INITIAL STATE: " << initialState << "\n----------------------------------------------------" << std::endl;
-    
-
-
     return true;
 }
 
@@ -173,36 +146,22 @@ bool TuringMachine::run()
         tape.resetTape(inputString);  // Reset tape and load current input string onto it
         isAccepting = false;
 
-        std::cout << "Processing input string: " << inputString << std::endl;
-
-        // Process each input in input string
+        // Process tape inputs until halt accept or reject
         while (true)
         {
-            // Get current state from list using its name and accept if it is final
+            // Test to see if current state is final, halt accept if yes
             if (stateList[currentState].isFinal) {
                 isAccepting = true;
                 break;
             }
             
-            // Get current state from hash map based on its name, then get its transition table
+            // Get current state from hash map using its name, then get its transition table
             unordered_map<char, struct Transition> transitions = stateList[currentState].transitions;
 
             // Get tape input at TM head and check if it is in state's transition table, reject if not
             char input = tape.getAtHead();
             if (transitions.find(input) == transitions.end())
                 break;
-
-
-
-            // TESTING PRINT
-            std::cout << "\tINPUT:" << input << std::endl;
-            std::cout << "\t\tCurrent State: " << currentState << std::endl;
-            std::cout << "\t\tCurrent Input:" << input << std::endl;
-            std::cout << "\t\t\tNext State:" << transitions[input].nextState << std::endl;
-            std::cout << "\t\t\tWriting:" << transitions[input].write << std::endl;
-            std::cout << "\t\t\tHead Going: " << (transitions[input].goRight ? "right" : "left") << std::endl;
-
-
 
             // Get transition for the given input and process
             currentState = transitions[input].nextState;

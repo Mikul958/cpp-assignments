@@ -9,7 +9,11 @@
 using std::vector;
 using std::string;
 
-// Class representing the tape of a turing machine
+
+/**
+ * Class representing the tape and head of a Turing Machine
+ * @author Michael Pikula
+ */
 class Tape
 {
     public:
@@ -17,7 +21,7 @@ class Tape
 
         void resetTape(string = "");
         char getAtHead();
-        
+
         void goLeft(char);
         void goRight(char);
 

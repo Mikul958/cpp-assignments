@@ -14,22 +14,37 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
-// Transition associated with a specific state and input
+
+/**
+ * Transition associated with a specific state and input
+ * @param nextState String; name of the state this transition leads to
+ * @param write Char; Symbol to write on tape at head before it moves
+ * @param goRight Bool; direction for head to move - true for right, false for left
+ */
 struct Transition
 {
-    string nextState;  // Name of the State this transition will go to.
-    char write;        // Symbol to write before head moves
-    bool goRight;      // Direction for head to move; false for left, true for right
+    string nextState;
+    char write;
+    bool goRight;
 };
 
-// State in a Turing machine, containing a name and set of transitions
+/**
+ * State of a turing machine
+ * @param name String; name of this state
+ * @param isFinal Bool; true if this state is accepting
+ * @param transitions unordered_map<char, Transition>; hash table mapping a character input to a transition
+ */
 struct State
 {
-    string name;                                  // Name of state as given in text file
+    string name;
     bool isFinal = false;
-    unordered_map<char, struct Transition> transitions;  // Hash table mapping a character input to its transition
+    unordered_map<char, struct Transition> transitions;
 };
 
+/**
+ * Class representing a Turing Machine; simulates Turing Machine tests given info and input files
+ * @author Michael Pikula
+ */
 class TuringMachine
 {
     public:
@@ -62,7 +77,7 @@ class TuringMachine
 
         // Returned to main
         vector<string> inputs;   // List of whole input strings
-        vector<string> results;  // List of tests on each input string
+        vector<string> results;  // List of test results for each input string
         string error;            // Contains Turing Machine error, if applicable
 };
 

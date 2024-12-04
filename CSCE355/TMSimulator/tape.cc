@@ -2,6 +2,7 @@
 
 #include "tape.h"
 
+
 /**
  * Sets the symbol the tape recognizes as blank to the specified character
  * @param newBlank Character to use as blank symbol
