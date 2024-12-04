@@ -6,6 +6,13 @@
 Tape::Tape()
 {
     resetTape();
+    blank = '_';  // Default blank symbol, changed later during TM initialization
+}
+
+// Sets the tape's blank symbol to the specified character
+void Tape::setBlank(char newBlank)
+{
+    blank = newBlank;
 }
 
 // Mark current cell with new symbol and move left
@@ -13,9 +20,9 @@ void Tape::goLeft(char newSymbol)
 {   
     tape[head--] = newSymbol;
 
-    // Add blank symbol to left of tape if left boundary is crossed
+    // Add blank symbol at new head location if left boundary is crossed
     if (head < 0) {
-        tape.insert(tape.begin(), kBlank);
+        tape.insert(tape.begin(), blank);
         head = 0;
         tapeSize++;
     }
@@ -26,9 +33,9 @@ void Tape::goRight(char newSymbol)
 {
     tape[head++] = newSymbol;
 
-    // Add blank symbol to right of tape if right boundary is crossed
+    // Add blank symbol at new head location if right boundary is crossed
     if (head >= tapeSize) {
-        tape.push_back(kBlank);
+        tape.push_back(blank);
         tapeSize++;
     }
 }
@@ -38,14 +45,14 @@ void Tape::resetTape() {
     tape.clear();
     head = 0;
     tapeSize = 1;
-    tape.push_back(kBlank);
+    tape.push_back(blank);
 }
 
 // Returns contents right of current head until first blank on tape
 string Tape::getContents()
 {
     string output = "";
-    while (head < tapeSize && tape[head] != kBlank) {
+    while (head < tapeSize && tape[head] != blank) {
         output += tape[head];
         head++;
     }

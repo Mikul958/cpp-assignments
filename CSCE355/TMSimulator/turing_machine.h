@@ -16,30 +16,33 @@ using std::unordered_map;
 
 // Transition associated with a specific state and input
 struct Transition {
-    char write;       // Symbol to write before head moves
-    bool headRight;   // Direction for head to move; false for left, true for right
     string next;      // Name of the State this transition will go to.
+    char write;       // Symbol to write before head moves
+    bool goRight;     // Direction for head to move; false for left, true for right
 };
 
 // State in a Turing machine, containing a name and set of transitions
 struct State {
     string name;                                  // Name of state as given in text file
+    bool isFinal = false;
     unordered_map<char, Transition> transitions;  // Hash table mapping a character input to its transition
-    bool isFinal;
 };
 
 class TuringMachine
 {
     public:
-        bool LoadTM(string);
-        bool LoadInputs(string);
+        bool loadTM(string);
+        bool loadInputs(string);
         
-        bool Run();
+        bool run();
+
+        void cleanLine(string*);
+        vector<string> split(string, char);
 
     private:
-        unordered_map<string, State> states;  // Hash table mapping a state's name to itself
-        string currentState;                  // Name of the current state
-        Tape tape;                            // Tape that the TM will use
+        unordered_map<string, State> stateList;  // Hash table mapping a state's name to itself
+        string currentState;                     // Name of the current state
+        Tape tape;                               // Tape that the TM will use
 
         bool isTransducer;
         vector<string> inputs;   // List of whole input strings

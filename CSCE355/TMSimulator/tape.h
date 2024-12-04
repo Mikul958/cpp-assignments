@@ -9,13 +9,12 @@
 using std::vector;
 using std::string;
 
-const char kBlank = '\037';
-
 // Class representing the tape of a turing machine
 class Tape
 {
     public:
         explicit Tape();
+        void setBlank(char);
 
         void goLeft(char);
         void goRight(char);
@@ -26,6 +25,7 @@ class Tape
     private:
         int head;                 // Index of head
         int tapeSize;             // Running size of tape
+        char blank;               // Blank character specified by TM file
         vector<char> tape;        // Contents of tape
 };
 
