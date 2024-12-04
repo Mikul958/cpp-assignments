@@ -4,7 +4,11 @@
 
 #include <iostream>
 
-// Initialize all states of Turing machine using given TM text file, returns true if successful
+/**
+ * Initializes states, alphabet, and blank symbol of Turing Machine using given TM text file
+ * @param filename Path of a text file containing Turing Machine info (Ex. data/wwr_tm.txt)
+ * @return true if load successful, false otherwise
+ */
 bool TuringMachine::loadTM(string filename)
 {
     // Open file using ifstream
@@ -118,7 +122,11 @@ bool TuringMachine::loadTM(string filename)
     return true;
 }
 
-// Load inputs using given input text file, returns true if successful
+/**
+ * Loads test type and all input strings from the given input text file
+ * @param filename Path of a text file containing input info (Ex. data/wwr_input.txt)
+ * @return true if load successful, false otherwise
+ */
 bool TuringMachine::loadInputs(string filename)
 {
     // Open file using ifstream
@@ -150,7 +158,10 @@ bool TuringMachine::loadInputs(string filename)
     return true;
 }
 
-// Runs the Turing machine simulation for each input string and stores the results
+/**
+ * Simulates a Turing Machine test for all input strings
+ * @return true if tests finish normally, false otherwise
+ */
 bool TuringMachine::run()
 {
     for (string inputString : inputs)
@@ -203,14 +214,13 @@ bool TuringMachine::run()
             addResultTransducer();
         else
             addResult();
-
-        std::cout << "Resulting Tape: " << tape.getWholeTape() << std::endl;
     }
-
     return true;
 }
 
-// Adds result to results vector for recognizer tests
+/**
+ * Adds result of current test to results vector for recognizer test ("accept" or "reject")
+ */
 void TuringMachine::addResult()
 {
     if (isAccepting)
@@ -219,20 +229,29 @@ void TuringMachine::addResult()
         results.push_back("reject");
 }
 
-// Adds result to results vector for transducer tests
+/**
+ * Adds result of current test to results vector for transducer test (contents of tape from head to first blank, moving right)
+ */
 void TuringMachine::addResultTransducer()
 {
     results.push_back(tape.transduce());
 }
 
-// Takes in a file line and cleans the carriage return (\r) if it exists
+/**
+ * Takes in a file line and removes the trailing carriage return (\r) if it exists
+ * @param line A reference to a read-in file line
+ */
 void TuringMachine::cleanLine(string * line)
 {
     if (line->back() == '\r')
         line->pop_back();
 }
 
-// Takes in a file line and splits at the specified delimiter, ignoring whitespace and parentheses
+/**
+ * Takes in a string and splits it at the specified delimiter, cleaning spaces and parentheses
+ * @param line The file line being split
+ * @param delim The delimiter that the string is being split along
+ */
 vector<string> TuringMachine::split(string line, char delim)
 {
     vector<string> output;
@@ -249,14 +268,21 @@ vector<string> TuringMachine::split(string line, char delim)
     return output;
 }
 
-vector<string> TuringMachine::getInputs() {
+// TODO do we need?
+vector<string> TuringMachine::getInputs()
+{
     return inputs;
 }
 
-vector<string> TuringMachine::getResults() {
+// TODO do we need?
+vector<string> TuringMachine::getResults()
+{
     return results;
 }
 
+/**
+ * Runs a Turing Machine simulation given two files containing TM info and inputs, respectively
+ */
 int main()
 {
     // Initialize simulator and load files

@@ -2,13 +2,20 @@
 
 #include "tape.h"
 
-// Sets the tape's blank symbol to the specified character
+/**
+ * Sets the symbol the tape recognizes as blank to the specified character
+ * @param newBlank Character to use as blank symbol
+ */
 void Tape::setBlank(char newBlank)
 {
     blank = newBlank;
 }
 
 // Resets tape, and, optionally loads an input string onto it
+/**
+ * Clears the tape and resets tracking information, then loads the provided string onto the tape
+ * @param toLoad Input string to load onto the tape; empty by default
+ */
 void Tape::resetTape(string toLoad)
 {
     head = 0;
@@ -16,17 +23,25 @@ void Tape::resetTape(string toLoad)
     tape.clear();
     tape.push_back(blank);
 
+    // Write new input string to tape and reset head back to start
     for (char input : toLoad)
         goRight(input);
     head = 0;
 }
 
+/**
+ * Gets the character on the tape at the Turing Machine head
+ * @return Character at head's location
+ */
 char Tape::getAtHead()
 {
     return tape[head];
 }
 
-// Mark current cell with new symbol and move left
+/**
+ * Marks the current tape cell and moves the head to the left, adding more space if needed
+ * @param newSymbol Character to mark the current cell with
+ */
 void Tape::goLeft(char newSymbol)
 {   
     tape[head--] = newSymbol;
@@ -39,7 +54,10 @@ void Tape::goLeft(char newSymbol)
     }
 }
 
-// Mark current cell with new symbol and move right
+/**
+ * Marks the current tape cell and moves the head to the right, adding more space if needed
+ * @param newSymbol Character to mark the current cell with
+ */
 void Tape::goRight(char newSymbol)
 {
     tape[head++] = newSymbol;
@@ -51,7 +69,10 @@ void Tape::goRight(char newSymbol)
     }
 }
 
-// Returns contents to right of current head until first blank on tape
+/**
+ * Returns the output of a transducer test as a string
+ * @return A string containing all contents of the tape from the head to the first blank, moving right
+ */
 string Tape::transduce()
 {
     string output = "";
@@ -59,13 +80,5 @@ string Tape::transduce()
         output += tape[head];
         head++;
     }
-    return output;
-}
-
-string Tape::getWholeTape()
-{
-    string output;
-    for (char c : tape)
-        output += c;
     return output;
 }

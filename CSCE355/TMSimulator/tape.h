@@ -17,11 +17,11 @@ class Tape
 
         void resetTape(string = "");
         char getAtHead();
+        
         void goLeft(char);
         void goRight(char);
 
         string transduce();
-        string getWholeTape();
 
     private:        
         int head;                 // Index of head
