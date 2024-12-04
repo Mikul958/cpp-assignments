@@ -153,22 +153,19 @@ bool TuringMachine::loadInputs(string filename)
 // Runs the Turing machine simulation for each input string and stores the results
 bool TuringMachine::run()
 {
-    // for (string inputString : inputs)
-    for (int i=0; i < 1; i++)
+    for (string inputString : inputs)
     {
-        string inputString = inputs[i];
-        
         // Reset all ephemeral properties
         currentState = initialState;
-        tape.resetTape();
+        tape.resetTape(inputString);  // Reset tape and load current input string onto it
         isAccepting = false;
 
         std::cout << "Processing input string: " << inputString << std::endl;
 
         // Process each input in input string
-        for (char input : inputString)
+        while (true)
         {
-            // Get current state from list using its name and halt if it is final
+            // Get current state from list using its name and accept if it is final
             if (stateList[currentState].isFinal) {
                 isAccepting = true;
                 break;
@@ -177,7 +174,8 @@ bool TuringMachine::run()
             // Get current state from hash map based on its name, then get its transition table
             unordered_map<char, struct Transition> transitions = stateList[currentState].transitions;
 
-            // Check if given input is in state's transition table, reject if not
+            // Get tape input at TM head and check if it is in state's transition table, reject if not
+            char input = tape.getAtHead();
             if (transitions.find(input) == transitions.end())
                 break;
 
@@ -263,8 +261,8 @@ int main()
 {
     // Initialize simulator and load files
     TuringMachine simulator;
-    simulator.loadTM("data/wwr_tm.txt");
-    simulator.loadInputs("data/wwr_input.txt");
+    simulator.loadTM("data/reverse_trans_tm.txt");
+    simulator.loadInputs("data/reverse_trans_input.txt");
 
     // Run
     simulator.run();

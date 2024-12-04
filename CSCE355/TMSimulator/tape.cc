@@ -5,14 +5,32 @@
 // Add initial element to tape vector and set head and tapeSize
 Tape::Tape()
 {
-    resetTape();
     blank = '_';  // Default blank symbol, changed later during TM initialization
+    resetTape();
 }
 
 // Sets the tape's blank symbol to the specified character
 void Tape::setBlank(char newBlank)
 {
     blank = newBlank;
+}
+
+// Resets tape, and, optionally loads an input string onto it
+void Tape::resetTape(string toLoad)
+{
+    head = 0;
+    tapeSize = 1;
+    tape.clear();
+    tape.push_back(blank);
+
+    for (char input : toLoad)
+        goRight(input);
+    head = 0;
+}
+
+char Tape::getAtHead()
+{
+    return tape[head];
 }
 
 // Mark current cell with new symbol and move left
@@ -38,14 +56,6 @@ void Tape::goRight(char newSymbol)
         tape.push_back(blank);
         tapeSize++;
     }
-}
-
-// Resets (or initializes) tape
-void Tape::resetTape() {
-    tape.clear();
-    head = 0;
-    tapeSize = 1;
-    tape.push_back(blank);
 }
 
 // Returns contents to right of current head until first blank on tape

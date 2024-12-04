@@ -16,10 +16,11 @@ class Tape
         explicit Tape();
         void setBlank(char);
 
+        void resetTape(string = "");
+        char getAtHead();
         void goLeft(char);
         void goRight(char);
 
-        void resetTape();
         string transduce();
         string getWholeTape();
 
