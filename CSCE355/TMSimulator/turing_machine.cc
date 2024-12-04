@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-// Initialize all states of Turing machine using given TM text file
+// Initialize all states of Turing machine using given TM text file, returns true if successful
 bool TuringMachine::loadTM(string filename)
 {
     // Open file using ifstream
@@ -53,7 +53,7 @@ bool TuringMachine::loadTM(string filename)
     // LINE 4: Set initial state
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    currentState = currentLine;
+    initialState = currentLine;
 
     // LINE 5: Set blank symbol
     std::getline(file, currentLine);
@@ -83,6 +83,8 @@ bool TuringMachine::loadTM(string filename)
         // Create new transition and add at specified state + input
         struct Transition newTransition = {nextName, toWrite, headRight};
         stateList[currentName].transitions.insert({input, newTransition});
+
+        // TODO return false if input is not part of tape alphabet
     }
 
 
@@ -104,19 +106,19 @@ bool TuringMachine::loadTM(string filename)
         std::cout << "\tTRANSITIONS:" << std::endl;
         for (auto transitionPair : statePair.second.transitions) {
             std::cout << "\t\tON INPUT: " << transitionPair.first << std::endl;
-            std::cout << "\t\t\tNext: " << transitionPair.second.next << std::endl;
+            std::cout << "\t\t\tNext: " << transitionPair.second.nextState << std::endl;
             std::cout << "\t\t\tWrite: " << transitionPair.second.write << std::endl;
             std::cout << "\t\t\tDirection: " << (transitionPair.second.goRight ? "Right" : "Left") << std::endl;
         }
     }
-    std::cout << "INITIAL STATE: " << currentState << "\n----------------------------------------------------" << std::endl;
+    std::cout << "INITIAL STATE: " << initialState << "\n----------------------------------------------------" << std::endl;
     
 
 
     return true;
 }
 
-// Simulate Turing machine using given input text file
+// Load inputs using given input text file, returns true if successful
 bool TuringMachine::loadInputs(string filename)
 {
     // Open file using ifstream
@@ -141,25 +143,85 @@ bool TuringMachine::loadInputs(string filename)
     while (std::getline(file, currentLine)) {
         cleanLine(&currentLine);
         inputs.push_back(currentLine);
+
+        // TODO return false if string contains char not in input alphabet
     }
     file.close();
+    return true;
+}
+
+// Runs the Turing machine simulation for each input string and stores the results
+bool TuringMachine::run()
+{
+    for (string inputString : inputs)
+    {
+        // Reset all ephemeral properties
+        currentState = initialState;
+        tape.resetTape();
+        isAccepting = false;
+
+        std::cout << "Processing input string: " << inputString << std::endl;
+
+        // Process each input in input string
+        for (char input : inputString)
+        {
+            // Get current state from list using its name and halt if it is final
+            if (stateList[currentState].isFinal) {
+                isAccepting = true;
+                break;
+            }
+            
+            // Get current state from hash map based on its name, then get its transition table
+            unordered_map<char, struct Transition> transitions = stateList[currentState].transitions;
+
+            // Check if given input is in state's transition table, reject if not
+            if (transitions.find(input) == transitions.end())
+                break;
 
 
 
-    // TEST EVERYTHING
-    std::cout << "LOADED INPUTS:" << std::endl;
-    for (string s : inputs)
-        std::cout << " - " << s << std::endl;
+            // TESTING PRINT
+            std::cout << "\tINPUT:" << input << std::endl;
+            std::cout << "\t\tCurrent State: " << currentState << std::endl;
+            std::cout << "\t\tCurrent Input:" << input << std::endl;
+            std::cout << "\t\t\tNext State:" << transitions[input].nextState << std::endl;
+            std::cout << "\t\t\tWriting:" << transitions[input].write << std::endl;
+            std::cout << "\t\t\tHead Going: " << (transitions[input].goRight ? "right" : "left") << std::endl;
 
 
+
+            // Get transition for the given input and process
+            currentState = transitions[input].nextState;
+            if (transitions[input].goRight)
+                tape.goRight(transitions[input].write);
+            else
+                tape.goLeft(transitions[input].write);
+        }
+        // Process result and add to results vector
+        if (isTransducer)
+            addResultTransducer();
+        else
+            addResult();
+
+        std::cout << "Resulting Tape: " << tape.getWholeTape() << std::endl;
+    }
 
     return true;
 }
 
-bool TuringMachine::run()
+// Adds result to results vector for recognizer tests
+void TuringMachine::addResult()
 {
-    // TODO
-    return true;
+    if (isAccepting)
+        results.push_back("accept");
+    else
+        results.push_back("reject");
+}
+
+// Adds result to results vector for transducer tests
+void TuringMachine::addResultTransducer()
+{
+    results.push_back(tape.transduce());
 }
 
 // Takes in a file line and cleans the carriage return (\r) if it exists
@@ -186,9 +248,28 @@ vector<string> TuringMachine::split(string line, char delim)
     return output;
 }
 
-int main() {
-    TuringMachine m;
-    m.loadTM("data/wwr_tm.txt");
-    m.loadInputs("data/wwr_input.txt");
+vector<string> TuringMachine::getInputs() {
+    return inputs;
+}
+
+vector<string> TuringMachine::getResults() {
+    return results;
+}
+
+int main()
+{
+    // Initialize simulator and load files
+    TuringMachine simulator;
+    simulator.loadTM("data/wwr_tm.txt");
+    simulator.loadInputs("data/wwr_input.txt");
+
+    // Run
+    simulator.run();
+
+    // Print results
+    for (size_t i=0; i < simulator.getResults().size(); i++)
+    {
+        std::cout << simulator.getInputs()[i] << " - " << simulator.getResults()[i] << std::endl;
+    }
 }
 

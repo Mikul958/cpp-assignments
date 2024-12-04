@@ -48,13 +48,21 @@ void Tape::resetTape() {
     tape.push_back(blank);
 }
 
-// Returns contents right of current head until first blank on tape
-string Tape::getContents()
+// Returns contents to right of current head until first blank on tape
+string Tape::transduce()
 {
     string output = "";
     while (head < tapeSize && tape[head] != blank) {
         output += tape[head];
         head++;
     }
+    return output;
+}
+
+string Tape::getWholeTape()
+{
+    string output;
+    for (char c : tape)
+        output += c;
     return output;
 }

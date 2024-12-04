@@ -20,7 +20,8 @@ class Tape
         void goRight(char);
 
         void resetTape();
-        string getContents();
+        string transduce();
+        string getWholeTape();
 
     private:        
         int head;                 // Index of head
