@@ -49,7 +49,7 @@ class TuringMachine
 {
     public:
         // Initialize and run
-        TuringMachine(string, string);
+        explicit TuringMachine(string, string);
         bool run();
 
         // Get simulation results
@@ -79,15 +79,15 @@ class TuringMachine
         string error;              // Contains Turing Machine error, if applicable
 
 
-        // Helper functions
+        // Helper functions, grouped by purpose
+        bool loadTuringMachine(string);
+        bool loadInputs(string);
+        
         void addResult();
         void addResultTransducer();
 
         void cleanLine(string*);
         vector<string> split(string, char);
-
-        bool loadTuringMachine(string);
-        bool loadInputs(string);
 };
 
 #endif  // _TURINGMACHINE_H_
