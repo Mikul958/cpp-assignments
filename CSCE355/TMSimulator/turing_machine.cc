@@ -28,92 +28,69 @@ TuringMachine::TuringMachine(string tmFilename, string inputFilename)
  */
 bool TuringMachine::loadTuringMachine(string filename)
 {
-    // Open file using ifstream
-    int lineNumber = -1;
-    std::ifstream file(filename.c_str());
-    if (!file.is_open()) {
+    // Open tm file
+    if (!openFile(filename)) {
         this->error = "tm file \"" + filename + "\' not found";
         return false;
     }
 
-    // Read lines until all comments are skipped
-    string currentLine;
-    while (std::getline(file, currentLine)) {
-        lineNumber++;
-        if (currentLine.substr(0, 2) != "//")
+    // Read lines until all comments at top are skipped
+    while (getFileLine()) {
+        if (this->fileLine.substr(0, 2) != "//")
             break;
     }
 
     // LINE 0: Check first uncommented line reads "TM"
-    cleanLine(&currentLine);
-    if (currentLine != "TM") {
-        this->error = filename + ", line " + std::to_string(lineNumber) +
-                    ": unrecognized header \"" + currentLine + "\", expected \"TM\"";
+    if (this->fileLine != "TM") {
+        this->error = filename + ", line " + std::to_string(this->lineNumber) +
+                    ": unrecognized header \"" + fileLine + "\", expected \"TM\"";
         return false;
     }
 
     // LINE 1: Add empty states to TM hash map
-    std::getline(file, currentLine);
-    cleanLine(&currentLine);
-    lineNumber++;
-
-    vector<string> tokens = split(currentLine, ',');
+    getFileLine();
+    vector<string> tokens = split(this->fileLine, ',');
     for (string name : tokens) {
-        struct State newState = {name};     // Create new State with name of current string
-        this->stateList.insert({name, newState});
+        struct State newState = {name};             // Only initialize name for now
+        this->stateList.insert({name, newState});   // Add (name, state) pair to hash table
     }
 
     // LINE 2: Read in input alphabet (sigma)
-    std::getline(file, currentLine);
-    cleanLine(&currentLine);
-    lineNumber++;
-
-    tokens = split(currentLine, ',');
+    getFileLine();
+    tokens = split(this->fileLine, ',');
     for (string symbol : tokens)
         this->sigma.push_back(symbol.front());
 
     // LINE 3: Read in tape alphabet (gamma)
-    std::getline(file, currentLine);
-    cleanLine(&currentLine);
-    lineNumber++;
-    
-    tokens = split(currentLine, ',');
+    getFileLine();
+    tokens = split(this->fileLine, ',');
     for (string symbol : tokens)
         this->gamma.push_back(symbol.front());
 
     // LINE 4: Set initial state, ensuring it is already in state list
-    std::getline(file, currentLine);
-    cleanLine(&currentLine);
-    lineNumber++;
-
-    if (this->stateList.find(currentLine) == this->stateList.end()) {
-        this->error = filename + ", line " + std::to_string(lineNumber) +
-                    ": initial state \"" + currentLine + "\" not in state list";
+    getFileLine();
+    if (this->stateList.find(this->fileLine) == this->stateList.end()) {
+        this->error = filename + ", line " + std::to_string(this->lineNumber) +
+                    ": initial state \"" + this->fileLine + "\" not in state list";
         return false;
     }
-    this->initialState = currentLine;
+    this->initialState = this->fileLine;
 
     // LINE 5: Set blank symbol, ensuring it is already in tape alphabet
-    std::getline(file, currentLine);
-    cleanLine(&currentLine);
-    lineNumber++;
-
-    if (this->gamma.find(currentLine.front()) == string::npos) {
-        this->error = filename + ", line " + std::to_string(lineNumber) +
-                    ": blank symbol \'" + currentLine.front() + "\' not in tape alphabet";
+    getFileLine();
+    if (this->gamma.find(this->fileLine.front()) == string::npos) {
+        this->error = filename + ", line " + std::to_string(this->lineNumber) +
+                    ": blank symbol \'" + this->fileLine.front() + "\' not in tape alphabet";
         return false;
     }
-    this->tape.setBlank(currentLine.front());
+    this->tape.setBlank(this->fileLine.front());
 
     // LINE 6: Get list of final states and set all existing states as such, ensuring they are in state list
-    std::getline(file, currentLine);
-    cleanLine(&currentLine);
-    lineNumber++;
-
-    vector<string> finalStates = split(currentLine, ',');
+    getFileLine();
+    vector<string> finalStates = split(this->fileLine, ',');
     for (string name : finalStates) {
         if (this->stateList.find(name) == this->stateList.end()) {
-            this-> error = filename + ", line " + std::to_string(lineNumber) +
+            this->error = filename + ", line " + std::to_string(this->lineNumber) +
                          ": final state \"" + name + "\" not in state list";
             return false;
         }
@@ -121,12 +98,10 @@ bool TuringMachine::loadTuringMachine(string filename)
     }
 
     // LINE 7+: Read in deltas and add transitions to states; delta = (currentState, input, nextState, toWrite, direction)
-    while (std::getline(file, currentLine)) {
-        cleanLine(&currentLine);
-        lineNumber++;
-        vector<string> delta = split(currentLine, ',');
+    while (getFileLine()) {
+        vector<string> delta = split(this->fileLine, ',');
         if (delta.size() != 5) {
-            this->error = filename + ", line " + std::to_string(lineNumber) +
+            this->error = filename + ", line " + std::to_string(this->lineNumber) +
                         ": delta is of size " + std::to_string(delta.size()) + ", expected 5";
             return false;
         }
@@ -143,6 +118,7 @@ bool TuringMachine::loadTuringMachine(string filename)
         this->stateList[currentName].transitions.insert({input, newTransition});
     }
 
+    closeFile();
     return true;
 }
 
@@ -154,54 +130,46 @@ bool TuringMachine::loadTuringMachine(string filename)
 bool TuringMachine::loadInputs(string filename)
 {
     // Open file using ifstream
-    int lineNumber = -1;
-    std::ifstream file(filename.c_str());
-    if (!file.is_open()) {
+    if (!openFile(filename)) {
         this->error = "input file \"" + filename + "\' not found";
         return false;
     }
 
-    // Read lines until all comments are skipped
-    string currentLine;
-    while (std::getline(file, currentLine)) {
-        lineNumber++;
-        if (currentLine.substr(0, 2) != "//")
+    // Read lines until all comments at top are skipped
+    while (getFileLine()) {
+        if (this->fileLine.substr(0, 2) != "//")
             break;
     }
 
     // Check first line to ensure file is an input file and check simulation type
-    cleanLine(&currentLine);
-    if (currentLine == "Recognizer") {
+    if (this->fileLine == "Recognizer") {
         this->isTransducer = false;
     }
-    else if (currentLine == "Transducer") {
+    else if (this->fileLine == "Transducer") {
         this->isTransducer = true;
     }
     else {
-        this->error = filename + ", line " + std::to_string(lineNumber) +
-                      ": unrecognized test type \"" + currentLine +
+        this->error = filename + ", line " + std::to_string(this->lineNumber) +
+                      ": unrecognized test type \"" + this->fileLine +
                       "\", expected \"Recognizer\" or \"Transducer\"";
         return false;
     }
 
-    // Load inputs and close file
+    // Load inputs and close file; abort if any input string contains an illegal input
     this->inputs.clear();
-    while (std::getline(file, currentLine)) {
-        lineNumber++;
-        cleanLine(&currentLine);
-        this->inputs.push_back(currentLine);
-
-        // Abort if input string contains a character not in input alphabet
-        for (char input : currentLine) {
-            if (sigma.find(input) == string::npos) {
-                this->error = filename + ", line " + std::to_string(lineNumber) +
+    while (getFileLine()) {
+        for (char input : this->fileLine) {
+            if (this->sigma.find(input) == string::npos) {
+                this->error = filename + ", line " + std::to_string(this->lineNumber) +
                             ": found input character \'" + string(1, input) +
                             "\' not in input alphabet specified by Turing Machine";
                 return false;
             }
         }
+        this->inputs.push_back(this->fileLine);
     }
-    file.close();
+
+    closeFile();
     return true;
 }
 
@@ -226,7 +194,7 @@ bool TuringMachine::run()
         isAccepting = false;
         this->tape.resetTape(inputString);    // Reset TM tape and load new input string onto it
 
-        // Process tape inputs until halt accept or reject
+        // Process tape until TM encounters accepting/final state or dies
         while (true)
         {
             // Test to see if current state is final, halt accept if yes
@@ -238,17 +206,18 @@ bool TuringMachine::run()
             // Get current state from hash map using its name, then get its transition table
             unordered_map<char, struct Transition> transitions = this->stateList[currentState].transitions;
 
-            // Get tape input at TM head and check if it is in state's transition table, reject if not
+            // Get tape input at TM head and check if it is a key in transition table, die if no
             char input = this->tape.getAtHead();
             if (transitions.find(input) == transitions.end())
                 break;
 
-            // Get transition for the given input and process
-            currentState = transitions[input].nextState;
-            if (transitions[input].goRight)
-                this->tape.goRight(transitions[input].write);
+            // Otherwise, get transition from table and process
+            struct Transition toDo = transitions[input];
+            currentState = toDo.nextState;
+            if (toDo.goRight)
+                this->tape.goRight(toDo.write);
             else
-                this->tape.goLeft(transitions[input].write);
+                this->tape.goLeft(toDo.write);
         }
         // Process result and add to results vector
         if (this->isTransducer)
@@ -261,6 +230,7 @@ bool TuringMachine::run()
 
 /**
  * Adds result of current test to results vector for recognizer test ("accept" or "reject")
+ * @param isAccepting whether or not the simulation reached an accepting state
  */
 void TuringMachine::addResultRecognizer(bool isAccepting)
 {
@@ -280,13 +250,46 @@ void TuringMachine::addResultTransducer()
 
 
 /**
- * Takes in a file line and removes the trailing carriage return (\r) if it exists
- * @param line A reference to a read-in file line
+ * Opens the file with the given file path and stores in this->currentFile
+ * @param filename File path relative to the program directory
+ * @return true if file was successfully opened
  */
-void TuringMachine::cleanLine(string * line)
+bool TuringMachine::openFile(string filename)
 {
-    if (line->back() == '\r')
-        line->pop_back();
+    closeFile();
+    currentFile.open(filename.c_str());
+    if (!currentFile.is_open()) {
+        this->error = "tm file \"" + filename + "\' not found";
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Closes the file open at this->currentFile, if it exists
+ */
+void TuringMachine::closeFile()
+{
+    if (currentFile.is_open())
+        currentFile.close();
+    lineNumber = -1;
+}
+
+/**
+ * Wrapper for std::getline(this->currentFile, &this->fileLine); tracks line number and cleans trailing '\r' from line
+ * @return true if there was a file line available to read
+ */
+bool TuringMachine::getFileLine()
+{
+    // Check file is open and has another line to read
+    if (!currentFile.is_open() || !std::getline(this->currentFile, this->fileLine))
+        return false;
+    
+    // Clean trailing '\r' if it exists
+    lineNumber++;
+    if (fileLine.back() == '\r')
+        fileLine.pop_back();
+    return true;
 }
 
 /**

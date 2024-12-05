@@ -72,9 +72,12 @@ class TuringMachine
         vector<string> inputs;
         vector<string> results;
 
-        // Used for error detection
-        bool isOK = false;         // Has Turing Machine successfully initialized?
-        string error;              // Contains Turing Machine error, if applicable
+        // Used for file reading and error detection
+        std::ifstream currentFile;  // Current open file
+        string fileLine;            // Last-read file line
+        int lineNumber = -1;        // Line number of last-read file line
+        bool isOK = false;          // Has Turing Machine successfully initialized?
+        string error;               // Contains Turing Machine error, if applicable
 
 
         // Helper functions, grouped by purpose
@@ -84,7 +87,9 @@ class TuringMachine
         void addResultRecognizer(bool);
         void addResultTransducer();
 
-        void cleanLine(string*);
+        bool openFile(string);
+        void closeFile();
+        bool getFileLine();
         vector<string> split(string, char);
 };
 

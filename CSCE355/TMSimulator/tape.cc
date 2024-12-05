@@ -32,7 +32,7 @@ void Tape::resetTape(string toLoad)
 
 /**
  * Gets the character on the tape at the Turing Machine head
- * @return Character at head's location
+ * @return A character in the Turing Machine's tape alphabet
  */
 char Tape::getAtHead()
 {
