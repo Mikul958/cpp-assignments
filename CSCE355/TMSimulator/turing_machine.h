@@ -48,6 +48,7 @@ struct State
 class TuringMachine
 {
     public:
+        
         // Initialize and run
         explicit TuringMachine(string, string);
         bool run();
@@ -58,21 +59,18 @@ class TuringMachine
         string getError();
 
     private:
-        // Ephemeral info, reset with each run
-        string currentState;    // Name of the current state
-        Tape tape;              // Tape that the TM will use
-        bool isAccepting;
-
-        // TM properties, persist between runs
+        
+        // TM properties, loaded from file and persist
         bool isTransducer;
         string initialState;
         string sigma;                              // String containing input alphabet, used to ensure input strings are valid
         string gamma;                              // String containing tape alphabet, used to ensure all transition inputs are valid
         unordered_map<string, State> stateList;    // Hash table mapping a state's name to itself
+        Tape tape;
 
-        // Results; have accessors
-        vector<string> inputs;     // List of whole input strings
-        vector<string> results;    // List of test results for each input string
+        // Input strings and corresponding esults; have accessors
+        vector<string> inputs;
+        vector<string> results;
 
         // Used for error detection
         bool isOK = false;         // Has Turing Machine successfully initialized?
@@ -83,7 +81,7 @@ class TuringMachine
         bool loadTuringMachine(string);
         bool loadInputs(string);
         
-        void addResult();
+        void addResultRecognizer(bool);
         void addResultTransducer();
 
         void cleanLine(string*);

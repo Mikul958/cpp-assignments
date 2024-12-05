@@ -216,25 +216,27 @@ bool TuringMachine::run()
     if (!this->isOK)
         return false;
     
-    // Run test for each input string in vector
+    // Declare variables to track state and status of current run, run tests for all strings
+    string currentState;
+    bool isAccepting;
     for (string inputString : this->inputs)
     {
-        // Reset all ephemeral properties
-        this->currentState = initialState;
-        this->tape.resetTape(inputString);   // Reset tape and load current input string onto it
-        this->isAccepting = false;
+        // Initialize values for the current run
+        currentState = this->initialState;
+        isAccepting = false;
+        this->tape.resetTape(inputString);    // Reset TM tape and load new input string onto it
 
         // Process tape inputs until halt accept or reject
         while (true)
         {
             // Test to see if current state is final, halt accept if yes
-            if (this->stateList[this->currentState].isFinal) {
-                this->isAccepting = true;
+            if (this->stateList[currentState].isFinal) {
+                isAccepting = true;
                 break;
             }
             
             // Get current state from hash map using its name, then get its transition table
-            unordered_map<char, struct Transition> transitions = this->stateList[this->currentState].transitions;
+            unordered_map<char, struct Transition> transitions = this->stateList[currentState].transitions;
 
             // Get tape input at TM head and check if it is in state's transition table, reject if not
             char input = this->tape.getAtHead();
@@ -242,7 +244,7 @@ bool TuringMachine::run()
                 break;
 
             // Get transition for the given input and process
-            this->currentState = transitions[input].nextState;
+            currentState = transitions[input].nextState;
             if (transitions[input].goRight)
                 this->tape.goRight(transitions[input].write);
             else
@@ -252,7 +254,7 @@ bool TuringMachine::run()
         if (this->isTransducer)
             addResultTransducer();
         else
-            addResult();
+            addResultRecognizer(isAccepting);
     }
     return true;
 }
@@ -260,9 +262,9 @@ bool TuringMachine::run()
 /**
  * Adds result of current test to results vector for recognizer test ("accept" or "reject")
  */
-void TuringMachine::addResult()
+void TuringMachine::addResultRecognizer(bool isAccepting)
 {
-    if (this->isAccepting)
+    if (isAccepting)
         this->results.push_back("accept");
     else
         this->results.push_back("reject");
@@ -273,7 +275,7 @@ void TuringMachine::addResult()
  */
 void TuringMachine::addResultTransducer()
 {
-    this->results.push_back(tape.transduce());
+    this->results.push_back(this->tape.transduce());
 }
 
 
