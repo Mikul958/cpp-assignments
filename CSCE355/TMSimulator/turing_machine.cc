@@ -205,9 +205,10 @@ bool TuringMachine::loadInputs(string filename)
     return true;
 }
 
+
 /**
- * Simulates a Turing Machine test for all input strings
- * @return true if tests finish normally, false otherwise
+ * Simulates a Turing Machine test for all input strings.
+ * @return true if Turing Machine was successfully initialized, false otherwise
  */
 bool TuringMachine::run()
 {
@@ -275,6 +276,7 @@ void TuringMachine::addResultTransducer()
     this->results.push_back(tape.transduce());
 }
 
+
 /**
  * Takes in a file line and removes the trailing carriage return (\r) if it exists
  * @param line A reference to a read-in file line
@@ -306,6 +308,7 @@ vector<string> TuringMachine::split(string line, char delim)
     return output;
 }
 
+
 /**
  * Gets vector containing simulation inputs. Indices match those of TuringMachine->results
  * @return A copy of TuringMachine->inputs
@@ -325,15 +328,6 @@ vector<string> TuringMachine::getResults()
 }
 
 /**
- * Returns a boolean representing whether or not the Turing Machine has been initialized
- * @return true if successfully initialized, false otherwise
- */
-bool TuringMachine::getIsOK()
-{
-    return this->isOK;
-}
-
-/**
  * Gets Turing Machine error stored in TuringMachine->error
  * @return error description as red text
  */
@@ -343,6 +337,7 @@ string TuringMachine::getError()
     const string COLOR_RESET = "\u001B[0m";
     return COLOR_RED + this->error + COLOR_RESET;
 }
+
 
 /**
  * Runs a Turing Machine simulation given two files containing TM info and inputs, respectively
@@ -358,7 +353,7 @@ int main(int argc, char* argv[])
     // Initialize TuringMachine instance using tm and input files and attempt to run
     TuringMachine simulator(argv[1], argv[2]);
     if (!simulator.run()) {
-        cout << "\n\tfailed to run Turing Machine - not initialized: " << simulator.getError() << "\n" << endl;
+        cout << "\n\tFAILED TO INITIALIZE TURING MACHINE:\n\t" << simulator.getError() << "\n" << endl;
         return 3;
     }
 
