@@ -355,14 +355,8 @@ int main(int argc, char* argv[])
         return 1;
     }
     
-    // Initialize TuringMachine instance using tm and input files
+    // Initialize TuringMachine instance using tm and input files and attempt to run
     TuringMachine simulator(argv[1], argv[2]);
-    if (!simulator.getIsOK()) {
-        cout << "\n\tfailed to initialize Turing Machine: " << simulator.getError() << "\n" << endl;
-        return 2;
-    }
-
-    // Run initialized Turing Machine - error check here is extra, already covered by getIsOK()
     if (!simulator.run()) {
         cout << "\n\tfailed to run Turing Machine - not initialized: " << simulator.getError() << "\n" << endl;
         return 3;

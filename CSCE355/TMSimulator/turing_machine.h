@@ -48,24 +48,13 @@ struct State
 class TuringMachine
 {
     public:
-        // Constructor/initialization functions
+        // Initialize and run
         TuringMachine(string, string);
-        bool loadTuringMachine(string);
-        bool loadInputs(string);
-        
-        // Runtime functions
         bool run();
-        void addResult();
-        void addResultTransducer();
-
-        // Helper functions
-        void cleanLine(string*);
-        vector<string> split(string, char);
 
         // Get simulation results
         vector<string> getInputs();
         vector<string> getResults();
-        bool getIsOK();
         string getError();
 
     private:
@@ -88,6 +77,17 @@ class TuringMachine
         // Used for error detection
         bool isOK = false;         // Has Turing Machine successfully initialized?
         string error;              // Contains Turing Machine error, if applicable
+
+
+        // Helper functions
+        void addResult();
+        void addResultTransducer();
+
+        void cleanLine(string*);
+        vector<string> split(string, char);
+
+        bool loadTuringMachine(string);
+        bool loadInputs(string);
 };
 
 #endif  // _TURINGMACHINE_H_
