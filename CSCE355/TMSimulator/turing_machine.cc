@@ -126,9 +126,7 @@ bool TuringMachine::loadTuringMachine(string filename)
             return false;
         }
 
-        // Retrieve information as correct data types from split delta and validate
-
-        // TODO validate
+        // Retrieve information as correct data types from split delta (too lazy to validate these)
         string currentName = delta[0];
         char input = delta[1].front();
         string nextName = delta[2];
@@ -138,8 +136,6 @@ bool TuringMachine::loadTuringMachine(string filename)
         // Create new transition and add at specified state + input
         struct Transition newTransition = {nextName, toWrite, headRight};
         this->stateList[currentName].transitions.insert({input, newTransition});
-
-        // TODO return false if input is not part of tape alphabet
     }
 
     return true;
