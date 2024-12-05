@@ -8,24 +8,38 @@ using std::endl;
 
 
 /**
- * Initializes states, alphabet, and blank symbol of Turing Machine using given TM text file
+ * Initializes TuringMachine using LoadTuringMachine() and loadInputs()
+ * @param tmFilename File path of the file containing turing machine information
+ * @param inputFilename File path of the file containing test type and input strings
+ */
+TuringMachine::TuringMachine(string tmFilename, string inputFilename)
+{
+    if (!loadTuringMachine(tmFilename))
+        return;
+    if (!loadInputs(inputFilename))
+        return;
+    this->isOK = true;
+}
+
+/**
+ * Initializes states, alphabet, and blank symbol of Turing Machine using given TM text file.
  * @param filename Path of a text file containing Turing Machine info (Ex. data/wwr_tm.txt)
  * @return true if load successful, false otherwise
  */
 bool TuringMachine::loadTuringMachine(string filename)
 {
     // Open file using ifstream
-    this->fileLine = 0;
+    int lineNumber = -1;
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
-        this->error = "path \"" + filename + "\' not found";
+        this->error = "file \"" + filename + "\' not found";
         return false;
     }
 
     // Read lines until all comments are skipped
     string currentLine;
     while (std::getline(file, currentLine)) {
-        fileLine++;
+        lineNumber++;
         if (currentLine.substr(0, 2) != "//")
             break;
     }
@@ -33,14 +47,14 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 0: Check first uncommented line reads "TM"                TODO figure out how to make file line start at 0, off by one atm
     cleanLine(&currentLine);
     if (currentLine != "TM") {
-        this->error = "file header reads \"" + currentLine + "\", expected \"TM\"";
+        this->error = filename + ", line " + std::to_string(lineNumber) + ": file header reads \"" + currentLine + "\", expected \"TM\"";
         return false;
     }
 
     // LINE 1: Add empty states to TM hash map
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    this->fileLine++;
+    lineNumber++;
 
     vector<string> tokens = split(currentLine, ',');
     for (string name : tokens) {
@@ -51,7 +65,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 2: Read in input alphabet (sigma)
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    this->fileLine++;
+    lineNumber++;
 
     tokens = split(currentLine, ',');
     for (string symbol : tokens)
@@ -60,44 +74,61 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 3: Read in tape alphabet (gamma)
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    this->fileLine++;
+    lineNumber++;
     
     tokens = split(currentLine, ',');
     for (string symbol : tokens)
         this->gamma.push_back(symbol.front());
 
-    // LINE 4: Set initial state
+    // LINE 4: Set initial state, ensuring it is already in state list
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    this->fileLine++;
+    lineNumber++;
+
+    if (this->stateList.find(currentLine) == this->stateList.end()) {
+        this->error = filename + ", line " + std::to_string(lineNumber) + ": initial state \"" + currentLine + "\" not in state list";
+        return false;
+    }
     this->initialState = currentLine;
 
-    // LINE 5: Set blank symbol
+    // LINE 5: Set blank symbol, ensuring it is already in tape alphabet
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    this->fileLine++;
+    lineNumber++;
+
+    if (this->gamma.find(currentLine.front()) == string::npos) {
+        this->error = filename + ", line " + std::to_string(lineNumber) + ": blank symbol \'" + currentLine.front() + "\' not in tape alphabet";
+        return false;
+    }
     this->tape.setBlank(currentLine.front());
 
-    // LINE 6: Get list of final states and set all existing states as such
+    // LINE 6: Get list of final states and set all existing states as such, ensuring they are in state list
     std::getline(file, currentLine);
     cleanLine(&currentLine);
-    this->fileLine++;
+    lineNumber++;
 
     vector<string> finalStates = split(currentLine, ',');
-    for (string name : finalStates)
+    for (string name : finalStates) {
+        if (this->stateList.find(name) == this->stateList.end()) {
+            this-> error = filename + ", line " + std::to_string(lineNumber) + ": final state \"" + name + "\" not in state list";
+            return false;
+        }
         this->stateList[name].isFinal = true;
+    }
 
     // LINE 7+: Read in deltas and add transitions to states; delta = (currentState, input, nextState, toWrite, direction)
     while (std::getline(file, currentLine)) {
         cleanLine(&currentLine);
-        this->fileLine++;
+        lineNumber++;
         vector<string> delta = split(currentLine, ',');
         if (delta.size() != 5) {
-            this->error = "Found delta of size " + std::to_string(delta.size()) + ", expected 5";  // TODO get line number
+            this->error = filename + ", line " + std::to_string(lineNumber) + ": delta is of size " + std::to_string(delta.size()) + ", expected 5";
             return false;
         }
 
-        // Retrieve information as correct data types from split delta
+        // Retrieve information as correct data types from split delta and validate
+
+        // TODO validate
         string currentName = delta[0];
         char input = delta[1].front();
         string nextName = delta[2];
@@ -122,17 +153,17 @@ bool TuringMachine::loadTuringMachine(string filename)
 bool TuringMachine::loadInputs(string filename)
 {
     // Open file using ifstream
-    this->fileLine = 0;
+    int lineNumber = -1;
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
-        this->error = "path \"" + filename + "\' not found";
+        this->error = "file \"" + filename + "\' not found";
         return false;
     }
 
     // Read lines until all comments are skipped
     string currentLine;
     while (std::getline(file, currentLine)) {
-        this->fileLine++;
+        lineNumber++;
         if (currentLine.substr(0, 2) != "//")
             break;
     }
@@ -151,8 +182,9 @@ bool TuringMachine::loadInputs(string filename)
     }
 
     // Load inputs and close file
+    this->inputs.clear();
     while (std::getline(file, currentLine)) {
-        this->fileLine++;
+        lineNumber++;
         cleanLine(&currentLine);
         this->inputs.push_back(currentLine);
 
@@ -174,6 +206,11 @@ bool TuringMachine::loadInputs(string filename)
  */
 bool TuringMachine::run()
 {
+    // Abort if turing machine was not initialized
+    if (!this->isOK)
+        return false;
+    
+    // Run test for each input string in vector
     for (string inputString : this->inputs)
     {
         // Reset all ephemeral properties
@@ -266,7 +303,7 @@ vector<string> TuringMachine::split(string line, char delim)
 
 /**
  * Gets vector containing simulation inputs. Indices match those of TuringMachine->results
- * @return TuringMachine->inputs
+ * @return A copy of TuringMachine->inputs
  */
 vector<string> TuringMachine::getInputs()
 {
@@ -275,7 +312,7 @@ vector<string> TuringMachine::getInputs()
 
 /**
  * Gets vector containing simulation results. Indices match those of TuringMachine->inputs
- * @return TuringMachine->results
+ * @return A copy of TuringMachine->results
  */
 vector<string> TuringMachine::getResults()
 {
@@ -283,12 +320,12 @@ vector<string> TuringMachine::getResults()
 }
 
 /**
- * Gets last read line number of the last file opened
- * @return File line number, starting at 1
+ * Returns a boolean representing whether or not the Turing Machine has been initialized
+ * @return true if successfully initialized, false otherwise
  */
-int TuringMachine::getFileLine()
+bool TuringMachine::getIsOK()
 {
-    return this->fileLine;
+    return this->isOK;
 }
 
 /**
@@ -313,23 +350,17 @@ int main(int argc, char* argv[])
         return 1;
     }
     
-    // Load Turing Machine and inputs
-    TuringMachine simulator;
-    if (!simulator.loadTuringMachine(argv[1])) {
-        cout << "\n\tturing_machine.cc::TuringMachine::loadTuringMachine(): "
-             << argv[1] << ", line " << simulator.getFileLine() << ": " << simulator.getError() << "\n" << endl;
+    // Initialize TuringMachine instance using tm and input files
+    TuringMachine simulator(argv[1], argv[2]);
+    if (!simulator.getIsOK()) {
+        cout << "\n\tfailed to initialize Turing Machine: " << simulator.getError() << "\n" << endl;
         return 2;
     }
-    if (!simulator.loadInputs(argv[2])) {
-        cout << "\n\tturing_machine.cc::TuringMachine::loadInputs(): "
-             << argv[2] << ", line " << simulator.getFileLine() << ": " << simulator.getError() << "\n" << endl;
-        return 3;
-    }
 
-    // Run Turing Machine
+    // Run initialized Turing Machine - error check here is extra, already covered by getIsOK()
     if (!simulator.run()) {
-        cout << "\n\tturing_machine.cc::TuringMachine::run(): " << simulator.getError() << "\n" << endl;
-        return 4;
+        cout << "\n\tfailed to run Turing Machine - not initialized: " << simulator.getError() << "\n" << endl;
+        return 3;
     }
 
     // Print results
