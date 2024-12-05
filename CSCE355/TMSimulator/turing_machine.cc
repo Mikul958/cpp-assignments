@@ -44,10 +44,11 @@ bool TuringMachine::loadTuringMachine(string filename)
             break;
     }
 
-    // LINE 0: Check first uncommented line reads "TM"                TODO figure out how to make file line start at 0, off by one atm
+    // LINE 0: Check first uncommented line reads "TM"
     cleanLine(&currentLine);
     if (currentLine != "TM") {
-        this->error = filename + ", line " + std::to_string(lineNumber) + ": file header reads \"" + currentLine + "\", expected \"TM\"";
+        this->error = filename + ", line " + std::to_string(lineNumber) +
+                    ": unrecognized header \"" + currentLine + "\", expected \"TM\"";
         return false;
     }
 
@@ -86,7 +87,8 @@ bool TuringMachine::loadTuringMachine(string filename)
     lineNumber++;
 
     if (this->stateList.find(currentLine) == this->stateList.end()) {
-        this->error = filename + ", line " + std::to_string(lineNumber) + ": initial state \"" + currentLine + "\" not in state list";
+        this->error = filename + ", line " + std::to_string(lineNumber) +
+                    ": initial state \"" + currentLine + "\" not in state list";
         return false;
     }
     this->initialState = currentLine;
@@ -97,7 +99,8 @@ bool TuringMachine::loadTuringMachine(string filename)
     lineNumber++;
 
     if (this->gamma.find(currentLine.front()) == string::npos) {
-        this->error = filename + ", line " + std::to_string(lineNumber) + ": blank symbol \'" + currentLine.front() + "\' not in tape alphabet";
+        this->error = filename + ", line " + std::to_string(lineNumber) +
+                    ": blank symbol \'" + currentLine.front() + "\' not in tape alphabet";
         return false;
     }
     this->tape.setBlank(currentLine.front());
@@ -110,7 +113,8 @@ bool TuringMachine::loadTuringMachine(string filename)
     vector<string> finalStates = split(currentLine, ',');
     for (string name : finalStates) {
         if (this->stateList.find(name) == this->stateList.end()) {
-            this-> error = filename + ", line " + std::to_string(lineNumber) + ": final state \"" + name + "\" not in state list";
+            this-> error = filename + ", line " + std::to_string(lineNumber) +
+                         ": final state \"" + name + "\" not in state list";
             return false;
         }
         this->stateList[name].isFinal = true;
@@ -122,7 +126,8 @@ bool TuringMachine::loadTuringMachine(string filename)
         lineNumber++;
         vector<string> delta = split(currentLine, ',');
         if (delta.size() != 5) {
-            this->error = filename + ", line " + std::to_string(lineNumber) + ": delta is of size " + std::to_string(delta.size()) + ", expected 5";
+            this->error = filename + ", line " + std::to_string(lineNumber) +
+                        ": delta is of size " + std::to_string(delta.size()) + ", expected 5";
             return false;
         }
 
@@ -173,7 +178,9 @@ bool TuringMachine::loadInputs(string filename)
         this->isTransducer = true;
     }
     else {
-        this->error = "test type not recognized (expected \"Recognizer\" or \"Transducer\", actual \"" + currentLine + "\")";
+        this->error = filename + ", line " + std::to_string(lineNumber) +
+                      ": unrecognized test type \"" + currentLine +
+                      "\", expected \"Recognizer\" or \"Transducer\"";
         return false;
     }
 
@@ -187,7 +194,9 @@ bool TuringMachine::loadInputs(string filename)
         // Abort if input string contains a character not in input alphabet
         for (char input : currentLine) {
             if (sigma.find(input) == string::npos) {
-                this->error = "found input character \'" + string(1, input) + "\' not in input alphabet specified by Turing Machine";
+                this->error = filename + ", line " + std::to_string(lineNumber) +
+                            ": found input character \'" + string(1, input) +
+                            "\' not in input alphabet specified by Turing Machine";
                 return false;
             }
         }
