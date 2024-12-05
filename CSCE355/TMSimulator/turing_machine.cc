@@ -32,7 +32,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     int lineNumber = -1;
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
-        this->error = "file \"" + filename + "\' not found";
+        this->error = "tm file \"" + filename + "\' not found";
         return false;
     }
 
@@ -157,7 +157,7 @@ bool TuringMachine::loadInputs(string filename)
     int lineNumber = -1;
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
-        this->error = "file \"" + filename + "\' not found";
+        this->error = "input file \"" + filename + "\' not found";
         return false;
     }
 
