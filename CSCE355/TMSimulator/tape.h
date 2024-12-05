@@ -31,7 +31,7 @@ class Tape
         int head;                 // Index of head
         int tapeSize;             // Running size of tape
         char blank;               // Blank character specified by TM file
-        vector<char> tape;        // Contents of tape
+        string tape;              // Contents of tape
 };
 
 #endif  // _TAPE_H_
