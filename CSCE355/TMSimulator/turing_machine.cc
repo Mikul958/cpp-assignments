@@ -2,10 +2,6 @@
 
 #include "turing_machine.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 
 /**
  * Initializes TuringMachine using LoadTuringMachine() and loadInputs()
@@ -341,30 +337,4 @@ string TuringMachine::getError()
     const string COLOR_RED = "\u001B[31m";
     const string COLOR_RESET = "\u001B[0m";
     return COLOR_RED + this->error + COLOR_RESET;
-}
-
-
-/**
- * Runs a Turing Machine simulation given two files containing TM info and inputs, respectively
- */
-int main(int argc, char* argv[])
-{
-    // Validate usage
-    if (argc != 3) {
-        cout << "\n\tusage: ./tm_simulator <turing machine file> <input file>\n" << endl;
-        return 1;
-    }
-    
-    // Initialize TuringMachine instance using tm and input files and attempt to run
-    TuringMachine simulator(argv[1], argv[2]);
-    if (!simulator.run()) {
-        cout << "\n\tFAILED TO INITIALIZE TURING MACHINE:\n\t" << simulator.getError() << "\n" << endl;
-        return 3;
-    }
-
-    // Print results
-    for (size_t i=0; i < simulator.getResults().size(); i++)
-        cout << simulator.getInputs()[i] << " - " << simulator.getResults()[i] << endl;
-
-    return 0;
 }

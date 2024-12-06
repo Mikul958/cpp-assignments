@@ -16,10 +16,14 @@ link = g++ $(flags) -o
 # Create tm_simulator executable and clean .o files
 all : tm_simulator clean
 
-# Create tm_simulator executable
-tm_simulator : turing_machine.o tape.o
+# Create tm_simulator executable by linking all .o files
+tm_simulator : main.o turing_machine.o tape.o
 	$(link) $@ $^
 
+
+# Compile main.cc
+main.o : main.cc
+	$(compile) $@ $<
 
 # Compile turing_machine.cc, ensuring both turing_machine.cc and turing_machine.h exist
 turing_machine.o : turing_machine.cc turing_machine.h
