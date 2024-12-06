@@ -7,6 +7,9 @@ using std::cout;
 using std::endl;
 
 
+const string TEXT_RESET = "\u001B[0m";
+const string TEXT_RED = "\u001B[31m";
+
 // Main method showcasing the functionality of the TuringMachine class
 // Initializes and runs Turing Machine simulator, then prints results or errors
 int main(int argc, char* argv[])
@@ -20,7 +23,7 @@ int main(int argc, char* argv[])
     // Initialize TuringMachine instance using tm and input files and attempt to run
     TuringMachine simulator(argv[1], argv[2]);
     if (!simulator.run()) {
-        cout << "\n\tFAILED TO INITIALIZE TURING MACHINE:\n\t" << simulator.getError() << "\n" << endl;
+        cout << TEXT_RED << "<error>: " << TEXT_RESET << simulator.getError() << endl;
         return 2;
     }
 

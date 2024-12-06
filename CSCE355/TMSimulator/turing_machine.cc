@@ -26,7 +26,7 @@ bool TuringMachine::loadTuringMachine(string filename)
 {
     // Open tm file
     if (!openFile(filename)) {
-        this->error = "tm file \"" + filename + "\' not found";
+        this->error = "tm file \"" + filename + "\" not found";
         return false;
     }
 
@@ -39,7 +39,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     // LINE 0: Check first uncommented line reads "TM"
     if (this->fileLine != "TM") {
         this->error = filename + ", line " + std::to_string(this->lineNumber) +
-                    ": unrecognized header \"" + fileLine + "\", expected \"TM\"";
+                    " - unrecognized header \"" + fileLine + "\", expected \"TM\"";
         return false;
     }
 
@@ -67,7 +67,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     getFileLine();
     if (this->stateList.find(this->fileLine) == this->stateList.end()) {
         this->error = filename + ", line " + std::to_string(this->lineNumber) +
-                    ": initial state \"" + this->fileLine + "\" not in state list";
+                    " - initial state \"" + this->fileLine + "\" not in state list";
         return false;
     }
     this->initialState = this->fileLine;
@@ -76,7 +76,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     getFileLine();
     if (this->gamma.find(this->fileLine.front()) == string::npos) {
         this->error = filename + ", line " + std::to_string(this->lineNumber) +
-                    ": blank symbol \'" + this->fileLine.front() + "\' not in tape alphabet";
+                    " - blank symbol \'" + this->fileLine.front() + "\' not in tape alphabet";
         return false;
     }
     this->tape.setBlank(this->fileLine.front());
@@ -87,7 +87,7 @@ bool TuringMachine::loadTuringMachine(string filename)
     for (string name : finalStates) {
         if (this->stateList.find(name) == this->stateList.end()) {
             this->error = filename + ", line " + std::to_string(this->lineNumber) +
-                         ": final state \"" + name + "\" not in state list";
+                         " - final state \"" + name + "\" not in state list";
             return false;
         }
         this->stateList[name].isFinal = true;
@@ -98,7 +98,7 @@ bool TuringMachine::loadTuringMachine(string filename)
         vector<string> delta = split(this->fileLine, ',');
         if (delta.size() != 5) {
             this->error = filename + ", line " + std::to_string(this->lineNumber) +
-                        ": delta is of size " + std::to_string(delta.size()) + ", expected 5";
+                        " - delta is of size " + std::to_string(delta.size()) + ", expected 5";
             return false;
         }
 
@@ -127,7 +127,7 @@ bool TuringMachine::loadInputs(string filename)
 {
     // Open file using ifstream
     if (!openFile(filename)) {
-        this->error = "input file \"" + filename + "\' not found";
+        this->error = "input file \"" + filename + "\" not found";
         return false;
     }
 
@@ -146,7 +146,7 @@ bool TuringMachine::loadInputs(string filename)
     }
     else {
         this->error = filename + ", line " + std::to_string(this->lineNumber) +
-                      ": unrecognized test type \"" + this->fileLine +
+                      " - unrecognized test type \"" + this->fileLine +
                       "\", expected \"Recognizer\" or \"Transducer\"";
         return false;
     }
@@ -157,7 +157,7 @@ bool TuringMachine::loadInputs(string filename)
         for (char input : this->fileLine) {
             if (this->sigma.find(input) == string::npos) {
                 this->error = filename + ", line " + std::to_string(this->lineNumber) +
-                            ": found input character \'" + string(1, input) +
+                            " - found input character \'" + string(1, input) +
                             "\' not in input alphabet specified by Turing Machine";
                 return false;
             }
@@ -254,10 +254,8 @@ bool TuringMachine::openFile(string filename)
 {
     closeFile();
     currentFile.open(filename.c_str());
-    if (!currentFile.is_open()) {
-        this->error = "tm file \"" + filename + "\' not found";
+    if (!currentFile.is_open())
         return false;
-    }
     return true;
 }
 
@@ -329,12 +327,10 @@ vector<string> TuringMachine::getResults()
 }
 
 /**
- * Gets Turing Machine error stored in TuringMachine->error
- * @return error description as red text
+ * Gets error thrown by Turing Machine, if it exists
+ * @return error message in format (header + ": " + error)
  */
 string TuringMachine::getError()
 {
-    const string COLOR_RED = "\u001B[31m";
-    const string COLOR_RESET = "\u001B[0m";
-    return COLOR_RED + this->error + COLOR_RESET;
+    return this->error;
 }
