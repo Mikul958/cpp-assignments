@@ -6,6 +6,7 @@
 using std::cout;
 using std::endl;
 
+
 // Main method showcasing the functionality of the TuringMachine class
 // Initializes and runs Turing Machine simulator, then prints results or errors
 int main(int argc, char* argv[])
