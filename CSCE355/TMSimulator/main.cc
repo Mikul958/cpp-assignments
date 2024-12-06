@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 {
     // Validate usage
     if (argc != 3) {
-        cout << "\n\tusage: ./tm_simulator <turing machine file> <input file>\n" << endl;
+        cout << "\n\tusage: ./tm_simulator <definition file> <input file>\n" << endl;
         return 1;
     }
     

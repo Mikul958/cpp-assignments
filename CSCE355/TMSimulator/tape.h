@@ -30,7 +30,7 @@ class Tape
     private:        
         int head;                 // Index of head
         int tapeSize;             // Running size of tape
-        char blank;               // Blank character specified by TM file
+        char blank;               // Blank character specified by definition file
         string tape;              // Contents of tape
 };
 

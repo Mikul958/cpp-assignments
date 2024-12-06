@@ -5,12 +5,12 @@
 
 /**
  * Initializes TuringMachine using LoadTuringMachine() and loadInputs()
- * @param tmFilename File path of the file containing turing machine information
+ * @param definitionFilename File path of the file containing turing machine information
  * @param inputFilename File path of the file containing test type and input strings
  */
-TuringMachine::TuringMachine(string tmFilename, string inputFilename)
+TuringMachine::TuringMachine(string definitionFilename, string inputFilename)
 {
-    if (!loadTuringMachine(tmFilename))
+    if (!loadTuringMachine(definitionFilename))
         return;
     if (!loadInputs(inputFilename))
         return;
@@ -18,15 +18,15 @@ TuringMachine::TuringMachine(string tmFilename, string inputFilename)
 }
 
 /**
- * Initializes states, alphabet, and blank symbol of Turing Machine using given TM text file.
+ * Initializes states, alphabet, and blank symbol of Turing Machine using given definition file.
  * @param filename Path of a text file containing Turing Machine info (Ex. data/wwr_tm.txt)
  * @return true if load successful, false otherwise
  */
 bool TuringMachine::loadTuringMachine(string filename)
 {
-    // Open tm file
+    // Open definition file
     if (!openFile(filename)) {
-        this->error = "tm file \"" + filename + "\" not found";
+        this->error = "definition file \"" + filename + "\" not found";
         return false;
     }
 
